@@ -5,15 +5,35 @@ import { WhatsAppButton } from "./components/WhatsAppButton";
 import ScrollToTop from "./components/ScrollToTop";
 import "./globals.css";
 
+import { combinedJsonLdSchema } from "./config/schema";
+
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
 });
 
 export const metadata: Metadata = {
-  title: "HiveRift - Global Software Engineering Agency",
+  metadataBase: new URL("https://hiverift.com"),
+  title: "HiveRift - Premier Software Engineering & Digital Agency (India)",
   description:
-    "HiveRift - Global Software Engineering Agency. Delivering innovative digital solutions worldwide.",
+    "HiveRift is a premier software engineering agency in New Delhi, India. We specialize in custom web apps, mobile applications, AI/ML, and cloud solutions.",
+  alternates: {
+    canonical: "https://hiverift.com",
+    languages: {
+      "en-IN": "https://hiverift.com",
+      "en-US": "https://hiverift.us",
+      "x-default": "https://hiverift.com",
+    },
+  },
+  openGraph: {
+    title: "HiveRift - Premier Software Engineering & Digital Agency",
+    description:
+      "HiveRift delivers custom software development, mobile apps, AI/ML solutions, and digital growth services.",
+    url: "https://hiverift.com",
+    siteName: "HiveRift",
+    locale: "en_IN",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -22,7 +42,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en-IN" suppressHydrationWarning>
       <head suppressHydrationWarning>
         {/* Strip third-party extension attributes before React hydration */}
         <script
@@ -113,6 +133,16 @@ export default function RootLayout({
             })(window,document,'script','dataLayer','GTM-TQM5WMT6');
           `}
         </Script>
+
+        {/* Schema.org Structured Data (JSON-LD) - Unified Graph */}
+        <script
+          id="hiverift-schema-graph"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(combinedJsonLdSchema),
+          }}
+          suppressHydrationWarning
+        />
       </head>
 
       <body className={`antialiased ${inter.variable}`} suppressHydrationWarning>

@@ -16,7 +16,6 @@ import {
   Globe,
   Award,
   Zap,
-  Landmark,
   Sparkles,
   ArrowRight
 } from "lucide-react";
@@ -32,13 +31,6 @@ const offices = [
     flag: "🇮🇳",
     icon: Building2,
     label: "Headquarters"
-  },
-  {
-    country: "USA - Michigan",
-    address: "1234 East Grand River Avenue, Suite 250, Lansing, MI 48906, USA",
-    flag: "🇺🇸",
-    icon: Landmark,
-    label: "United States Office"
   },
   {
     country: "Canada - Ontario",
@@ -303,7 +295,7 @@ export default function ContactContent() {
             </div>
 
             {/* Office Grid */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-2 gap-8">
               {/* India HQ */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -355,61 +347,12 @@ export default function ContactContent() {
                 </div>
               </motion.div>
 
-              {/* USA Office */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 }}
-                className="bg-white rounded-2xl p-8 shadow-xl border border-gray-100 hover:border-emerald-300 transition-all group"
-              >
-                <div className="flex items-center gap-4 mb-8">
-                  <div className="text-5xl">🇺🇸</div>
-                  <div>
-                    <h3 className="text-xl font-black text-gray-900">USA Office</h3>
-                    <p className="text-emerald-600 font-bold uppercase text-[10px] tracking-widest">United States</p>
-                  </div>
-                </div>
-
-                <div className="space-y-6">
-                  <div className="flex gap-4">
-                    <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 flex-shrink-0">
-                      <Phone size={18} />
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Call Us</p>
-                      <a href="tel:+19728337525" className="text-base font-bold text-gray-900 hover:text-emerald-600 transition-colors">+1 972 833 7525</a>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-4">
-                    <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 flex-shrink-0">
-                      <MapPin size={18} />
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Visit Us</p>
-                      <p className="text-sm text-gray-700 font-bold leading-relaxed">1234 E Grand River Ave, Lansing, MI 48906</p>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-4">
-                    <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 flex-shrink-0">
-                      <Mail size={18} />
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Inquiries</p>
-                      <a href="mailto:info@hiverift.com" className="text-sm text-gray-900 font-bold hover:text-emerald-600">info@hiverift.com</a>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-
               {/* Canada Office */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: 0.2 }}
+                transition={{ delay: 0.1 }}
                 className="bg-white rounded-2xl p-8 shadow-xl border border-gray-100 hover:border-emerald-300 transition-all group"
               >
                 <div className="flex items-center gap-4 mb-8">

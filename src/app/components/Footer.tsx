@@ -76,7 +76,7 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Column 4: Global Reach (Compact Format) */}
+          {/* Column 4: Contact & Locations */}
           <div className="flex flex-col">
             <h4 className="text-white font-bold text-sm tracking-widest uppercase mb-5 border-b border-emerald-500/30 pb-2 w-fit">
               Connect
@@ -85,16 +85,14 @@ export function Footer() {
               <div className="flex items-start gap-3">
                 <MapPin size={16} className="text-emerald-500 mt-0.5 shrink-0" />
                 <div className="text-[12px] leading-tight space-y-2 text-gray-400">
-                  <p><b className="text-white">🇮🇳 India:</b> New Delhi, 110005</p>
-                  <p><b className="text-white">🇺🇸 USA:</b> Lansing, Michigan, 48906</p>
+                  <p><b className="text-white">🇮🇳 India (HQ):</b> New Delhi, 110005</p>
                   <p><b className="text-white">🇨🇦 Canada:</b> Cambridge, Ontario</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <Phone size={16} className="text-emerald-500 shrink-0" />
                 <div className="text-[12px] space-y-1">
-                  <a href="tel:+918814930229" className="block hover:text-white transition-colors">+91 8814930229</a>
-                  <a href="tel:+19728337525" className="block hover:text-white transition-colors">+1 972 833 7525</a>
+                  <a href="tel:+918814930229" className="block hover:text-white transition-colors">+91 88149 30229</a>
                 </div>
               </div>
               <div className="flex items-start gap-3">
