@@ -11,20 +11,17 @@ export function getImageUrl(image?: string): string {
     return image;
   }
 
-  // Fix any legacy localhost with wrong port (like :4005)
-  if (image.includes("localhost:4005") || image.includes("127.0.0.1:4005")) {
-    image = image.replace(/localhost:4005/g, "localhost:4000").replace(/127\.0\.0\.1:4005/g, "127.0.0.1:4000");
-  }
-
   // External images (Unsplash, Pexels, etc.) without /uploads/
   if ((image.startsWith("http://") || image.startsWith("https://")) && !image.includes("/uploads/")) {
     return image;
   }
 
-  // Extract clean filename or path
-  const cleanPath = image
-    .replace(/^https?:\/\/[^\/]+\/(uploads\/)?/, "")
-    .replace(/^\/?(uploads\/)?/, "");
+  // Extract just the clean filename (e.g. blog-1788936022039-456590593.png)
+  const filename = image.replace(/^.*\/uploads\//, "").replace(/^.*[\\\/]/, "").trim();
+
+  if (!filename) {
+    return "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800";
+  }
 
   const isLocalEnv =
     API_BASE_URL.includes("localhost") ||
@@ -32,16 +29,19 @@ export function getImageUrl(image?: string): string {
     (typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"));
 
   if (isLocalEnv) {
-    return `http://localhost:4000/uploads/${cleanPath}`;
+    return `http://localhost:4000/uploads/${filename}`;
   }
 
+  // In production, uploads are hosted under /hiverift_api/uploads/
   if (process.env.NEXT_PUBLIC_UPLOADS_URL) {
     const base = process.env.NEXT_PUBLIC_UPLOADS_URL.replace(/\/$/, "");
-    return `${base}/uploads/${cleanPath}`;
+    if (base.includes("/hiverift_api")) {
+      return `${base}/uploads/${filename}`;
+    }
+    return `${base}/hiverift_api/uploads/${filename}`;
   }
 
-  const uploadServer = API_BASE_URL.replace(/\/api\/v1\/?$/, "").replace(/\/$/, "");
-  return `${uploadServer}/uploads/${cleanPath}`;
+  return `https://hiverift.com/hiverift_api/uploads/${filename}`;
 }
 
 export async function getBlogsFromApi(category?: string, search?: string): Promise<BlogPost[]> {
