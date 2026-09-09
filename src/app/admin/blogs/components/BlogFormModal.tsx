@@ -50,6 +50,7 @@ export function BlogFormModal({
   });
 
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageUrlInput, setImageUrlInput] = useState<string>("");
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -75,6 +76,7 @@ export function BlogFormModal({
         quote: initialData.content?.quote || "",
         conclusion: initialData.content?.conclusion || ""
       });
+      setImageUrlInput(initialImg);
       setPreviewUrl(initialImg ? getImageUrl(initialImg) : "");
     } else {
       setFormData({
@@ -91,6 +93,7 @@ export function BlogFormModal({
         quote: "",
         conclusion: ""
       });
+      setImageUrlInput("");
       setPreviewUrl("");
     }
   }, [initialData, isOpen]);
@@ -101,10 +104,14 @@ export function BlogFormModal({
       const url = URL.createObjectURL(imageFile);
       setPreviewUrl(url);
       return () => URL.revokeObjectURL(url);
+    } else if (imageUrlInput.trim()) {
+      setPreviewUrl(getImageUrl(imageUrlInput.trim()));
     } else if (formData.image && typeof formData.image === "string") {
       setPreviewUrl(getImageUrl(formData.image));
+    } else {
+      setPreviewUrl("");
     }
-  }, [imageFile, formData.image]);
+  }, [imageFile, imageUrlInput, formData.image]);
 
   // Key Takeaways Actions
   const handleTakeawayChange = (index: number, value: string) => {
@@ -169,11 +176,11 @@ export function BlogFormModal({
       return;
     }
 
-    if (!imageFile && !formData.image && !initialData) {
+    if (!imageFile && !imageUrlInput.trim() && !formData.image && !initialData) {
       Swal.fire({
         icon: "error",
         title: "Image Required",
-        text: "Please select an image file to upload."
+        text: "Please select an image file to upload or enter an image URL."
       });
       return;
     }
@@ -198,9 +205,11 @@ export function BlogFormModal({
 
       data.append("content", JSON.stringify(contentObj));
 
-      // Append image ONLY if valid file or non-empty string URL
+      // Append image: file takes precedence, then entered URL, then existing formData image
       if (imageFile) {
         data.append("image", imageFile);
+      } else if (imageUrlInput.trim()) {
+        data.append("image", imageUrlInput.trim());
       } else if (typeof formData.image === "string" && formData.image.trim()) {
         data.append("image", formData.image.trim());
       }
@@ -282,36 +291,75 @@ export function BlogFormModal({
                   )}
                 </div>
 
-                <div className="grid sm:grid-cols-12 gap-5 items-center">
-                  {/* Left Dropzone File Picker */}
-                  <div className={`${previewUrl ? "sm:col-span-6" : "sm:col-span-12"} transition-all`}>
+                <div className="grid sm:grid-cols-12 gap-5 items-start">
+                  {/* Left Dropzone File Picker & URL Option */}
+                  <div className="sm:col-span-6 space-y-3">
                     <input
                       type="file"
                       accept="image/*"
-                      onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0] || null;
+                        setImageFile(file);
+                        if (file) {
+                          setImageUrlInput("");
+                        }
+                      }}
                       className="hidden"
                       id="blog-image-file-input"
                     />
                     <label
                       htmlFor="blog-image-file-input"
-                      className="w-full min-h-[160px] p-6 rounded-2xl border-2 border-dashed border-slate-300 hover:border-emerald-500 bg-slate-50/80 hover:bg-emerald-50/30 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-200 group"
+                      className="w-full min-h-[140px] p-5 rounded-2xl border-2 border-dashed border-slate-300 hover:border-emerald-500 bg-slate-50/80 hover:bg-emerald-50/30 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-200 group"
                     >
-                      <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 group-hover:border-emerald-300 text-emerald-600 flex items-center justify-center mb-3 shadow-xs transition-transform group-hover:scale-110">
-                        <Upload size={22} />
+                      <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 group-hover:border-emerald-300 text-emerald-600 flex items-center justify-center mb-2 shadow-xs transition-transform group-hover:scale-110">
+                        <Upload size={20} />
                       </div>
                       <span className="text-xs font-black text-slate-800 group-hover:text-emerald-700">
-                        {imageFile ? imageFile.name : previewUrl ? "Click to Replace Cover Image" : "Upload High Quality Cover Image"}
+                        {imageFile ? imageFile.name : "Choose / Upload New Image File"}
                       </span>
-                      <span className="text-[11px] font-bold text-slate-400 mt-1">
-                        PNG, JPG, JPEG or WEBP (Max 5MB)
+                      <span className="text-[10px] font-bold text-slate-400 mt-1">
+                        PNG, JPG, JPEG, WEBP or JFIF (Max 10MB)
                       </span>
                     </label>
+
+                    {/* Or URL Input */}
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                          Or Paste Image Web URL
+                        </span>
+                        {imageUrlInput && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setImageUrlInput("");
+                              if (!imageFile) setPreviewUrl("");
+                            }}
+                            className="text-[10px] text-rose-500 hover:underline font-bold"
+                          >
+                            Clear URL
+                          </button>
+                        )}
+                      </div>
+                      <input
+                        type="url"
+                        value={imageUrlInput}
+                        onChange={(e) => {
+                          setImageUrlInput(e.target.value);
+                          if (e.target.value) {
+                            setImageFile(null);
+                          }
+                        }}
+                        placeholder="https://images.unsplash.com/... or https://..."
+                        className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none transition-all"
+                      />
+                    </div>
                   </div>
 
                   {/* Right Live Image Preview Card */}
-                  {previewUrl && (
-                    <div className="sm:col-span-6 space-y-2">
-                      <div className="relative aspect-video w-full rounded-2xl overflow-hidden border border-slate-200 bg-slate-900 shadow-md group">
+                  <div className="sm:col-span-6 space-y-2">
+                    <div className="relative aspect-video w-full rounded-2xl overflow-hidden border border-slate-200 bg-slate-900 shadow-md group">
+                      {previewUrl ? (
                         <img
                           src={previewUrl}
                           alt="Cover Preview"
@@ -321,27 +369,34 @@ export function BlogFormModal({
                               "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800";
                           }}
                         />
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center text-slate-500 text-xs font-bold gap-2">
+                          <ImageIcon size={28} className="text-slate-600" />
+                          No Image Selected
+                        </div>
+                      )}
+                      {previewUrl && (
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent flex items-end p-3">
                           <div className="text-[10px] font-black text-white uppercase tracking-wider truncate flex items-center gap-1.5">
                             <CheckCircle2 size={13} className="text-emerald-400 shrink-0" />
-                            {imageFile ? `Selected: ${imageFile.name}` : "Current Cover Image"}
+                            {imageFile ? `New File: ${imageFile.name}` : imageUrlInput ? "Custom Web URL" : "Current Cover Image"}
                           </div>
-                        </div>
-                      </div>
-                      {imageFile && (
-                        <div className="flex items-center justify-between text-[11px] font-bold text-slate-500 px-1">
-                          <span>Size: {(imageFile.size / 1024 / 1024).toFixed(2)} MB</span>
-                          <button
-                            type="button"
-                            onClick={() => setImageFile(null)}
-                            className="text-rose-600 hover:text-rose-700 font-black flex items-center gap-1"
-                          >
-                            <Trash2 size={13} /> Remove Selected File
-                          </button>
                         </div>
                       )}
                     </div>
-                  )}
+                    {imageFile && (
+                      <div className="flex items-center justify-between text-[11px] font-bold text-slate-500 px-1">
+                        <span>Size: {(imageFile.size / 1024 / 1024).toFixed(2)} MB</span>
+                        <button
+                          type="button"
+                          onClick={() => setImageFile(null)}
+                          className="text-rose-600 hover:text-rose-700 font-black flex items-center gap-1"
+                        >
+                          <Trash2 size={13} /> Remove Selected File
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 

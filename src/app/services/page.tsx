@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import ServicesContent from "./ServicesContent";
+import { createBreadcrumbSchema } from "@/app/config/schema";
 
 export const metadata: Metadata = {
   title: "Our Services | Web, Mobile, AI & Digital Solutions | HiveRift",
@@ -7,5 +8,19 @@ export const metadata: Metadata = {
 };
 
 export default function ServicesPage() {
-  return <ServicesContent />;
+  const breadcrumbSchema = createBreadcrumbSchema([
+    { name: "Home", url: "/" },
+    { name: "Services", url: "/services" },
+  ]);
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <ServicesContent />
+    </>
+  );
 }
+

@@ -1,11 +1,17 @@
 import axios from "axios";
 
 // Environment-aware API Base URL
-// In local development (npm run dev), NODE_ENV is "development" -> defaults to local backend http://localhost:4000/api/v1
-// In live production build, NODE_ENV is "production" -> defaults to live server https://hiverift.com/hiverift_api
-export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  (process.env.NODE_ENV === "development" ? "http://localhost:4000/api/v1" : "https://hiverift.com/hiverift_api");
+export const getBaseUrl = (): string => {
+  if (typeof window !== "undefined") {
+    const host = window.location.hostname;
+    if (host === "localhost" || host === "127.0.0.1") {
+      return process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api/v1";
+    }
+  }
+  return process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === "development" ? "http://localhost:4000/api/v1" : "https://hiverift.com/hiverift_api");
+};
+
+export const API_BASE_URL = getBaseUrl();
 
 export const ENDPOINTS = {
   BLOGS: "/blogs",

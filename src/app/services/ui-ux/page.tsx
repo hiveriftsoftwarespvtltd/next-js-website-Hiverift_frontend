@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import UIUXContent from "./UIUXContent";
+import { createBreadcrumbSchema } from "@/app/config/schema";
 
 export const metadata: Metadata = {
   title: "UI/UX Design Services | User-Centric Experiences | HiveRift",
@@ -7,5 +8,19 @@ export const metadata: Metadata = {
 };
 
 export default function UIUXPage() {
-  return <UIUXContent />;
+  const breadcrumbSchema = createBreadcrumbSchema([
+    { name: "Home", url: "/" },
+    { name: "Services", url: "/services" },
+    { name: "UI/UX Design", url: "/services/ui-ux" },
+  ]);
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <UIUXContent />
+    </>
+  );
 }

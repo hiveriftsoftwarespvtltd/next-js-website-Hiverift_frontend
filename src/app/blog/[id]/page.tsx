@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { blogPosts } from "@/app/data/blogData";
 import BlogDetailContent from "./BlogDetailContent";
+import { createArticleSchema, createBreadcrumbSchema } from "@/app/config/schema";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -45,5 +46,33 @@ export default async function BlogDetailPage({ params }: Props) {
     }
   };
 
-  return <BlogDetailContent post={initialPost as any} />;
+  const articleSchema = post
+    ? createArticleSchema({
+        title: post.title,
+        description: post.desc,
+        url: `/blog/${post.id}`,
+        image: post.image,
+        datePublished: post.date,
+        authorName: post.author,
+      })
+    : null;
+
+  const breadcrumbSchema = createBreadcrumbSchema([
+    { name: "Home", url: "/" },
+    { name: "Blog", url: "/blog" },
+    { name: post ? post.title : "Article", url: `/blog/${id}` },
+  ]);
+
+  const jsonLdData = articleSchema ? [articleSchema, breadcrumbSchema] : [breadcrumbSchema];
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }}
+      />
+      <BlogDetailContent post={initialPost as any} />
+    </>
+  );
 }
+

@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import { useState } from "react";
 import { Plus, Minus } from "lucide-react";
+import { createFAQSchema } from "@/app/config/schema";
 
 const faqs = [
   {
@@ -43,9 +44,14 @@ interface FAQProps {
 export function FAQ({ items }: FAQProps) {
   const displayFaqs = items || faqs;
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const faqSchema = createFAQSchema(displayFaqs);
 
   return (
     <section className="py-24 bg-white relative overflow-hidden">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <div className="container mx-auto px-4 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-black text-gray-900 mb-4 tracking-tight">Frequently Asked Questions</h2>

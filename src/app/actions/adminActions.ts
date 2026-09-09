@@ -5,14 +5,31 @@ export function getImageUrl(image?: string): string {
   if (!image) {
     return "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800";
   }
-  if (image.startsWith("http://") || image.startsWith("https://") || image.startsWith("data:")) {
+
+  // Blob previews or base64 data URLs
+  if (image.startsWith("data:") || image.startsWith("blob:")) {
     return image;
   }
-  const cleanPath = image.replace(/^\/?(uploads\/)?/, "");
+
+  // Fix any legacy localhost with wrong port (like :4005)
+  if (image.includes("localhost:4005") || image.includes("127.0.0.1:4005")) {
+    image = image.replace(/localhost:4005/g, "localhost:4000").replace(/127\.0\.0\.1:4005/g, "127.0.0.1:4000");
+  }
+
+  // External images (Unsplash, Pexels, etc.) without /uploads/
+  if ((image.startsWith("http://") || image.startsWith("https://")) && !image.includes("/uploads/")) {
+    return image;
+  }
+
+  // Extract clean filename or path
+  const cleanPath = image
+    .replace(/^https?:\/\/[^\/]+\/(uploads\/)?/, "")
+    .replace(/^\/?(uploads\/)?/, "");
 
   const isLocalEnv =
     API_BASE_URL.includes("localhost") ||
-    API_BASE_URL.includes("127.0.0.1");
+    API_BASE_URL.includes("127.0.0.1") ||
+    (typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"));
 
   if (isLocalEnv) {
     return `http://localhost:4000/uploads/${cleanPath}`;
@@ -118,7 +135,8 @@ export async function createBlogApi(blogData: any) {
     const res = await fetch(url, { method: "POST", body: blogData });
     const json = await res.json();
     if (!res.ok) {
-      throw new Error(json.message || Array.isArray(json.message) ? json.message.join(", ") : `Upload failed with status ${res.status}`);
+      const errMsg = Array.isArray(json.message) ? json.message.join(", ") : (json.message || `Upload failed with status ${res.status}`);
+      throw new Error(errMsg);
     }
     return json;
   }
@@ -134,7 +152,8 @@ export async function updateBlogApi(id: string, blogData: any) {
     const res = await fetch(url, { method: "PATCH", body: blogData });
     const json = await res.json();
     if (!res.ok) {
-      throw new Error(json.message || Array.isArray(json.message) ? json.message.join(", ") : `Update failed with status ${res.status}`);
+      const errMsg = Array.isArray(json.message) ? json.message.join(", ") : (json.message || `Update failed with status ${res.status}`);
+      throw new Error(errMsg);
     }
     return json;
   }

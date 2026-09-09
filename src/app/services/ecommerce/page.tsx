@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import EcommerceContent from "./EcommerceContent";
+import { createBreadcrumbSchema } from "@/app/config/schema";
 
 export const metadata: Metadata = {
   title: "E-Commerce Solutions | Custom Online Stores | HiveRift",
@@ -7,5 +8,19 @@ export const metadata: Metadata = {
 };
 
 export default function EcommercePage() {
-  return <EcommerceContent />;
+  const breadcrumbSchema = createBreadcrumbSchema([
+    { name: "Home", url: "/" },
+    { name: "Services", url: "/services" },
+    { name: "E-Commerce Solutions", url: "/services/ecommerce" },
+  ]);
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <EcommerceContent />
+    </>
+  );
 }

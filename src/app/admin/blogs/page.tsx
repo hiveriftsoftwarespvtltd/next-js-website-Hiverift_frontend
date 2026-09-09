@@ -13,8 +13,7 @@ import {
   Sparkles,
   CheckCircle2,
   FileText,
-  Layers,
-  Database
+  Layers
 } from "lucide-react";
 import Swal from "sweetalert2";
 import { AdminSidebar } from "../components/AdminSidebar";
@@ -27,8 +26,7 @@ import {
   getImageUrl,
   createBlogApi,
   updateBlogApi,
-  deleteBlogApi,
-  seedBlogsApi
+  deleteBlogApi
 } from "@/app/actions/adminActions";
 
 export default function AdminBlogsPage() {
@@ -73,29 +71,6 @@ export default function AdminBlogsPage() {
     } catch (err: any) {
       Swal.fire({ icon: "error", title: "Error", text: err.message || "Failed to save blog." });
     }
-  };
-
-  const handleSeedBlogs = async () => {
-    Swal.fire({
-      title: "Seed Sample Blogs?",
-      text: "This will add initial 6 articles to your NestJS database.",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonColor: "#10b981",
-      confirmButtonText: "Yes, Seed Articles"
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        setLoading(true);
-        try {
-          await seedBlogsApi();
-          Swal.fire({ icon: "success", title: "Seeded!", text: "Initial articles created successfully." });
-          fetchBlogs();
-        } catch (err: any) {
-          Swal.fire({ icon: "error", title: "Seed Failed", text: err.message });
-          setLoading(false);
-        }
-      }
-    });
   };
 
   const handleDeleteBlog = (id: string, title: string) => {
@@ -184,7 +159,7 @@ export default function AdminBlogsPage() {
               </div>
 
               {/* Quick Actions */}
-              <div className="flex flex-col sm:flex-row lg:flex-col gap-2.5 justify-center">
+              <div className="flex flex-col justify-center">
                 <button
                   onClick={() => {
                     setEditingBlog(null);
@@ -193,12 +168,6 @@ export default function AdminBlogsPage() {
                   className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-emerald-200 transition-all"
                 >
                   <Plus size={16} /> Add New Article
-                </button>
-                <button
-                  onClick={handleSeedBlogs}
-                  className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-all"
-                >
-                  <Database size={14} /> Seed Initial 6 Blogs
                 </button>
               </div>
             </div>

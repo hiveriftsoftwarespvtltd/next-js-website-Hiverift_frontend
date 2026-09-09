@@ -1,58 +1,44 @@
 import type { MetadataRoute } from "next";
+import { blogPosts } from "@/app/data/blogData";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://hiverift.com";
 
-  // All public indexable routes
-  const routes = [
+  const staticRoutes = [
     "",
+    "/about",
     "/services",
     "/services/web-development",
     "/services/mobile-development",
-    "/services/software-development",
     "/services/ai-ml",
-    "/services/cloud-devops",
-    "/services/ui-ux",
-    "/services/digital-marketing",
-    "/services/ecommerce",
     "/services/data-annotation",
-    "/about",
-    "/contact",
-    "/careers",
-    "/pricing",
-    "/case-studies",
+    "/services/cloud-devops",
+    "/services/digital-marketing",
+    "/services/software-development",
+    "/services/ui-ux",
+    "/services/ecommerce",
     "/blog",
-    "/industries",
-    "/solutions",
+    "/case-studies",
+    "/careers",
+    "/contact",
+    "/pricing",
     "/privacy",
     "/terms",
-    "/q/what-is-digital-marketing",
-    "/q/why-website-important",
-    "/q/how-can-we-help",
-    "/q/results-timeline",
   ];
 
-  return routes.map((route) => {
-    let priority = 0.7;
-    let changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"] = "weekly";
+  const staticEntries: MetadataRoute.Sitemap = staticRoutes.map((route) => ({
+    url: `${baseUrl}${route}`,
+    lastModified: new Date(),
+    changeFrequency: route === "" ? "daily" : "weekly",
+    priority: route === "" ? 1.0 : route.startsWith("/services") ? 0.9 : 0.8,
+  }));
 
-    if (route === "") {
-      priority = 1.0;
-      changeFrequency = "daily";
-    } else if (route.startsWith("/services")) {
-      priority = 0.9;
-    } else if (route === "/contact" || route === "/about" || route === "/pricing") {
-      priority = 0.8;
-    } else if (route === "/terms" || route === "/privacy") {
-      priority = 0.3;
-      changeFrequency = "yearly";
-    }
+  const blogEntries: MetadataRoute.Sitemap = blogPosts.map((post) => ({
+    url: `${baseUrl}/blog/${post.id}`,
+    lastModified: post.date ? new Date(post.date) : new Date(),
+    changeFrequency: "monthly",
+    priority: 0.7,
+  }));
 
-    return {
-      url: `${baseUrl}${route}`,
-      lastModified: new Date(),
-      changeFrequency,
-      priority,
-    };
-  });
+  return [...staticEntries, ...blogEntries];
 }

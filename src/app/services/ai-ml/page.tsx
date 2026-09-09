@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import AIMLContent from "./AIMLContent";
+import { createBreadcrumbSchema } from "@/app/config/schema";
 
 export const metadata: Metadata = {
   title: "AI & Machine Learning Solutions | Enterprise Intelligence | HiveRift",
@@ -7,5 +8,19 @@ export const metadata: Metadata = {
 };
 
 export default function AIMLPage() {
-  return <AIMLContent />;
+  const breadcrumbSchema = createBreadcrumbSchema([
+    { name: "Home", url: "/" },
+    { name: "Services", url: "/services" },
+    { name: "AI & Machine Learning", url: "/services/ai-ml" },
+  ]);
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <AIMLContent />
+    </>
+  );
 }

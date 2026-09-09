@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import WebDevContent from "./WebDevContent";
+import { createBreadcrumbSchema } from "@/app/config/schema";
 
 export const metadata: Metadata = {
   title: "Professional Web Development Services | HiveRift",
@@ -7,5 +8,21 @@ export const metadata: Metadata = {
 };
 
 export default function WebDevelopmentPage() {
-  return <WebDevContent />;
+  const breadcrumbSchema = createBreadcrumbSchema([
+    { name: "Home", url: "/" },
+    { name: "Services", url: "/services" },
+    { name: "Web Development", url: "/services/web-development" },
+  ]);
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <WebDevContent />
+    </>
+  );
 }
+
+
