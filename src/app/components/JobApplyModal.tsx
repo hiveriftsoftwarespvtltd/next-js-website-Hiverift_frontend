@@ -145,7 +145,7 @@ export function JobApplyModal({ isOpen, onClose, jobTitle = "" }: JobApplyModalP
                 <form onSubmit={handleSubmit} className="p-5 md:p-8 space-y-3.5">
                   <div className="grid md:grid-cols-2 gap-3.5">
                     <div className="space-y-1">
-                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Full Name *</label>
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Full Name</label>
                       <input 
                         type="text" required
                         value={formData.name}
@@ -155,7 +155,7 @@ export function JobApplyModal({ isOpen, onClose, jobTitle = "" }: JobApplyModalP
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Email Address *</label>
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Email Address</label>
                       <input 
                         type="email" required
                         value={formData.email}
@@ -168,7 +168,7 @@ export function JobApplyModal({ isOpen, onClose, jobTitle = "" }: JobApplyModalP
 
                   <div className="grid md:grid-cols-2 gap-3.5">
                     <div className="space-y-1">
-                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Phone Number *</label>
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Phone Number</label>
                       <input 
                         type="tel" required
                         value={formData.phone}
@@ -178,7 +178,7 @@ export function JobApplyModal({ isOpen, onClose, jobTitle = "" }: JobApplyModalP
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Position *</label>
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Position</label>
                       <select 
                         value={formData.position}
                         onChange={(e) => setFormData({...formData, position: e.target.value})}
@@ -194,7 +194,7 @@ export function JobApplyModal({ isOpen, onClose, jobTitle = "" }: JobApplyModalP
 
                   <div className="grid md:grid-cols-2 gap-3.5">
                     <div className="space-y-1">
-                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Resume (PDF/DOC) *</label>
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Resume (PDF/DOC)</label>
                       <div className="relative">
                         <input 
                           type="file" required
@@ -226,7 +226,7 @@ export function JobApplyModal({ isOpen, onClose, jobTitle = "" }: JobApplyModalP
 
                   <div className="space-y-1">
                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 flex justify-between">
-                      <span>Cover Letter *</span>
+                      <span>Cover Letter</span>
                       <span className="text-[10px] font-bold text-emerald-600 tracking-normal">{formData.coverLetter.length} / 500 characters</span>
                     </label>
                     <textarea 

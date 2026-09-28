@@ -11,33 +11,33 @@ export default function PrivacyContent() {
     <div className="min-h-screen bg-white">
       <Header />
       
-      {/* Hero Section */}
-      <section className="relative min-h-[400px] md:h-[450px] overflow-hidden mt-20 md:mt-32 flex items-center">
-        <div className="absolute inset-0">
-          <ImageWithFallback
-            src="https://images.unsplash.com/photo-1563986768609-322da13575f3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkYXRhJTIwc2VjdXJpdHklMjBwcml2YWN5fGVufDB8fHx8MTczOTgzMDQwMHww&ixlib=rb-4.1.0&q=80&w=1080"
-            alt="Privacy Policy"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-950/95 via-emerald-900/90 to-slate-900/95"></div>
+      {/* Hero Section - Clean Light Mode matching Home Page */}
+      <section className="relative pt-32 pb-16 md:pt-40 md:pb-20 overflow-hidden bg-gradient-to-b from-[#f4fcf7] via-white to-white border-b border-emerald-100/60">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[700px] h-[300px] bg-gradient-to-r from-emerald-100/50 via-teal-100/40 to-emerald-100/30 blur-3xl rounded-full -z-10" />
+          <div className="absolute inset-0 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:24px_24px] opacity-20 -z-10" />
         </div>
 
         <div className="container mx-auto px-4 lg:px-8 relative z-10 text-center">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="max-w-4xl mx-auto"
+            transition={{ duration: 0.6 }}
+            className="max-w-4xl mx-auto space-y-6"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 backdrop-blur-md border border-emerald-500/20 rounded-full mb-6 max-w-fit mx-auto">
-              <Fingerprint size={16} className="text-emerald-400" />
-              <span className="text-sm font-black text-emerald-400 tracking-widest uppercase">Data Protection</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 border border-emerald-200/80 rounded-full shadow-xs">
+              <Fingerprint size={16} className="text-emerald-700" />
+              <span className="text-xs font-black text-emerald-800 tracking-wider uppercase">
+                DATA PRIVACY & SECURITY STANDARDS
+              </span>
             </div>
-            <h1 className="text-4xl md:text-7xl font-black text-white mb-6 leading-[1.1]">
-              Privacy <span className="text-emerald-400">Policy</span>
+
+            <h1 className="text-4xl md:text-6xl font-black text-slate-900 leading-[1.1] tracking-tight">
+              Privacy <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 bg-clip-text text-transparent">Policy</span>
             </h1>
-            <p className="text-lg md:text-2xl text-white/90 leading-relaxed max-w-2xl mx-auto font-medium">
-              We respect your privacy. This policy explains exactly what data we collect and why.
+
+            <p className="text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl mx-auto font-medium">
+              We take intellectual property and client privacy seriously. This policy details how HiveRift collects, protects, and governs client and visitor data in accordance with international standards and India's DPDP Act 2023.
             </p>
           </motion.div>
         </div>
@@ -68,7 +68,7 @@ export default function PrivacyContent() {
             <div className="prose prose-lg max-w-none text-gray-600 font-medium leading-relaxed space-y-12">
               <div>
                 <h3 className="text-2xl font-black text-gray-900 mb-4">1. Who We Are</h3>
-                <p>HiveRift is operated by KhatuShyam Technologies, a company registered in India, with its principal office at 3rd Floor, Right Portion House No. 8577 (New) / Plot No. XVI/6501 (Old), Ward No. XVI, New Rohtak Road, Karol Bagh, New Delhi – 110005. For privacy matters, contact: info@hiverift.com</p>
+                <p>HiveRift Softwares Pvt Ltd is a company registered in India, with its principal office at 3rd Floor, Right Portion House No. 8577 (New) / Plot No. XVI/6501 (Old), Ward No. XVI, New Rohtak Road, Karol Bagh, New Delhi – 110005. For privacy matters, contact: info@hiverift.com</p>
               </div>
 
               <div>
@@ -99,7 +99,7 @@ export default function PrivacyContent() {
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-emerald-600"><Phone size={20}/></div>
-                    <span className="font-bold text-gray-900">+91 8814930229</span>
+                    <span className="font-bold text-gray-900">88149 30229</span>
                   </div>
                   <div className="flex items-center gap-4 text-left">
                     <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-emerald-600 flex-shrink-0"><MapPin size={20}/></div>

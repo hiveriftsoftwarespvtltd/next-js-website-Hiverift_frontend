@@ -6,7 +6,6 @@ import {
   Calendar,
   Clock,
   ArrowRight,
-  Sparkles,
   Filter,
   Search,
   Mail,
@@ -18,11 +17,17 @@ import {
   MessageCircle,
   Plus,
   Minus,
-  Rocket
+  Rocket,
+  Sparkles,
+  BookOpen,
+  Code2,
+  TrendingUp,
+  ShieldCheck
 } from "lucide-react";
 import { Header } from "@/app/components/Header";
 import { Footer } from "@/app/components/Footer";
 import { FAQ } from "@/app/components/FAQ";
+import { EnquiryModal } from "@/app/components/EnquiryModal";
 import Link from "next/link";
 import { ImageWithFallback } from "@/app/components/figma/ImageWithFallback";
 import { blogPosts, BlogPost } from "@/app/data/blogData";
@@ -32,6 +37,7 @@ export default function BlogContent() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [posts, setPosts] = useState<BlogPost[]>(blogPosts);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     getBlogsFromApi(activeCategory, searchQuery).then((data) => {
@@ -56,36 +62,58 @@ export default function BlogContent() {
     <div className="min-h-screen bg-white">
       <Header />
 
-      {/* Hero Section */}
-      <section className="relative min-h-[400px] md:h-[500px] overflow-hidden mt-20 md:mt-32 flex items-center">
-        <div className="absolute inset-0">
-          <ImageWithFallback
-            src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxibG9nJTIwd3JpdGluZyUyMHRlY2h8ZW58MHx8fHwxNzM5ODMwNDUxfDA&ixlib=rb-4.1.0&q=80&w=1080"
-            alt="Insights & Updates"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-950/95 via-emerald-900/90 to-slate-900/95"></div>
+      {/* Hero Section - Clean Light Mode matching Home Page */}
+      <section className="relative pt-32 pb-16 md:pt-40 md:pb-20 overflow-hidden bg-gradient-to-b from-[#f4fcf7] via-white to-white border-b border-emerald-100/60">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[750px] h-[320px] bg-gradient-to-r from-emerald-100/50 via-teal-100/40 to-emerald-100/30 blur-3xl rounded-full -z-10" />
+          <div className="absolute inset-0 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:24px_24px] opacity-20 -z-10" />
         </div>
 
         <div className="container mx-auto px-4 lg:px-8 relative z-10 text-center">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="max-w-4xl mx-auto"
+            transition={{ duration: 0.6 }}
+            className="max-w-4xl mx-auto space-y-6"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 backdrop-blur-md border border-emerald-500/20 rounded-full mb-6">
-              <Sparkles size={14} className="text-emerald-400" />
-              <span className="text-sm font-black text-emerald-400 tracking-widest uppercase">
-                Insights & Updates
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 border border-emerald-200/80 rounded-full shadow-xs">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
+              </span>
+              <span className="text-xs font-black text-emerald-800 tracking-wider uppercase">
+                ENGINEERING & GROWTH PLAYBOOKS
               </span>
             </div>
-            <h1 className="text-4xl md:text-7xl font-black text-white mb-6 leading-[1.1] tracking-tight">
-              Insights, Ideas & <span className="text-emerald-400">Real Talk</span>
+
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-slate-900 leading-[1.1] tracking-tight">
+              Engineering Insights, <br />
+              <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 bg-clip-text text-transparent">
+                Real-World Benchmarks
+              </span>{" "}
+              & Architecture
             </h1>
-            <p className="text-lg md:text-2xl text-white/90 leading-relaxed max-w-3xl mx-auto font-medium">
-              Practical advice for Indian businesses navigating websites, marketing, apps, and technology written by the team that builds it every day.
+
+            <p className="text-lg md:text-xl text-slate-600 leading-relaxed max-w-2xl mx-auto font-medium">
+              In-depth technical blueprints, headless commerce playbooks, full-stack architecture patterns, and data-driven marketing guides written by HiveRift's core engineering team.
             </p>
+
+            {/* Quick Filter Pills */}
+            <div className="flex flex-wrap justify-center items-center gap-2 pt-4">
+              {dynamicCategories.map((cat, i) => (
+                <button
+                  key={i}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`px-4 py-2 rounded-full text-xs font-bold transition-all shadow-xs ${
+                    activeCategory === cat
+                      ? "bg-slate-900 text-white shadow-md shadow-slate-900/10"
+                      : "bg-white text-slate-600 hover:text-emerald-700 hover:bg-emerald-50 border border-slate-200"
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
           </motion.div>
         </div>
       </section>
@@ -258,8 +286,7 @@ export default function BlogContent() {
                     </button>
                   </div>
                 </div>
-                <Sparkles size={80} className="absolute -bottom-6 -right-6 text-emerald-600/10" />
-              </div>
+                </div>
 
               {/* Help Widget */}
               <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm space-y-6">
@@ -275,7 +302,7 @@ export default function BlogContent() {
                 <div className="space-y-4 pt-2">
                   <div className="flex items-center gap-3 text-gray-900 font-black">
                     <Phone size={18} className="text-emerald-600" />
-                    <span className="text-sm">+91 8814930229</span>
+                    <span className="text-sm">88149 30229</span>
                   </div>
                   <Link href="/contact" className="flex items-center justify-between text-xs font-black text-emerald-600 uppercase tracking-widest group">
                     <span>Schedule a Call</span>
@@ -288,34 +315,44 @@ export default function BlogContent() {
         </div>
       </section>
 
-      {/* Ready to Grow CTA - Centered & Reduced Width */}
-      <section className="py-6 bg-slate-50/30">
+      {/* Consultation Banner - Aligned with Home & Service Pages */}
+      <section className="py-12 bg-white">
         <div className="container mx-auto px-4 lg:px-8">
-          <div className="max-w-5xl mx-auto">
-            <div className="bg-white border border-gray-100 rounded-[2rem] px-8 py-6 shadow-xl relative overflow-hidden group">
-              <div className="flex flex-row items-center justify-between gap-6 relative z-10">
-                <div className="flex-1 space-y-2">
-                  <h3 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight">Ready to Grow Your Business?</h3>
-                  <p className="text-xs font-bold text-gray-500 leading-relaxed">
-                    Get a free strategy session and let our experts help you grow online.
-                  </p>
-                  <div className="pt-2">
-                    <Link href="/contact">
-                      <button className="px-6 py-3 bg-emerald-600 text-white rounded-xl font-black text-xs flex items-center gap-2 hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100">
-                        Get Free Consultation <ArrowRight size={14} />
-                      </button>
-                    </Link>
-                  </div>
+          <div className="max-w-5xl mx-auto bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 rounded-3xl p-8 md:p-12 text-white relative overflow-hidden shadow-2xl border border-slate-800">
+            <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
+              <div className="space-y-3 max-w-xl">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/20 border border-emerald-500/30 rounded-full text-xs font-black text-emerald-400 uppercase tracking-widest">
+                  Engineering Consultation
                 </div>
-                <div className="w-20 h-20 relative flex-shrink-0 group-hover:scale-110 transition-transform duration-500">
-                  <div className="absolute inset-0 bg-emerald-100 rounded-full blur-2xl opacity-50"></div>
-                  <Rocket size={72} className="text-emerald-600 relative z-10" />
-                </div>
+                <h3 className="text-2xl md:text-3xl font-black tracking-tight leading-snug">
+                  Need an Architectural Review or Full-Stack Engineering Team?
+                </h3>
+                <p className="text-slate-300 text-sm leading-relaxed">
+                  Book a direct 30-minute scoping call with our lead solutions architect. We'll audit your stack, benchmark performance, and map out a fixed-cost milestone roadmap.
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  className="px-6 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-emerald-950/40 flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span>Book Strategy Call</span>
+                  <ArrowRight size={14} />
+                </button>
+                <Link
+                  href="/contact"
+                  className="px-6 py-3.5 bg-white/10 hover:bg-white/20 text-white border border-white/15 rounded-xl font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center"
+                >
+                  Contact Us
+                </Link>
               </div>
             </div>
           </div>
         </div>
       </section>
+
+      <EnquiryModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
 
       {/* FAQ Section - Full Width & Centered */}
       <FAQ items={[

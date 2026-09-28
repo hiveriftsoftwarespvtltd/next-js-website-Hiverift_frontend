@@ -305,7 +305,7 @@ export function Industries() {
             </span>
           </h2>
           <p className="text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-4">
-            Delivering tailored, industry-specific solutions that address unique challenges and drive measurable results across 12+ sectors worldwide
+            Delivering tailored, industry-specific solutions across 10+ industries worldwide.
           </p>
         </motion.div>
 

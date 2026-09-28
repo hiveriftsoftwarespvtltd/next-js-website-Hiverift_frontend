@@ -7,7 +7,6 @@ import {
   Plus,
   Trash2,
   Save,
-  Sparkles,
   Image as ImageIcon,
   FileText,
   Upload,
@@ -282,7 +281,7 @@ export function BlogFormModal({
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
                     <ImageIcon size={16} className="text-emerald-600" />
-                    Cover Image & Live Preview *
+                    Cover Image & Live Preview
                   </label>
                   {previewUrl && (
                     <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200/60 flex items-center gap-1">
@@ -410,7 +409,7 @@ export function BlogFormModal({
                 {/* Title & Category */}
                 <div className="grid md:grid-cols-3 gap-4">
                   <div className="md:col-span-2 space-y-1.5">
-                    <label className="text-xs font-black text-slate-700">Article Title *</label>
+                    <label className="text-xs font-black text-slate-700">Article Title</label>
                     <input
                       type="text"
                       required
@@ -422,7 +421,7 @@ export function BlogFormModal({
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-black text-slate-700">Category *</label>
+                    <label className="text-xs font-black text-slate-700">Category</label>
                     <select
                       value={formData.category}
                       onChange={(e) => setFormData({ ...formData, category: e.target.value })}
@@ -440,7 +439,7 @@ export function BlogFormModal({
 
                 {/* Description */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-black text-slate-700">Short Summary / Description *</label>
+                  <label className="text-xs font-black text-slate-700">Short Summary / Description</label>
                   <textarea
                     rows={2}
                     required
@@ -488,7 +487,6 @@ export function BlogFormModal({
               {/* SECTION 3: Rich Article Content */}
               <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-xs space-y-5">
                 <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
-                  <Sparkles size={16} className="text-emerald-600" />
                   Article Detail Content & Sections
                 </h3>
 

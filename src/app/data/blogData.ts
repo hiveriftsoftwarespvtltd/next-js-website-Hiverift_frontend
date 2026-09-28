@@ -82,7 +82,7 @@ export const blogPosts: BlogPost[] = [
         },
         {
           heading: "2. Instant WhatsApp Nurturing",
-          text: "In India, WhatsApp has a 98% open rate compared to 15% in traditional email marketing. Integrating instant WhatsApp automation when a user submits a lead form increases response times and closes deals faster."
+          text: "WhatsApp automation can help businesses respond quickly when a user submits a lead form, keeping the conversation convenient and timely."
         },
         {
           heading: "3. Retargeting Warm Traffic",

@@ -1,10 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { AdminGuard } from "../components/AdminGuard";
 import { AdminSidebar } from "../components/AdminSidebar";
 import { AdminHeader } from "../components/AdminHeader";
-import { getContactSubmissions, deleteSubmission, updateSubmissionStatus } from "@/app/actions/contactActions";
+import {
+  getContactSubmissions,
+  deleteSubmission,
+  purgeAllSubmissions,
+  updateSubmissionDetails,
+  addSubmissionNote,
+} from "@/app/actions/contactActions";
+import { getAdminUser, AdminUser } from "@/app/config/auth";
 import {
   Inbox,
   Search,
@@ -12,20 +19,35 @@ import {
   Trash2,
   Eye,
   Mail,
-  Briefcase,
+  Phone,
+  MessageSquare,
   Building,
-  FileText,
   CheckCircle2,
   XCircle,
   AlertCircle,
-  ChevronLeft,
-  ChevronRight,
   Clock,
   Tag,
-  Download
+  Download,
+  Calendar,
+  UserCheck,
+  Filter,
+  Send,
+  Plus,
+  ArrowRight,
+  ShieldAlert,
+  ChevronDown,
+  Sparkles,
+  ExternalLink,
 } from "lucide-react";
+import Swal from "sweetalert2";
 
-interface SubmissionItem {
+interface QueryNote {
+  note: string;
+  author: string;
+  createdAt: string | Date;
+}
+
+interface QueryItem {
   _id: string;
   fullName?: string;
   name?: string;
@@ -39,711 +61,946 @@ interface SubmissionItem {
   coverLetter?: string;
   resume?: string;
   status?: string;
+  priority?: "High" | "Medium" | "Low";
+  assignedTo?: string;
+  followUpDate?: string;
+  internalNotes?: QueryNote[];
+  source?: string;
   createdAt?: string;
   updatedAt?: string;
 }
 
-const ITEMS_PER_PAGE = 6;
+const STATUS_OPTIONS = [
+  "New",
+  "Contacted",
+  "In Progress",
+  "Follow-up Scheduled",
+  "Converted",
+  "Closed",
+];
+
+const PRIORITY_OPTIONS = ["High", "Medium", "Low"];
+
+const SALES_REPRESENTATIVES = [
+  "Unassigned",
+  "Vikram Malhotra (Lead Rep)",
+  "Priya Sharma (Enterprise Sales)",
+  "Rohit Verma (Digital Marketing)",
+  "Amit Saxena (SME Accounts)",
+];
 
 export default function AdminInquiriesPage() {
-  const [submissions, setSubmissions] = useState<SubmissionItem[]>([]);
+  const [inquiries, setInquiries] = useState<QueryItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState<"all" | "contact" | "careers">("all");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [priorityFilter, setPriorityFilter] = useState<string>("all");
+  const [sourceFilter, setSourceFilter] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedItem, setSelectedItem] = useState<SubmissionItem | null>(null);
-  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [statusMessage, setStatusMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const itemsPerPage = 10;
 
-  const fetchSubmissions = async () => {
+  // Selected query for detail/edit modal
+  const [selectedQuery, setSelectedQuery] = useState<QueryItem | null>(null);
+  const [editStatus, setEditStatus] = useState("New");
+  const [editPriority, setEditPriority] = useState<"High" | "Medium" | "Low">("Medium");
+  const [editAssignedTo, setEditAssignedTo] = useState("Unassigned");
+  const [editFollowUpDate, setEditFollowUpDate] = useState("");
+  const [newNoteText, setNewNoteText] = useState("");
+  const [isSavingDetails, setIsSavingDetails] = useState(false);
+  const [isAddingNote, setIsAddingNote] = useState(false);
+
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<AdminUser | null>(null);
+
+  useEffect(() => {
+    setCurrentUser(getAdminUser());
+    fetchInquiries();
+  }, []);
+
+  const fetchInquiries = async () => {
     setIsLoading(true);
-    setStatusMessage(null);
     try {
       const res = await getContactSubmissions();
       if (res.success && Array.isArray(res.data)) {
-        setSubmissions(res.data);
+        setInquiries(res.data);
       } else {
-        setSubmissions([]);
+        setInquiries([]);
       }
     } catch (err) {
-      console.error("Failed to load submissions:", err);
+      console.error("Failed to load inquiries:", err);
     } finally {
       setIsLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchSubmissions();
-  }, []);
-
-  const handleStatusChange = async (id: string, newStatus: string) => {
-    try {
-      setSubmissions((prev) =>
-        prev.map((item) => (item._id === id ? { ...item, status: newStatus } : item))
-      );
-      if (selectedItem?._id === id) {
-        setSelectedItem((prev) => (prev ? { ...prev, status: newStatus } : null));
-      }
-      const res = await updateSubmissionStatus(id, newStatus);
-      if (res.success) {
-        setStatusMessage({ type: "success", text: `Status updated to '${newStatus}'.` });
-      } else {
-        setStatusMessage({ type: "error", text: res.message || "Failed to update status." });
-        fetchSubmissions();
-      }
-    } catch (err: any) {
-      setStatusMessage({ type: "error", text: err?.message || "Failed to update status." });
-      fetchSubmissions();
-    }
+  // Open Edit Modal
+  const openDetailModal = (q: QueryItem) => {
+    setSelectedQuery(q);
+    setEditStatus(q.status || "New");
+    setEditPriority(q.priority || "Medium");
+    setEditAssignedTo(q.assignedTo || "Unassigned");
+    setEditFollowUpDate(q.followUpDate || "");
+    setNewNoteText("");
   };
 
-  const handleDelete = async () => {
-    if (!deleteTargetId) return;
-    setIsDeleting(true);
+  // Save Query Details
+  const handleSaveDetails = async () => {
+    if (!selectedQuery) return;
+    setIsSavingDetails(true);
+
     try {
-      const res = await deleteSubmission(deleteTargetId);
+      const payload = {
+        status: editStatus,
+        priority: editPriority,
+        assignedTo: editAssignedTo,
+        followUpDate: editFollowUpDate,
+      };
+
+      const res = await updateSubmissionDetails(selectedQuery._id, payload);
       if (res.success) {
-        setSubmissions((prev) => prev.filter((item) => item._id !== deleteTargetId));
-        if (selectedItem?._id === deleteTargetId) {
-          setSelectedItem(null);
-        }
-        setStatusMessage({ type: "success", text: "Submission deleted successfully." });
+        // Update local state
+        setInquiries((prev) =>
+          prev.map((item) =>
+            item._id === selectedQuery._id
+              ? { ...item, ...payload }
+              : item
+          )
+        );
+        setSelectedQuery((prev) => (prev ? { ...prev, ...payload } : null));
+
+        Swal.fire({
+          toast: true,
+          position: "top-end",
+          icon: "success",
+          title: "Query updated successfully",
+          showConfirmButton: false,
+          timer: 2000,
+          background: "#0f172a",
+          color: "#ffffff",
+        });
       } else {
-        setStatusMessage({ type: "error", text: res.message || "Failed to delete submission." });
+        Swal.fire({
+          icon: "error",
+          title: "Update Failed",
+          text: res.message || "Failed to update query details.",
+          background: "#0f172a",
+          color: "#ffffff",
+        });
       }
-    } catch (err: any) {
-      setStatusMessage({ type: "error", text: err?.message || "Failed to delete submission." });
+    } catch (e: any) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: e?.message || "Failed to update query.",
+        background: "#0f172a",
+        color: "#ffffff",
+      });
     } finally {
-      setIsDeleting(false);
-      setDeleteTargetId(null);
+      setIsSavingDetails(false);
     }
   };
 
-  // Determine submission type (Job Application vs Contact Inquiry)
-  const isJobApp = (item: SubmissionItem) =>
-    Boolean(item.position || item.portfolio || item.coverLetter || item.resume || item.fullName);
+  // Add Internal Note
+  const handleAddNote = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedQuery || !newNoteText.trim()) return;
+    setIsAddingNote(true);
 
-  // Filtered submissions
-  const filteredSubmissions = submissions.filter((item) => {
-    const isJob = isJobApp(item);
-    if (activeTab === "contact" && isJob) return false;
-    if (activeTab === "careers" && !isJob) return false;
+    try {
+      const author = currentUser?.name || "Staff";
+      const res = await addSubmissionNote(selectedQuery._id, newNoteText.trim(), author);
+      if (res.success) {
+        const addedNote: QueryNote = {
+          note: newNoteText.trim(),
+          author,
+          createdAt: new Date().toISOString(),
+        };
 
-    if (!searchQuery.trim()) return true;
-    const q = searchQuery.toLowerCase();
-    const nameStr = (item.fullName || item.name || "").toLowerCase();
-    const emailStr = (item.email || "").toLowerCase();
-    const phoneStr = (item.phone || "").toLowerCase();
-    const serviceStr = (item.service || "").toLowerCase();
-    const positionStr = (item.position || "").toLowerCase();
-    const companyStr = (item.company || "").toLowerCase();
+        const updatedNotes = [...(selectedQuery.internalNotes || []), addedNote];
+        setInquiries((prev) =>
+          prev.map((item) =>
+            item._id === selectedQuery._id
+              ? { ...item, internalNotes: updatedNotes }
+              : item
+          )
+        );
+        setSelectedQuery((prev) => (prev ? { ...prev, internalNotes: updatedNotes } : null));
+        setNewNoteText("");
 
-    return (
-      nameStr.includes(q) ||
-      emailStr.includes(q) ||
-      phoneStr.includes(q) ||
-      serviceStr.includes(q) ||
-      positionStr.includes(q) ||
-      companyStr.includes(q)
-    );
-  });
+        Swal.fire({
+          toast: true,
+          position: "top-end",
+          icon: "success",
+          title: "Internal note added",
+          showConfirmButton: false,
+          timer: 2000,
+          background: "#0f172a",
+          color: "#ffffff",
+        });
+      }
+    } catch (e: any) {
+      console.error("Failed to add note:", e);
+    } finally {
+      setIsAddingNote(false);
+    }
+  };
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, activeTab]);
-
-  const handleDownloadCSV = () => {
-    // Filter strictly for Contact Leads (excluding job applicants)
-    const contactLeads = submissions.filter((item) => {
-      if (isJobApp(item)) return false;
-      if (!searchQuery.trim()) return true;
-      const q = searchQuery.toLowerCase();
-      const nameStr = (item.fullName || item.name || "").toLowerCase();
-      const emailStr = (item.email || "").toLowerCase();
-      const phoneStr = (item.phone || "").toLowerCase();
-      const serviceStr = (item.service || "").toLowerCase();
-      const companyStr = (item.company || "").toLowerCase();
-      return (
-        nameStr.includes(q) ||
-        emailStr.includes(q) ||
-        phoneStr.includes(q) ||
-        serviceStr.includes(q) ||
-        companyStr.includes(q)
-      );
+  // Delete Single Query
+  const handleDeleteQuery = async (id: string, clientName: string) => {
+    const confirm = await Swal.fire({
+      title: "Delete Query Record?",
+      text: `Remove query submitted by ${clientName}?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#e11d48",
+      cancelButtonColor: "#334155",
+      confirmButtonText: "Yes, Delete",
+      background: "#0f172a",
+      color: "#ffffff",
     });
 
-    if (contactLeads.length === 0) return;
+    if (confirm.isConfirmed) {
+      const res = await deleteSubmission(id);
+      if (res.success) {
+        setInquiries((prev) => prev.filter((item) => item._id !== id));
+        if (selectedQuery?._id === id) setSelectedQuery(null);
+        Swal.fire({
+          icon: "success",
+          title: "Deleted",
+          text: "Query record removed.",
+          timer: 1500,
+          showConfirmButton: false,
+          background: "#0f172a",
+          color: "#ffffff",
+        });
+      }
+    }
+  };
+
+  // Purge All Old Queries (Requirement 1)
+  const handlePurgeAll = async () => {
+    const confirm = await Swal.fire({
+      title: "Purge All Existing Queries?",
+      text: "This will permanently delete all existing queries from the database to keep the query section clean for new incoming leads. This action cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#e11d48",
+      cancelButtonColor: "#334155",
+      confirmButtonText: "Yes, Purge All Queries",
+      background: "#0f172a",
+      color: "#ffffff",
+    });
+
+    if (confirm.isConfirmed) {
+      setIsLoading(true);
+      try {
+        const res = await purgeAllSubmissions();
+        if (res.success) {
+          setInquiries([]);
+          setSelectedQuery(null);
+          Swal.fire({
+            icon: "success",
+            title: "Query Section Cleaned",
+            text: "All existing queries have been deleted. The query pipeline is now clean and ready for new leads.",
+            background: "#0f172a",
+            color: "#ffffff",
+          });
+        }
+      } catch (err: any) {
+        Swal.fire({
+          icon: "error",
+          title: "Purge Failed",
+          text: err?.message || "Failed to purge database.",
+          background: "#0f172a",
+          color: "#ffffff",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
+
+  // Export to CSV
+  const handleExportCSV = () => {
+    if (inquiries.length === 0) {
+      Swal.fire({
+        icon: "info",
+        title: "No Data",
+        text: "There are no inquiries to export.",
+        background: "#0f172a",
+        color: "#ffffff",
+      });
+      return;
+    }
 
     const headers = [
-      "Name",
+      "Client Name",
       "Email",
       "Phone",
+      "Company",
       "Service Requested",
-      "Company Name",
       "Status",
-      "Submitted Date",
-      "Message / Project Details"
+      "Priority",
+      "Assigned To",
+      "Follow-up Date",
+      "Received Date",
+      "Message",
     ];
 
-    const escapeCSV = (str: string | undefined | null) => {
-      if (!str) return '""';
-      const escaped = String(str).replace(/"/g, '""');
-      return `"${escaped}"`;
-    };
+    const rows = inquiries.map((q) => [
+      `"${q.name || q.fullName || "N/A"}"`,
+      `"${q.email || "N/A"}"`,
+      `"${q.phone || "N/A"}"`,
+      `"${q.company || "N/A"}"`,
+      `"${q.service || q.position || "N/A"}"`,
+      `"${q.status || "New"}"`,
+      `"${q.priority || "Medium"}"`,
+      `"${q.assignedTo || "Unassigned"}"`,
+      `"${q.followUpDate || "None"}"`,
+      `"${q.createdAt ? new Date(q.createdAt).toLocaleDateString() : "N/A"}"`,
+      `"${(q.message || q.coverLetter || "").replace(/"/g, '""')}"`,
+    ]);
 
-    // Format phone number to strictly 10 digits without any extra words, spaces, or prefixes
-    const formatPhone10Digits = (phoneStr: string | undefined | null) => {
-      if (!phoneStr) return "";
-      const digitsOnly = String(phoneStr).replace(/\D/g, "");
-      if (digitsOnly.length > 10 && digitsOnly.startsWith("91")) {
-        return digitsOnly.slice(-10);
-      }
-      if (digitsOnly.length >= 10) {
-        return digitsOnly.slice(-10);
-      }
-      return digitsOnly;
-    };
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
 
-    const escapePhoneCSV = (phoneStr: string | undefined | null) => {
-      const clean = formatPhone10Digits(phoneStr);
-      if (!clean) return '""';
-      // Format as ="7550553955" so Excel treats it strictly as text string and avoids scientific notation (7.55E+09)
-      return `="${clean}"`;
-    };
-
-    const rows = contactLeads.map((item) => {
-      const name = item.fullName || item.name || "N/A";
-      const email = item.email || "N/A";
-      const phone = escapePhoneCSV(item.phone);
-      const service = item.service || "General Inquiry";
-      const company = item.company || "N/A";
-      const status = item.status || "Pending";
-      const date = item.createdAt
-        ? new Date(item.createdAt).toLocaleString("en-US", {
-            month: "short",
-            day: "numeric",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-          })
-        : "N/A";
-      const msg = item.message || item.coverLetter || "";
-
-      return [
-        escapeCSV(name),
-        escapeCSV(email),
-        phone,
-        escapeCSV(service),
-        escapeCSV(company),
-        escapeCSV(status),
-        escapeCSV(date),
-        escapeCSV(msg)
-      ].join(",");
-    });
-
-    const csvData = [headers.join(","), ...rows].join("\n");
-    const blob = new Blob(["\uFEFF" + csvData], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
+    const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute(
-      "download",
-      `hiverift_contact_leads_${new Date().toISOString().slice(0, 10)}.csv`
-    );
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `HiveRift_Inquiries_Export_${Date.now()}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
-  const totalCount = submissions.length;
-  const contactCount = submissions.filter((item) => !isJobApp(item)).length;
-  const careersCount = submissions.filter((item) => isJobApp(item)).length;
+  // Filtered & Searched Inquiries
+  const filteredInquiries = useMemo(() => {
+    return inquiries.filter((item) => {
+      // Search query
+      const name = (item.name || item.fullName || "").toLowerCase();
+      const email = (item.email || "").toLowerCase();
+      const phone = (item.phone || "").toLowerCase();
+      const company = (item.company || "").toLowerCase();
+      const service = (item.service || item.position || "").toLowerCase();
+      const message = (item.message || item.coverLetter || "").toLowerCase();
 
-  const totalPages = Math.max(1, Math.ceil(filteredSubmissions.length / ITEMS_PER_PAGE));
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedSubmissions = filteredSubmissions.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+      const searchMatch =
+        !searchQuery ||
+        name.includes(searchQuery.toLowerCase()) ||
+        email.includes(searchQuery.toLowerCase()) ||
+        phone.includes(searchQuery.toLowerCase()) ||
+        company.includes(searchQuery.toLowerCase()) ||
+        service.includes(searchQuery.toLowerCase()) ||
+        message.includes(searchQuery.toLowerCase());
+
+      // Status filter
+      const statusMatch =
+        statusFilter === "all" ||
+        (item.status || "New").toLowerCase() === statusFilter.toLowerCase();
+
+      // Priority filter
+      const priorityMatch =
+        priorityFilter === "all" ||
+        (item.priority || "Medium").toLowerCase() === priorityFilter.toLowerCase();
+
+      // Source filter
+      const isJob = !!item.position || !!item.resume;
+      const sourceMatch =
+        sourceFilter === "all" ||
+        (sourceFilter === "career" && isJob) ||
+        (sourceFilter === "contact" && !isJob);
+
+      return searchMatch && statusMatch && priorityMatch && sourceMatch;
+    });
+  }, [inquiries, searchQuery, statusFilter, priorityFilter, sourceFilter]);
+
+  // Pagination
+  const totalPages = Math.ceil(filteredInquiries.length / itemsPerPage) || 1;
+  const paginatedInquiries = filteredInquiries.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const getStatusBadge = (status = "New") => {
+    switch (status) {
+      case "New":
+        return "bg-blue-950/80 border-blue-800 text-blue-400";
+      case "Contacted":
+        return "bg-cyan-950/80 border-cyan-800 text-cyan-400";
+      case "In Progress":
+        return "bg-amber-950/80 border-amber-800 text-amber-400";
+      case "Follow-up Scheduled":
+        return "bg-purple-950/80 border-purple-800 text-purple-400";
+      case "Converted":
+        return "bg-emerald-950/80 border-emerald-800 text-emerald-400";
+      case "Closed":
+        return "bg-slate-800 border-slate-700 text-slate-400";
+      default:
+        return "bg-slate-800 border-slate-700 text-slate-300";
+    }
+  };
+
+  const getPriorityBadge = (priority = "Medium") => {
+    switch (priority) {
+      case "High":
+        return "bg-rose-950/80 border-rose-800 text-rose-400 font-bold";
+      case "Medium":
+        return "bg-amber-950/80 border-amber-800 text-amber-400";
+      case "Low":
+        return "bg-slate-800 border-slate-700 text-slate-400";
+    }
+  };
+
+  const formatDateTime = (value?: string) => {
+    if (!value) return "Recent";
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "Recent";
+
+    return date.toLocaleString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
   return (
-    <AdminGuard>
-      <div suppressHydrationWarning className="min-h-screen bg-slate-100 flex font-['Roboto',sans-serif]">
-        {/* Admin Sidebar */}
+    <AdminGuard allowedRoles={["Admin", "Sales"]}>
+      <div className="min-h-screen bg-slate-950 text-slate-100 flex font-['Roboto',sans-serif]">
         <AdminSidebar
           isOpen={isMobileSidebarOpen}
           onClose={() => setIsMobileSidebarOpen(false)}
         />
 
-        {/* Main Content Area */}
-        <div className="flex-1 lg:ml-64 ml-0 flex flex-col min-w-0 transition-all duration-300">
-          <AdminHeader
-            title="Form Inquiries & Submissions"
-            subtitle="Manage website contact form leads and career job applications saved in MongoDB."
-            onMenuClick={() => setIsMobileSidebarOpen(true)}
-          />
+        <div className="flex-1 lg:pl-64 flex flex-col min-w-0">
+          <AdminHeader onOpenSidebar={() => setIsMobileSidebarOpen(true)} />
 
-          <main className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8 flex-1">
-            {/* Toast Notification */}
-            {statusMessage && (
-              <div
-                className={`p-4 rounded-2xl border flex items-center justify-between shadow-xs transition-all ${
-                  statusMessage.type === "success"
-                    ? "bg-emerald-50 border-emerald-200 text-emerald-800"
-                    : "bg-rose-50 border-rose-200 text-rose-800"
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  {statusMessage.type === "success" ? <CheckCircle2 size={20} className="text-emerald-600" /> : <XCircle size={20} className="text-rose-600" />}
-                  <span className="text-xs font-bold">{statusMessage.text}</span>
+          <main className="p-4 sm:p-6 lg:p-8 space-y-6 flex-1">
+            {/* Top Title & Header Actions */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center gap-2.5">
+                    <Inbox size={26} className="text-emerald-400" />
+                    <span>Dynamic Query Management</span>
+                  </h1>
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-800 text-emerald-400 text-xs font-mono font-bold">
+                    {filteredInquiries.length} Active
+                  </span>
                 </div>
+                <p className="text-xs sm:text-sm text-slate-400 mt-1">
+                  Manage incoming client leads, assign sales reps, track follow-ups, and trigger WhatsApp/Call outreach.
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap items-center gap-2.5">
                 <button
-                  onClick={() => setStatusMessage(null)}
-                  className="text-xs font-bold hover:underline opacity-80 hover:opacity-100"
+                  onClick={fetchInquiries}
+                  className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer"
+                  title="Refresh Inquiries"
                 >
-                  Dismiss
+                  <RefreshCw size={15} className={isLoading ? "animate-spin" : ""} />
                 </button>
-              </div>
-            )}
 
-            {/* Metrics Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-              <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-                <div>
-                  <div className="text-xs font-bold uppercase tracking-wider text-slate-500">Total Submissions</div>
-                  <div className="text-3xl font-black text-slate-900 mt-1">{totalCount}</div>
-                </div>
-                <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 font-black flex items-center justify-center shrink-0">
-                  <Inbox size={24} />
-                </div>
-              </div>
+                <button
+                  onClick={handleExportCSV}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white text-xs font-bold transition-colors cursor-pointer"
+                >
+                  <Download size={14} />
+                  <span className="hidden sm:inline">Export CSV</span>
+                </button>
 
-              <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-                <div>
-                  <div className="text-xs font-bold uppercase tracking-wider text-slate-500">Contact Leads</div>
-                  <div className="text-3xl font-black text-cyan-700 mt-1">{contactCount}</div>
-                </div>
-                <div className="w-12 h-12 rounded-xl bg-cyan-50 text-cyan-600 font-black flex items-center justify-center shrink-0">
-                  <Mail size={24} />
-                </div>
-              </div>
-
-              <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-                <div>
-                  <div className="text-xs font-bold uppercase tracking-wider text-slate-500">Career Applicants</div>
-                  <div className="text-3xl font-black text-purple-700 mt-1">{careersCount}</div>
-                </div>
-                <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 font-black flex items-center justify-center shrink-0">
-                  <Briefcase size={24} />
-                </div>
+                {currentUser?.role === "Admin" && (
+                  <button
+                    onClick={handlePurgeAll}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-rose-950/60 border border-rose-800/80 hover:bg-rose-900/60 text-rose-300 text-xs font-bold transition-colors cursor-pointer"
+                    title="Delete all existing queries from the database"
+                  >
+                    <Trash2 size={14} />
+                    <span>Purge Old Queries</span>
+                  </button>
+                )}
               </div>
             </div>
 
-            {/* Controls: Filter Tabs, Search & Refresh */}
-            <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row gap-4 items-center justify-between">
-              {/* Category Filter Tabs */}
-              <div className="flex items-center bg-slate-100 p-1.5 rounded-xl border border-slate-200 w-full md:w-auto">
-                <button
-                  onClick={() => setActiveTab("all")}
-                  className={`flex-1 md:flex-none px-4 py-2 rounded-lg text-xs font-black transition-all ${
-                    activeTab === "all"
-                      ? "bg-emerald-600 text-white shadow-md shadow-emerald-200"
-                      : "text-slate-600 hover:text-slate-900"
-                  }`}
-                >
-                  All ({totalCount})
-                </button>
-                <button
-                  onClick={() => setActiveTab("contact")}
-                  className={`flex-1 md:flex-none px-4 py-2 rounded-lg text-xs font-black transition-all ${
-                    activeTab === "contact"
-                      ? "bg-emerald-600 text-white shadow-md shadow-emerald-200"
-                      : "text-slate-600 hover:text-slate-900"
-                  }`}
-                >
-                  Contact Leads ({contactCount})
-                </button>
-                <button
-                  onClick={() => setActiveTab("careers")}
-                  className={`flex-1 md:flex-none px-4 py-2 rounded-lg text-xs font-black transition-all ${
-                    activeTab === "careers"
-                      ? "bg-emerald-600 text-white shadow-md shadow-emerald-200"
-                      : "text-slate-600 hover:text-slate-900"
-                  }`}
-                >
-                  Careers ({careersCount})
-                </button>
-              </div>
-
-              {/* Search Bar, CSV Download & Refresh */}
-              <div className="flex items-center gap-3 w-full md:w-auto">
-                <div className="relative flex-1 md:w-72">
-                  <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+            {/* Filter Bar & Search Controls */}
+            <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl space-y-4">
+              {/* Row 1: Search & Dropdown Filters */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                {/* Search Input */}
+                <div className="relative flex items-center lg:col-span-2">
                   <input
                     type="text"
-                    placeholder="Search by name, email, service..."
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-4 py-2.5 text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:bg-white transition-all"
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                    placeholder="Search by client name, email, phone, company, message..."
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 pl-10 pr-4 text-xs font-bold text-white outline-none focus:border-emerald-500 transition-all placeholder:text-slate-600"
                   />
+                  <Search size={15} className="absolute left-3.5 text-slate-500" />
                 </div>
 
-                <button
-                  onClick={handleDownloadCSV}
-                  disabled={contactCount === 0}
-                  className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs uppercase tracking-wider rounded-xl transition-all flex items-center gap-2 shadow-md shadow-emerald-200 disabled:opacity-50 shrink-0 cursor-pointer"
-                  title="Download Contact Leads CSV"
+                {/* Priority Filter */}
+                <select
+                  value={priorityFilter}
+                  onChange={(e) => {
+                    setPriorityFilter(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3 text-xs font-bold text-slate-300 outline-none focus:border-emerald-500 cursor-pointer"
                 >
-                  <Download size={15} />
-                  <span>Download Leads CSV</span>
-                </button>
+                  <option value="all">All Priorities</option>
+                  <option value="High">🔴 High Priority</option>
+                  <option value="Medium">🟡 Medium Priority</option>
+                  <option value="Low">⚪ Low Priority</option>
+                </select>
 
-                <button
-                  onClick={fetchSubmissions}
-                  disabled={isLoading}
-                  className="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl border border-slate-200 transition-all disabled:opacity-50 shrink-0"
-                  title="Refresh Submissions"
+                {/* Source Filter */}
+                <select
+                  value={sourceFilter}
+                  onChange={(e) => {
+                    setSourceFilter(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3 text-xs font-bold text-slate-300 outline-none focus:border-emerald-500 cursor-pointer"
                 >
-                  <RefreshCw size={16} className={isLoading ? "animate-spin" : ""} />
-                </button>
+                  <option value="all">All Sources</option>
+                  <option value="contact">Website Contact & Quotes</option>
+                  <option value="career">Job Applications</option>
+                </select>
+              </div>
+
+              {/* Row 2: Status Pill Tabs */}
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
+                <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 mr-1 flex items-center gap-1">
+                  <Filter size={11} />
+                  <span>Status:</span>
+                </span>
+                {["all", ...STATUS_OPTIONS].map((status) => {
+                  const isActive = statusFilter === status;
+                  return (
+                    <button
+                      key={status}
+                      onClick={() => {
+                        setStatusFilter(status);
+                        setCurrentPage(1);
+                      }}
+                      className={`px-3 py-1.5 rounded-lg font-bold whitespace-nowrap transition-all cursor-pointer ${
+                        isActive
+                          ? "bg-emerald-600 text-white shadow-md shadow-emerald-900/50"
+                          : "bg-slate-950 text-slate-400 hover:text-white border border-slate-800"
+                      }`}
+                    >
+                      {status === "all" ? "All" : status}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Data Table */}
-            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
-              {isLoading ? (
-                <div className="py-20 text-center space-y-3">
-                  <RefreshCw size={32} className="animate-spin text-emerald-600 mx-auto" />
-                  <p className="text-slate-500 text-xs font-bold">Loading submissions from database...</p>
+            {/* Inquiries Table / Empty State */}
+            {isLoading ? (
+              <div className="py-20 text-center text-slate-400 space-y-3">
+                <RefreshCw size={24} className="animate-spin text-emerald-500 mx-auto" />
+                <p className="text-xs font-bold">Loading live inquiries...</p>
+              </div>
+            ) : filteredInquiries.length === 0 ? (
+              <div className="bg-slate-900/90 border border-dashed border-slate-800 rounded-3xl p-12 text-center space-y-4">
+                <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto">
+                  <CheckCircle2 size={28} />
                 </div>
-              ) : filteredSubmissions.length === 0 ? (
-                <div className="py-20 text-center space-y-3">
-                  <Inbox size={40} className="text-slate-300 mx-auto" />
-                  <h3 className="text-slate-800 font-black text-base">No submissions found</h3>
-                  <p className="text-slate-500 text-xs max-w-sm mx-auto font-medium">
-                    {searchQuery
-                      ? "No records matched your search term. Try adjusting your query."
-                      : "No contact inquiries or job applications received yet."}
+                <div>
+                  <h3 className="text-base font-black text-white">Query Section is Clean & Ready</h3>
+                  <p className="text-xs text-slate-400 mt-1 max-w-md mx-auto leading-relaxed">
+                    {inquiries.length === 0
+                      ? "All old queries were successfully removed. Any new client form submissions or quote requests from the website will appear here in real time."
+                      : "No queries matched your search and filter criteria. Try clearing search filters."}
                   </p>
                 </div>
-              ) : (
-                <>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs border-collapse">
-                      <thead className="bg-slate-50 text-slate-500 uppercase tracking-wider font-black border-b border-slate-200 text-[10px]">
-                        <tr>
-                          <th className="py-4 px-6">Type</th>
-                          <th className="py-4 px-6">Name & Email</th>
-                          <th className="py-4 px-6">Phone</th>
-                          <th className="py-4 px-6">Service / Position</th>
-                          <th className="py-4 px-6">Status</th>
-                          <th className="py-4 px-6">Submitted Date</th>
-                          <th className="py-4 px-6 text-right">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100 font-semibold text-slate-700">
-                        {paginatedSubmissions.map((item) => {
-                          const isJob = isJobApp(item);
-                          const name = item.fullName || item.name || "N/A";
-                          const currentStatus = item.status || "Pending";
-                          const formattedDate = item.createdAt
-                            ? new Date(item.createdAt).toLocaleString("en-US", {
-                                month: "short",
-                                day: "numeric",
-                                year: "numeric",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })
-                            : "N/A";
+              </div>
+            ) : (
+              <div className="bg-slate-900/90 border border-slate-800 rounded-3xl shadow-xl overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-slate-950 text-slate-400 uppercase text-[10px] tracking-wider font-mono border-b border-slate-800">
+                      <tr>
+                        <th className="p-4 pl-6">Client / Contact</th>
+                        <th className="p-4">Service Required</th>
+                        <th className="p-4">Status</th>
+                        <th className="p-4">Priority</th>
+                        <th className="p-4">Assigned Rep</th>
+                        <th className="p-4">Follow-Up</th>
+                        <th className="p-4">Received</th>
+                        <th className="p-4 pr-6 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/60">
+                      {paginatedInquiries.map((q) => {
+                        const clientName = q.name || q.fullName || "Prospective Client";
+                        const clientEmail = q.email;
+                        const clientPhone = q.phone;
+                        const isJob = !!q.position || !!q.resume;
+                        const hasNotes = q.internalNotes && q.internalNotes.length > 0;
 
-                          return (
-                            <tr key={item._id} className="hover:bg-slate-50/80 transition-colors">
-                              <td className="py-4 px-6 whitespace-nowrap">
-                                {isJob ? (
-                                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black bg-purple-50 text-purple-700 border border-purple-200">
-                                    <Briefcase size={12} />
-                                    Job Applicant
-                                  </span>
-                                ) : (
-                                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black bg-cyan-50 text-cyan-700 border border-cyan-200">
-                                    <Mail size={12} />
-                                    Contact Lead
-                                  </span>
-                                )}
-                              </td>
-                              <td className="py-4 px-6">
-                                <div className="font-black text-slate-900 text-xs">{name}</div>
-                                <div className="text-slate-500 text-[11px] font-mono">{item.email}</div>
-                              </td>
-                              <td className="py-4 px-6 whitespace-nowrap font-mono text-slate-700">
-                                {item.phone || "N/A"}
-                              </td>
-                              <td className="py-4 px-6">
-                                <div className="font-bold text-slate-800">
-                                  {isJob ? item.position || "Applicant" : item.service || "General Inquiry"}
-                                </div>
-                                {!isJob && item.company && item.company !== "N/A" && (
-                                  <div className="text-[10px] text-slate-400 font-bold flex items-center gap-1 mt-0.5">
-                                    <Building size={10} />
-                                    {item.company}
-                                  </div>
-                                )}
-                              </td>
-                              <td className="py-4 px-6 whitespace-nowrap">
-                                <select
-                                  value={currentStatus}
-                                  onChange={(e) => handleStatusChange(item._id, e.target.value)}
-                                  className={`text-xs font-black px-2.5 py-1 rounded-xl border cursor-pointer focus:outline-none transition-all ${
-                                    currentStatus === "Completed"
-                                      ? "bg-emerald-50 text-emerald-700 border-emerald-300"
-                                      : currentStatus === "Contacted"
-                                      ? "bg-blue-50 text-blue-700 border-blue-300"
-                                      : currentStatus === "In Progress"
-                                      ? "bg-purple-50 text-purple-700 border-purple-300"
-                                      : currentStatus === "Rejected"
-                                      ? "bg-rose-50 text-rose-700 border-rose-300"
-                                      : "bg-amber-50 text-amber-700 border-amber-300"
-                                  }`}
-                                >
-                                  <option value="Pending" className="bg-white text-slate-900 font-semibold">🟡 Pending</option>
-                                  <option value="Contacted" className="bg-white text-slate-900 font-semibold">🔵 Contacted</option>
-                                  <option value="In Progress" className="bg-white text-slate-900 font-semibold">🟣 In Progress</option>
-                                  <option value="Completed" className="bg-white text-slate-900 font-semibold">🟢 Completed</option>
-                                  <option value="Rejected" className="bg-white text-slate-900 font-semibold">🔴 Rejected</option>
-                                </select>
-                              </td>
-                              <td className="py-4 px-6 whitespace-nowrap text-slate-500 text-[11px] font-medium">
-                                {formattedDate}
-                              </td>
-                              <td className="py-4 px-6 whitespace-nowrap text-right space-x-2">
-                                <button
-                                  onClick={() => setSelectedItem(item)}
-                                  className="p-2 bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border border-slate-200 hover:border-emerald-200 rounded-xl transition-all"
-                                  title="View Details"
-                                >
-                                  <Eye size={15} />
-                                </button>
-                                <button
-                                  onClick={() => setDeleteTargetId(item._id)}
-                                  className="p-2 bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-200 hover:border-rose-200 rounded-xl transition-all"
-                                  title="Delete Submission"
-                                >
-                                  <Trash2 size={15} />
-                                </button>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  {/* Pagination Bar */}
-                  {filteredSubmissions.length > 0 && (
-                    <div className="bg-slate-50 border-t border-slate-200 px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-                      <div className="text-xs font-bold text-slate-500">
-                        Showing <span className="text-slate-900 font-black">{startIndex + 1}</span> to{" "}
-                        <span className="text-slate-900 font-black">
-                          {Math.min(startIndex + ITEMS_PER_PAGE, filteredSubmissions.length)}
-                        </span>{" "}
-                        of <span className="text-slate-900 font-black">{filteredSubmissions.length}</span> entries
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                          disabled={currentPage === 1}
-                          className="p-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                          title="Previous Page"
-                        >
-                          <ChevronLeft size={16} />
-                        </button>
-
-                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                          <button
-                            key={page}
-                            onClick={() => setCurrentPage(page)}
-                            className={`w-8 h-8 rounded-xl text-xs font-black transition-all ${
-                              currentPage === page
-                                ? "bg-emerald-600 text-white shadow-md shadow-emerald-200"
-                                : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-100"
-                            }`}
+                        return (
+                          <tr
+                            key={q._id}
+                            className="hover:bg-slate-800/40 transition-colors group cursor-pointer"
+                            onClick={() => openDetailModal(q)}
                           >
-                            {page}
-                          </button>
-                        ))}
+                            {/* Client Name & Phone */}
+                            <td className="p-4 pl-6">
+                              <div className="font-bold text-white group-hover:text-emerald-300 transition-colors">
+                                {clientName}
+                              </div>
+                              <div className="text-[11px] text-slate-400 font-mono flex items-center gap-1.5 mt-0.5">
+                                <span>{clientPhone}</span>
+                                {q.company && q.company !== "N/A" && (
+                                  <span className="text-slate-500">• {q.company}</span>
+                                )}
+                              </div>
+                            </td>
 
-                        <button
-                          onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                          disabled={currentPage === totalPages}
-                          className="p-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                          title="Next Page"
-                        >
-                          <ChevronRight size={16} />
-                        </button>
-                      </div>
+                            {/* Service / Type */}
+                            <td className="p-4">
+                              <div className="font-semibold text-slate-200">
+                                {q.service || q.position || "General Web Inquiry"}
+                              </div>
+                              <div className="text-[10px] text-slate-500">
+                                {isJob ? "Job Application" : "Website Quoting / Contact"}
+                              </div>
+                            </td>
+
+                            {/* Status */}
+                            <td className="p-4" onClick={(e) => e.stopPropagation()}>
+                              <span
+                                className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${getStatusBadge(
+                                  q.status
+                                )}`}
+                              >
+                                {q.status || "New"}
+                              </span>
+                            </td>
+
+                            {/* Priority */}
+                            <td className="p-4">
+                              <span
+                                className={`inline-block px-2 py-0.5 rounded-md text-[10px] border ${getPriorityBadge(
+                                  q.priority
+                                )}`}
+                              >
+                                {q.priority || "Medium"}
+                              </span>
+                            </td>
+
+                            {/* Assigned To */}
+                            <td className="p-4 text-slate-300 text-[11px]">
+                              {q.assignedTo && q.assignedTo !== "Unassigned" ? (
+                                <span className="text-emerald-400 font-medium">
+                                  {q.assignedTo.split(" ")[0]}
+                                </span>
+                              ) : (
+                                <span className="text-slate-500 italic">Unassigned</span>
+                              )}
+                            </td>
+
+                            {/* Follow-Up */}
+                            <td className="p-4 text-slate-300 text-[11px] font-mono">
+                              {q.followUpDate ? (
+                                <span className="text-purple-400 font-bold flex items-center gap-1">
+                                  <Clock size={11} />
+                                  <span>{q.followUpDate}</span>
+                                </span>
+                              ) : (
+                                <span className="text-slate-600">—</span>
+                              )}
+                            </td>
+
+                            {/* Date & Time */}
+                            <td className="p-4 text-slate-400 font-mono text-[11px]">
+                              <div className="flex flex-col gap-0.5">
+                                <span>{formatDateTime(q.createdAt)}</span>
+                              </div>
+                            </td>
+
+                            {/* Actions */}
+                            <td className="p-4 pr-6 text-right" onClick={(e) => e.stopPropagation()}>
+                              <div className="inline-flex items-center gap-1.5">
+                                {/* Direct WhatsApp Trigger */}
+                                {clientPhone && (
+                                  <a
+                                    href={`https://wa.me/${clientPhone.replace(/[^0-9]/g, "")}`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-slate-950 transition-colors"
+                                    title="Instant WhatsApp"
+                                  >
+                                    <MessageSquare size={14} />
+                                  </a>
+                                )}
+
+                                {/* Phone Call */}
+                                {clientPhone && (
+                                  <a
+                                    href={`tel:${clientPhone}`}
+                                    className="p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white transition-colors"
+                                    title="Call Phone"
+                                  >
+                                    <Phone size={14} />
+                                  </a>
+                                )}
+
+                                {/* View / Edit Modal */}
+                                <button
+                                  onClick={() => openDetailModal(q)}
+                                  className="p-1.5 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white transition-colors cursor-pointer"
+                                  title="View Details & Notes"
+                                >
+                                  <Eye size={14} />
+                                </button>
+
+                                {/* Delete */}
+                                <button
+                                  onClick={() => handleDeleteQuery(q._id, clientName)}
+                                  className="p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white transition-colors cursor-pointer"
+                                  title="Delete"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                  <div className="p-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+                    <div>
+                      Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+                      {Math.min(currentPage * itemsPerPage, filteredInquiries.length)} of{" "}
+                      {filteredInquiries.length} queries
                     </div>
-                  )}
-                </>
-              )}
-            </div>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                        disabled={currentPage === 1}
+                        className="px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 hover:border-slate-700 disabled:opacity-30 cursor-pointer"
+                      >
+                        Previous
+                      </button>
+                      <span className="font-mono px-2 text-white">
+                        {currentPage} / {totalPages}
+                      </span>
+                      <button
+                        onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                        disabled={currentPage === totalPages}
+                        className="px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 hover:border-slate-700 disabled:opacity-30 cursor-pointer"
+                      >
+                        Next
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </main>
         </div>
 
-        {/* Modal: Submission Detail View */}
-        {selectedItem && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-in fade-in duration-200">
-            <div className="bg-white border border-slate-200 rounded-2xl max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-              <button
-                onClick={() => setSelectedItem(null)}
-                className="absolute top-5 right-5 p-2 text-slate-400 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors font-bold text-xs"
-              >
-                ✕
-              </button>
-
-              <div className="flex items-center gap-4 border-b border-slate-100 pb-5">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center shrink-0">
-                  {isJobApp(selectedItem) ? <Briefcase size={24} /> : <Mail size={24} />}
-                </div>
+        {/* ================= QUERY DETAIL & EDIT MODAL ================= */}
+        {selectedQuery && (
+          <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 z-50 overflow-y-auto">
+            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 max-w-2xl w-full shadow-2xl space-y-6 my-8">
+              {/* Modal Header */}
+              <div className="flex items-center justify-between pb-4 border-b border-slate-800">
                 <div>
-                  <h3 className="text-xl font-black text-slate-900">
-                    {selectedItem.fullName || selectedItem.name || "Inquiry Detail"}
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-800 text-emerald-400 text-[10px] font-mono font-bold uppercase mb-1">
+                    <span>Query ID: {selectedQuery._id.slice(-6)}</span>
+                  </div>
+                  <h3 className="text-xl font-black text-white">
+                    {selectedQuery.name || selectedQuery.fullName || "Prospective Client"}
                   </h3>
-                  <p className="text-xs font-bold text-slate-500">
-                    {isJobApp(selectedItem) ? `Position: ${selectedItem.position || "Job Application"}` : `Service: ${selectedItem.service || "Contact Form"}`}
-                  </p>
                 </div>
-              </div>
-
-              {/* Data Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-1">
-                  <span className="text-slate-400 font-black uppercase tracking-wider text-[10px]">Lead Status</span>
-                  <div>
-                    <select
-                      value={selectedItem.status || "Pending"}
-                      onChange={(e) => handleStatusChange(selectedItem._id, e.target.value)}
-                      className={`text-xs font-black px-3 py-1 rounded-xl border cursor-pointer focus:outline-none transition-all ${
-                        (selectedItem.status || "Pending") === "Completed"
-                          ? "bg-emerald-50 text-emerald-700 border-emerald-300"
-                          : (selectedItem.status || "Pending") === "Contacted"
-                          ? "bg-blue-50 text-blue-700 border-blue-300"
-                          : (selectedItem.status || "Pending") === "In Progress"
-                          ? "bg-purple-50 text-purple-700 border-purple-300"
-                          : (selectedItem.status || "Pending") === "Rejected"
-                          ? "bg-rose-50 text-rose-700 border-rose-300"
-                          : "bg-amber-50 text-amber-700 border-amber-300"
-                      }`}
-                    >
-                      <option value="Pending" className="bg-white text-slate-900 font-semibold">🟡 Pending</option>
-                      <option value="Contacted" className="bg-white text-slate-900 font-semibold">🔵 Contacted</option>
-                      <option value="In Progress" className="bg-white text-slate-900 font-semibold">🟣 In Progress</option>
-                      <option value="Completed" className="bg-white text-slate-900 font-semibold">🟢 Completed</option>
-                      <option value="Rejected" className="bg-white text-slate-900 font-semibold">🔴 Rejected</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-1">
-                  <span className="text-slate-400 font-black uppercase tracking-wider text-[10px]">Email Address</span>
-                  <p className="text-slate-900 font-mono font-bold">{selectedItem.email}</p>
-                </div>
-
-                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-1">
-                  <span className="text-slate-400 font-black uppercase tracking-wider text-[10px]">Phone Number</span>
-                  <p className="text-slate-900 font-mono font-bold">{selectedItem.phone || "N/A"}</p>
-                </div>
-
-                {selectedItem.company && selectedItem.company !== "N/A" && (
-                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-1">
-                    <span className="text-slate-400 font-black uppercase tracking-wider text-[10px]">Company Name</span>
-                    <p className="text-slate-900 font-bold">{selectedItem.company}</p>
-                  </div>
-                )}
-
-                {selectedItem.portfolio && (
-                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-1">
-                    <span className="text-slate-400 font-black uppercase tracking-wider text-[10px]">Portfolio Link</span>
-                    <p className="text-emerald-600 font-bold underline truncate">
-                      <a href={selectedItem.portfolio} target="_blank" rel="noreferrer">
-                        {selectedItem.portfolio}
-                      </a>
-                    </p>
-                  </div>
-                )}
-
-                {selectedItem.resume && (
-                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-1 md:col-span-2">
-                    <span className="text-slate-400 font-black uppercase tracking-wider text-[10px]">Resume File</span>
-                    <p className="text-emerald-700 font-bold flex items-center gap-2">
-                      <FileText size={16} />
-                      {selectedItem.resume}
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {/* Message / Cover Letter */}
-              {(selectedItem.message || selectedItem.coverLetter) && (
-                <div className="space-y-2">
-                  <h4 className="text-xs font-black text-slate-500 uppercase tracking-wider">
-                    {isJobApp(selectedItem) ? "Cover Letter" : "Message / Project Details"}
-                  </h4>
-                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 text-slate-800 text-xs leading-relaxed whitespace-pre-wrap font-medium">
-                    {selectedItem.coverLetter || selectedItem.message}
-                  </div>
-                </div>
-              )}
-
-              {/* Modal Footer */}
-              <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-                <span className="text-[11px] font-mono text-slate-400">
-                  ID: {selectedItem._id}
-                </span>
                 <button
-                  onClick={() => setSelectedItem(null)}
-                  className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-black rounded-xl transition-colors"
+                  onClick={() => setSelectedQuery(null)}
+                  className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 text-lg cursor-pointer"
                 >
-                  Close
+                  ✕
                 </button>
               </div>
-            </div>
-          </div>
-        )}
 
-        {/* Modal: Delete Confirmation */}
-        {deleteTargetId && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-in fade-in duration-200">
-            <div className="bg-white border border-slate-200 rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center shrink-0">
-                  <AlertCircle size={22} />
+              {/* Client Contact Quick Strip */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-2xl bg-slate-950 border border-slate-800 text-xs">
+                <div>
+                  <span className="text-[10px] text-slate-500 uppercase font-mono font-bold">Email</span>
+                  <div className="font-mono text-slate-200 truncate">
+                    <a href={`mailto:${selectedQuery.email}`} className="hover:text-emerald-400 underline">
+                      {selectedQuery.email}
+                    </a>
+                  </div>
                 </div>
                 <div>
-                  <h3 className="text-base font-black text-slate-900">Delete Submission?</h3>
-                  <p className="text-xs font-bold text-slate-400">This action cannot be undone.</p>
+                  <span className="text-[10px] text-slate-500 uppercase font-mono font-bold">Phone</span>
+                  <div className="font-mono text-slate-200">
+                    <a href={`tel:${selectedQuery.phone}`} className="hover:text-emerald-400 underline">
+                      {selectedQuery.phone}
+                    </a>
+                  </div>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-500 uppercase font-mono font-bold">Company</span>
+                  <div className="text-slate-200 truncate">{selectedQuery.company || "Direct Individual"}</div>
                 </div>
               </div>
 
-              <p className="text-xs font-semibold text-slate-600 leading-relaxed">
-                Are you sure you want to permanently delete this submission record from MongoDB?
-              </p>
+              {/* Client Message */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                  Client Requirement / Message
+                </label>
+                <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800 text-xs text-slate-200 leading-relaxed font-mono whitespace-pre-wrap max-h-40 overflow-y-auto">
+                  {selectedQuery.message || selectedQuery.coverLetter || "No specific requirement message provided."}
+                </div>
+              </div>
 
-              <div className="flex items-center justify-end gap-3 pt-2">
+              {/* Status, Priority, Assignment & Follow-Up Controls */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-800">
+                {/* Status Selector */}
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                    Inquiry Status
+                  </label>
+                  <select
+                    value={editStatus}
+                    onChange={(e) => setEditStatus(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3 text-xs font-bold text-white outline-none focus:border-emerald-500 cursor-pointer"
+                  >
+                    {STATUS_OPTIONS.map((st) => (
+                      <option key={st} value={st}>
+                        {st}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Priority Selector */}
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                    Lead Priority
+                  </label>
+                  <select
+                    value={editPriority}
+                    onChange={(e) => setEditPriority(e.target.value as any)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3 text-xs font-bold text-white outline-none focus:border-emerald-500 cursor-pointer"
+                  >
+                    {PRIORITY_OPTIONS.map((pr) => (
+                      <option key={pr} value={pr}>
+                        {pr} Priority
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Assigned Sales Rep */}
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                    Assigned Sales Representative
+                  </label>
+                  <select
+                    value={editAssignedTo}
+                    onChange={(e) => setEditAssignedTo(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3 text-xs font-bold text-white outline-none focus:border-emerald-500 cursor-pointer"
+                  >
+                    {SALES_REPRESENTATIVES.map((rep) => (
+                      <option key={rep} value={rep}>
+                        {rep}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Next Follow-Up Date */}
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                    Next Follow-Up Date
+                  </label>
+                  <input
+                    type="date"
+                    value={editFollowUpDate}
+                    onChange={(e) => setEditFollowUpDate(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-3 text-xs font-bold text-white outline-none focus:border-emerald-500 cursor-pointer"
+                  />
+                </div>
+              </div>
+
+              {/* Save Details Button */}
+              <div className="flex justify-end">
                 <button
-                  onClick={() => setDeleteTargetId(null)}
-                  disabled={isDeleting}
-                  className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-black rounded-xl transition-colors disabled:opacity-50"
+                  type="button"
+                  onClick={handleSaveDetails}
+                  disabled={isSavingDetails}
+                  className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg shadow-emerald-900/50 transition-all cursor-pointer disabled:opacity-50"
                 >
-                  Cancel
+                  {isSavingDetails ? "Saving..." : "Save Pipeline Updates"}
                 </button>
-                <button
-                  onClick={handleDelete}
-                  disabled={isDeleting}
-                  className="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-black rounded-xl transition-colors shadow-lg shadow-rose-200 flex items-center gap-2 disabled:opacity-50"
-                >
-                  {isDeleting && <RefreshCw size={14} className="animate-spin" />}
-                  <span>Delete Permanently</span>
-                </button>
+              </div>
+
+              {/* Internal Notes Timeline */}
+              <div className="pt-4 border-t border-slate-800 space-y-3">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-1.5">
+                  <MessageSquare size={13} className="text-emerald-400" />
+                  <span>Internal Sales Follow-Up Notes</span>
+                </label>
+
+                {/* Notes List */}
+                <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                  {selectedQuery.internalNotes && selectedQuery.internalNotes.length > 0 ? (
+                    selectedQuery.internalNotes.map((noteItem, nIdx) => (
+                      <div
+                        key={nIdx}
+                        className="p-3 rounded-xl bg-slate-950 border border-slate-800/80 text-xs space-y-1"
+                      >
+                        <div className="flex items-center justify-between text-[10px] text-slate-400 font-mono">
+                          <span className="font-bold text-emerald-400">{noteItem.author}</span>
+                          <span>{new Date(noteItem.createdAt).toLocaleString()}</span>
+                        </div>
+                        <p className="text-slate-200">{noteItem.note}</p>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-xs text-slate-500 italic py-2">
+                      No internal notes recorded yet. Add follow-up logs below.
+                    </p>
+                  )}
+                </div>
+
+                {/* Add Note Form */}
+                <form onSubmit={handleAddNote} className="flex gap-2">
+                  <input
+                    type="text"
+                    required
+                    value={newNoteText}
+                    onChange={(e) => setNewNoteText(e.target.value)}
+                    placeholder="Log a client call, quotation status, or meeting note..."
+                    className="flex-1 bg-slate-950 border border-slate-800 rounded-xl py-2 px-3 text-xs text-white outline-none focus:border-emerald-500"
+                  />
+                  <button
+                    type="submit"
+                    disabled={isAddingNote}
+                    className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl transition-colors cursor-pointer disabled:opacity-50"
+                  >
+                    {isAddingNote ? "Adding..." : "Add Note"}
+                  </button>
+                </form>
               </div>
             </div>
           </div>

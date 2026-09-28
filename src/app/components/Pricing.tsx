@@ -1,46 +1,51 @@
 "use client";
 
 import { motion } from "motion/react";
-import { Check, Info } from "lucide-react";
+import { Check, Info, ShieldCheck, Zap } from "lucide-react";
 import { useState } from "react";
 import { LeadPopup } from "./LeadPopup";
 
 const websitePricing = [
   {
     title: "Starter",
-    price: 44999,
-    gst: 8099,
-    total: 53098,
-    description: "Local shops, solo founders",
+    badgeLabel: "Starter Scope",
+    description: "Local shops, solo founders & personal brands",
     features: ["Up to 5 Pages", "Template-Based Website", "Mobile Optimisation", "Basic SEO Setup", "1 Month Support", "2 Rounds Revisions"],
     popular: false
   },
   {
     title: "Business Pro",
-    price: 59999,
-    gst:10799,
-    total: 70798,
-    description: "Startups, SMEs",
-    features: ["Up to 15 Pages", "Custom Design", "Mobile Optimisation", "Advanced SEO Setup", "WordPress Integration", "3 Months Support", "5 Rounds Revisions"],
+    badgeLabel: "Business Scope",
+    description: "Growing startups, mid-market businesses & SMEs",
+    features: ["Up to 15 Pages", "Custom Design", "Mobile Optimisation", "Advanced SEO Setup", "WordPress / Headless CMS Integration", "3 Months Support", "5 Rounds Revisions"],
     popular: true,
     badge: "Most Enquired"
   },
   {
     title: "Growth",
-    price: 149999,
-    gst: 26999,
-    total: 176998,
-    description: "Growing companies",
-    features:["Up to 30 Pages", "Custom + CMS", "Full Technical SEO", "E-commerce Ready", "Headless CMS Option", "6 Months Support", "Unlimited Revisions"],
+    badgeLabel: "Enterprise Scope",
+    description: "Scaling companies & high-volume digital platforms",
+    features: ["Up to 30 Pages", "Custom Next.js + Headless CMS", "Full Technical SEO & Schema", "E-commerce Ready", "Headless CMS Option", "6 Months Support", "Unlimited Revisions"],
     popular: false
   }
 ];
 
 const marketingPricing = [
-  { service: "Starter", price: "7,999", gst: "1,440", total: "9,439", seo: "5 pages", keywords: "10", blog: "1/mo", social: "1 platform, 6 posts", ads: "-", meta: "-", report: "Basic", manager: "Shared", contract: "3 months" },
-  { service: "Growth", price: "14,999", gst: "2,700", total: "17,699", seo: "15 pages", keywords: "25", blog: "2/mo", social: "2 platforms, 12 posts", ads: "Up to Rs. 20K spend", meta: "-", report: "Standard", manager: "Shared", contract: "3 months" },
-  { service: "Scale", price: "24,999", gst: "4,500", total: "29,499", seo: "25 pages", keywords: "50", blog: "4/mo", social: "3 platforms, 18 posts", ads: "Up to Rs. 50K spend", meta: "Included", report: "Full dashboard", manager: "Dedicated", contract: "6 months" },
-  { service: "Dominate", price: "39,999", gst: "7,200", total: "47,199", seo: "Unlimited", keywords: "100+", blog: "8/mo", social: "4 platforms, 24 posts", ads: "Up to Rs. 1.5L spend", meta: "Included + A/B", report: "Executive + insights", manager: "Senior strategist", contract: "6 months" },
+  { service: "Starter", planTier: "Starter Retainer", seo: "5 pages", keywords: "10", blog: "1/mo", social: "1 platform, 6 posts", ads: "Campaign Setup", meta: "-", report: "Basic", manager: "Shared", contract: "3 months" },
+  { service: "Growth", planTier: "Growth Retainer", seo: "15 pages", keywords: "25", blog: "2/mo", social: "2 platforms, 12 posts", ads: "Active Management", meta: "-", report: "Standard", manager: "Shared", contract: "3 months" },
+  { service: "Scale", planTier: "Scale Retainer", seo: "25 pages", keywords: "50", blog: "4/mo", social: "3 platforms, 18 posts", ads: "High-Intent PMax", meta: "Included", report: "Full dashboard", manager: "Dedicated", contract: "6 months" },
+  { service: "Dominate", planTier: "Enterprise Retainer", seo: "Unlimited", keywords: "100+", blog: "8/mo", social: "4 platforms, 24 posts", ads: "Omnichannel Scale", meta: "Included + A/B", report: "Executive + insights", manager: "Senior strategist", contract: "6 months" },
+];
+
+const appSolutions = [
+  { type: "Business / Portfolio Website", scope: "Custom Milestone Scope" },
+  { type: "E-commerce (Woo / Shopify / Custom)", scope: "Full Commerce Scope" },
+  { type: "Custom Web Application (Next.js / Node)", scope: "Full-Stack Application Scope" },
+  { type: "Android OR iOS App (Single Native)", scope: "Mobile Engineering Scope" },
+  { type: "Android + iOS App (Cross-Platform Flutter/React Native)", scope: "Cross-Platform Mobile Scope" },
+  { type: "Custom CRM / ERP Automation System", scope: "Enterprise System Scope" },
+  { type: "AI Chatbot / Workflow Automation", scope: "AI Integration Scope" },
+  { type: "Cloud Setup & DevOps Architecture", scope: "Infrastructure Architecture Scope" }
 ];
 
 export function Pricing() {
@@ -54,7 +59,7 @@ export function Pricing() {
   };
 
   return (
-    <section className="py-5 md:py-15  lg:py-15 bg-slate-50 relative overflow-hidden">
+    <section className="py-5 md:py-15 lg:py-15 bg-slate-50 relative overflow-hidden">
       <LeadPopup 
         isOpen={isPopupOpen} 
         onClose={() => setIsPopupOpen(false)} 
@@ -66,10 +71,10 @@ export function Pricing() {
       <div className="container mx-auto px-4 lg:px-8">
         <div className="text-center mb-10 md:mb-16">
           <h2 className="text-3xl md:text-5xl font-bold mb-4 md:mb-6 text-gray-900 tracking-tight">
-            Transparent <span className="text-emerald-600">Pricing</span>
+            Our Service <span className="text-emerald-600">Packages</span>
           </h2>
           <p className="text-gray-600 max-w-2xl mx-auto mb-8 md:mb-10 text-base md:text-lg px-4">
-            All prices are in Indian Rupees (INR). GST at 18% is applicable on all services.
+            Structured deliverables, transparent milestones, and dedicated engineering tailored precisely to your business scale.
           </p>
 
           {/* Tabs Control - Mobile Scrollable */}
@@ -117,15 +122,11 @@ export function Pricing() {
                     <p className="text-gray-500 text-xs md:text-sm font-medium">{plan.description}</p>
                   </div>
 
-                  <div className="mb-8 p-8 bg-emerald-50/30 rounded-[2.5rem] border border-emerald-100/50 text-center relative overflow-hidden group/price">
-                    <div className="absolute -right-4 -top-4 w-16 h-16 bg-emerald-200/20 rounded-full blur-2xl group-hover/price:scale-150 transition-transform duration-700"></div>
-                    
-                    <div className="flex flex-col items-center">
-                      <div className="flex items-baseline justify-center gap-1">
-                        <span className="text-xl font-bold text-emerald-600">₹</span>
-                        <span className="text-2xl md:text-3xl font-black text-gray-900 tracking-tighter">{plan.price.toLocaleString()}</span>
-                      </div>
-                    </div>
+                  <div className="mb-8 p-6 bg-emerald-50/40 rounded-2xl border border-emerald-100 text-center relative overflow-hidden">
+                    <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100/80 px-3 py-1 rounded-full">
+                      {plan.badgeLabel}
+                    </span>
+                    <p className="text-sm font-semibold text-gray-700 mt-2">Tailored Scope & Milestones</p>
                   </div>
 
                   <ul className="space-y-3 md:space-y-4 mb-8 md:mb-10">
@@ -144,7 +145,7 @@ export function Pricing() {
                     className={`w-full py-4 rounded-xl md:rounded-2xl font-bold transition-all shadow-md ${
                     plan.popular ? "bg-emerald-600 text-white hover:bg-emerald-700" : "bg-gray-900 text-white hover:bg-black"
                   }`}>
-                    Select Plan
+                    Request Package Scope
                   </button>
                 </motion.div>
               ))}
@@ -156,11 +157,11 @@ export function Pricing() {
                 <div>
                   <h2 className="text-xl font-bold text-white mb-3 uppercase tracking-tight">Enterprise</h2>
                   <p className="text-gray-400 text-[10px] md:text-xs font-bold mb-6">Corporates & Scaling Systems</p>
-                  <div className="text-2xl md:text-3xl font-bold text-emerald-400 mb-8 tracking-tight">Custom Quote</div>
+                  <div className="text-2xl md:text-3xl font-bold text-emerald-400 mb-8 tracking-tight">Custom Scope</div>
                   <ul className="space-y-4 mb-8">
-                    <li className="flex gap-3 text-xs text-gray-300 font-medium"><Check size={16} className="text-emerald-400" /> Unlimited & Scaling</li>
-                    <li className="flex gap-3 text-xs text-gray-300 font-medium"><Check size={16} className="text-emerald-400" /> Dedicated Resources</li>
-                    <li className="flex gap-3 text-xs text-gray-300 font-medium"><Check size={16} className="text-emerald-400" /> 24/7 Priority Support</li>
+                    <li className="flex gap-3 text-xs text-gray-300 font-medium"><Check size={16} className="text-emerald-400" /> Unlimited & Scaling Architecture</li>
+                    <li className="flex gap-3 text-xs text-gray-300 font-medium"><Check size={16} className="text-emerald-400" /> Dedicated Senior Engineering Squad</li>
+                    <li className="flex gap-3 text-xs text-gray-300 font-medium"><Check size={16} className="text-emerald-400" /> 24/7 Priority SLA & DevOps Support</li>
                   </ul>
                 </div>
                 <button 
@@ -177,44 +178,45 @@ export function Pricing() {
                   <div className="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center">
                     <Info size={18} className="text-emerald-600" />
                   </div>
-                  <h4>Milestones</h4>
+                  <h4>Milestone Structure</h4>
                 </div>
                 <ul className="space-y-4 text-xs md:text-sm text-gray-600 font-medium">
                   <li className="flex items-start gap-3">
                     <div className="w-2 h-2 rounded-full bg-emerald-500 mt-1.5 flex-shrink-0 shadow-sm"></div>
-                    <div><span className="text-gray-900 font-bold">50% Advance:</span> On project kickoff</div>
+                    <div><span className="text-gray-900 font-bold">Phase 1: Kickoff</span> — Architecture & Design Approval</div>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="w-2 h-2 rounded-full bg-emerald-500 mt-1.5 flex-shrink-0 shadow-sm"></div>
-                    <div><span className="text-gray-900 font-bold">25% Midway:</span> Design approval</div>
+                    <div><span className="text-gray-900 font-bold">Phase 2: Core Build</span> — Frontend & CMS Integration</div>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="w-2 h-2 rounded-full bg-emerald-500 mt-1.5 flex-shrink-0 shadow-sm"></div>
-                    <div><span className="text-gray-900 font-bold">25% Final:</span> Before handover</div>
+                    <div><span className="text-gray-900 font-bold">Phase 3: QA & Launch</span> — Performance, SEO & Final Handover</div>
                   </li>
                 </ul>
               </div>
 
-              {/* Taxation Card */}
+              {/* Guarantees Card */}
               <div className="bg-emerald-50/20 p-8 rounded-2xl border border-emerald-100 shadow-xl flex flex-col">
                 <div className="flex items-center gap-3 mb-6 text-gray-900 font-bold text-lg">
                   <div className="w-8 h-8 bg-emerald-100/50 rounded-lg flex items-center justify-center">
-                    <Info size={18} className="text-emerald-600" />
+                    <ShieldCheck size={18} className="text-emerald-600" />
                   </div>
-                  <h4>Taxation</h4>
+                  <h4>Quality & Deliverables</h4>
                 </div>
-                <div className="space-y-6">
-                  <p className="text-[10px] md:text-xs text-gray-600 font-medium leading-relaxed">
-                    Compliant with Indian GST laws.
-                  </p>
-                  <div className="grid grid-cols-1 gap-3">
-                    <div className="p-3 bg-white rounded-xl border border-emerald-100 shadow-sm">
-                      <p className="text-[10px] text-gray-400 font-bold uppercase mb-1">Domestic (Delhi)</p>
-                      <p className="text-xs font-bold text-gray-800">CGST 9% + SGST 9%</p>
+                <div className="space-y-4">
+                  <div className="p-3 bg-white rounded-xl border border-emerald-100 shadow-sm flex items-center gap-3">
+                    <Zap size={16} className="text-emerald-600 shrink-0" />
+                    <div>
+                      <p className="text-xs font-bold text-gray-800">100% Code Ownership</p>
+                      <p className="text-[11px] text-gray-500">Full source code & repository access upon completion</p>
                     </div>
-                    <div className="p-3 bg-white rounded-xl border border-emerald-100 shadow-sm">
-                      <p className="text-[10px] text-gray-400 font-bold uppercase mb-1">Inter-state (India)</p>
-                      <p className="text-xs font-bold text-gray-800">IGST 18%</p>
+                  </div>
+                  <div className="p-3 bg-white rounded-xl border border-emerald-100 shadow-sm flex items-center gap-3">
+                    <ShieldCheck size={16} className="text-emerald-600 shrink-0" />
+                    <div>
+                      <p className="text-xs font-bold text-gray-800">No Hidden Retainers</p>
+                      <p className="text-[11px] text-gray-500">Every deliverable and warranty term agreed upfront</p>
                     </div>
                   </div>
                 </div>
@@ -233,22 +235,35 @@ export function Pricing() {
                       {marketingPricing.map(p => (
                         <th key={p.service} className="p-6 text-center group/th">
                           <div className="text-base font-black tracking-tight text-white mb-2">{p.service}</div>
-                          <div className="inline-block px-3 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
-                            <div className="text-emerald-400 text-sm font-black">₹{p.price}/mo</div>
+                          <div className="inline-block px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
+                            <div className="text-emerald-400 text-xs font-bold">{p.planTier}</div>
                           </div>
                         </th>
                       ))}
                    </tr>
                  </thead>
                  <tbody className="text-sm font-medium">
-                   <tr className="border-b border-gray-50 transition-colors hover:bg-slate-50"><td className="p-4 pl-6">SEO (Pages)</td>{marketingPricing.map(p => <td key={p.service} className="p-4 text-center text-gray-600">{p.seo}</td>)}</tr>
-                   <tr className="border-b border-gray-50 transition-colors hover:bg-slate-50"><td className="p-4 pl-6">Keywords</td>{marketingPricing.map(p => <td key={p.service} className="p-4 text-center text-gray-600">{p.keywords}</td>)}</tr>
-                   <tr className="border-b border-gray-50 transition-colors hover:bg-slate-50"><td className="p-4 pl-6">Blogs</td>{marketingPricing.map(p => <td key={p.service} className="p-4 text-center text-gray-600">{p.blog}</td>)}</tr>
-                   <tr className="border-b border-gray-50 transition-colors hover:bg-slate-50"><td className="p-4 pl-6">Social Media</td>{marketingPricing.map(p => <td key={p.service} className="p-4 text-center text-gray-600">{p.social}</td>)}</tr>
-                   <tr className="border-b border-gray-50 transition-colors hover:bg-slate-50"><td className="p-4 pl-6">Google Ads</td>{marketingPricing.map(p => <td key={p.service} className="p-4 text-center text-gray-600">{p.ads}</td>)}</tr>
-                   <tr className="border-b border-gray-50 transition-colors hover:bg-slate-50"><td className="p-4 pl-6">Meta Ads</td>{marketingPricing.map(p => <td key={p.service} className="p-4 text-center text-gray-600">{p.meta}</td>)}</tr>
-                   <tr className="border-b border-gray-50 transition-colors hover:bg-slate-50"><td className="p-4 pl-6">Report Type</td>{marketingPricing.map(p => <td key={p.service} className="p-4 text-center text-gray-600">{p.report}</td>)}</tr>
-                   <tr className="border-b border-gray-50 transition-colors hover:bg-slate-50"><td className="p-4 pl-6">Min. Contract</td>{marketingPricing.map(p => <td key={p.service} className="p-4 text-center text-gray-600">{p.contract}</td>)}</tr>
+                   <tr className="border-b border-gray-50 transition-colors hover:bg-slate-50"><td className="p-4 pl-6 font-semibold">SEO (Pages)</td>{marketingPricing.map(p => <td key={p.service} className="p-4 text-center text-gray-600">{p.seo}</td>)}</tr>
+                   <tr className="border-b border-gray-50 transition-colors hover:bg-slate-50"><td className="p-4 pl-6 font-semibold">Keywords</td>{marketingPricing.map(p => <td key={p.service} className="p-4 text-center text-gray-600">{p.keywords}</td>)}</tr>
+                   <tr className="border-b border-gray-50 transition-colors hover:bg-slate-50"><td className="p-4 pl-6 font-semibold">Blogs</td>{marketingPricing.map(p => <td key={p.service} className="p-4 text-center text-gray-600">{p.blog}</td>)}</tr>
+                   <tr className="border-b border-gray-50 transition-colors hover:bg-slate-50"><td className="p-4 pl-6 font-semibold">Social Media</td>{marketingPricing.map(p => <td key={p.service} className="p-4 text-center text-gray-600">{p.social}</td>)}</tr>
+                   <tr className="border-b border-gray-50 transition-colors hover:bg-slate-50"><td className="p-4 pl-6 font-semibold">Google Ads</td>{marketingPricing.map(p => <td key={p.service} className="p-4 text-center text-gray-600">{p.ads}</td>)}</tr>
+                   <tr className="border-b border-gray-50 transition-colors hover:bg-slate-50"><td className="p-4 pl-6 font-semibold">Meta Ads</td>{marketingPricing.map(p => <td key={p.service} className="p-4 text-center text-gray-600">{p.meta}</td>)}</tr>
+                   <tr className="border-b border-gray-50 transition-colors hover:bg-slate-50"><td className="p-4 pl-6 font-semibold">Report Type</td>{marketingPricing.map(p => <td key={p.service} className="p-4 text-center text-gray-600">{p.report}</td>)}</tr>
+                   <tr className="border-b border-gray-50 transition-colors hover:bg-slate-50"><td className="p-4 pl-6 font-semibold">Min. Contract</td>{marketingPricing.map(p => <td key={p.service} className="p-4 text-center text-gray-600">{p.contract}</td>)}</tr>
+                   <tr>
+                     <td className="p-4 pl-6"></td>
+                     {marketingPricing.map(p => (
+                       <td key={p.service} className="p-4 text-center">
+                         <button 
+                           onClick={() => handleSelectPlan(`Marketing Retainer: ${p.service}`)}
+                           className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors"
+                         >
+                           Request Scope
+                         </button>
+                       </td>
+                     ))}
+                   </tr>
                  </tbody>
                </table>
              </div>
@@ -259,11 +274,7 @@ export function Pricing() {
                  <div key={item.service} className="bg-white rounded-2xl p-6 shadow-xl border border-emerald-100">
                    <div className="flex justify-between items-center mb-4 pb-4 border-b border-gray-100">
                      <h3 className="text-xl font-bold text-emerald-600 uppercase tracking-wider">{item.service}</h3>
-                     <span className="bg-emerald-100 text-emerald-700 font-bold px-3 py-1 rounded-full text-xs">Growth</span>
-                   </div>
-                   <div className="mb-6">
-                       <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Base Rate</p>
-                       <p className="text-2xl font-black text-emerald-700 tracking-tight">₹{item.price}/mo</p>
+                     <span className="bg-emerald-100 text-emerald-700 font-bold px-3 py-1 rounded-full text-xs">{item.planTier}</span>
                    </div>
                    <div className="space-y-3 mb-6 bg-slate-50 p-4 rounded-xl border border-gray-100">
                      <div className="flex justify-between text-xs font-semibold"><span className="text-gray-400">SEO Audit:</span> <span className="text-gray-700">{item.seo}</span></div>
@@ -274,7 +285,7 @@ export function Pricing() {
                      <div className="flex justify-between text-xs font-semibold"><span className="text-gray-400">Reporting:</span> <span className="text-gray-700">{item.report}</span></div>
                      <div className="flex justify-between text-xs font-semibold"><span className="text-emerald-700">Contract:</span> <span className="text-emerald-700 font-bold">{item.contract}</span></div>
                    </div>
-                   <button onClick={() => handleSelectPlan(`Marketing: ${item.service}`)} className="w-full py-3 bg-gray-900 text-white rounded-xl font-bold text-sm">Grow Now</button>
+                   <button onClick={() => handleSelectPlan(`Marketing: ${item.service}`)} className="w-full py-3 bg-gray-900 text-white rounded-xl font-bold text-sm">Request Retainer Scope</button>
                  </div>
                ))}
              </div>
@@ -289,23 +300,23 @@ export function Pricing() {
                  <thead className="bg-emerald-600 text-white text-center">
                    <tr>
                      <th className="p-6 text-left font-bold uppercase tracking-widest text-[10px]">Solution Type</th>
-                     <th className="p-8 bg-emerald-700 font-bold uppercase tracking-widest text-xs text-center">Starting Rate <br/> <span className="text-[8px] tracking-[0.2em]">(Excl. GST)</span></th>
+                     <th className="p-6 bg-emerald-700 font-bold uppercase tracking-widest text-xs text-center">Engagement Model</th>
+                     <th className="p-6 bg-emerald-800 font-bold uppercase tracking-widest text-xs text-center">Action</th>
                    </tr>
                  </thead>
                  <tbody className="text-sm text-center font-medium">
-                   {[
-                     { type: "Business / Portfolio Website", price: "14,999" },
-                     { type: "E-commerce (Woo/Shopify)", price: "24,999" },
-                     { type: "Custom Web Application", price: "49,999" },
-                     { type: "Android OR iOS App (Single)", price: "59,999" },
-                     { type: "Android + iOS App (Cross)", price: "99,999" },
-                     { type: "Custom CRM / ERP System", price: "1,49,999" },
-                     { type: "AI Chatbot / Automation", price: "39,999" },
-                     { type: "Cloud Setup & DevOps", price: "19,999" }
-                   ].map((row, idx) => (
+                   {appSolutions.map((row, idx) => (
                      <tr key={idx} className="border-b border-gray-50 transition-colors hover:bg-slate-50">
                        <td className="p-4 pl-6 text-left font-bold text-gray-900">{row.type}</td>
-                       <td className="p-4 font-bold text-emerald-700">₹{row.price}</td>
+                       <td className="p-4 font-semibold text-emerald-700">{row.scope}</td>
+                       <td className="p-4">
+                         <button 
+                           onClick={() => handleSelectPlan(`Solution: ${row.type}`)}
+                           className="px-4 py-2 bg-slate-900 hover:bg-black text-white text-xs font-bold rounded-lg transition-colors"
+                         >
+                           Enquire
+                         </button>
+                       </td>
                      </tr>
                    ))}
                  </tbody>
@@ -314,22 +325,13 @@ export function Pricing() {
 
              {/* Mobile Cards (Full 8 items) */}
              <div className="md:hidden space-y-4 px-2">
-               {[
-                 { type: "Business / Portfolio Website", price: "14,999" },
-                 { type: "E-commerce (Woo/Shopify)", price: "24,999" },
-                 { type: "Custom Web Application", price: "49,999" },
-                 { type: "Android OR iOS App (Single)", price: "59,999" },
-                 { type: "Android + iOS App (Cross)", price: "99,999" },
-                 { type: "Custom CRM / ERP System", price: "1,49,999" },
-                 { type: "AI Chatbot / Automation", price: "39,999" },
-                 { type: "Cloud Setup & DevOps", price: "19,999" }
-               ].map((item, idx) => (
+               {appSolutions.map((item, idx) => (
                  <div key={idx} className="bg-white rounded-xl p-5 shadow-lg border border-gray-100 flex flex-col gap-3">
                    <h3 className="text-sm font-bold text-gray-900 border-b border-gray-50 pb-2">{item.type}</h3>
                    <div className="flex justify-between items-end">
                      <div>
-                       <p className="text-[10px] text-gray-400 uppercase font-bold tracking-tight mb-1">Base Starting Rate</p>
-                       <p className="text-xl font-black text-emerald-700 tracking-tighter">₹{item.price}</p>
+                       <p className="text-[10px] text-gray-400 uppercase font-bold tracking-tight mb-1">Engagement Model</p>
+                       <p className="text-sm font-bold text-emerald-700">{item.scope}</p>
                      </div>
                    </div>
                    <button onClick={() => handleSelectPlan(`Solution: ${item.type}`)} className="mt-2 py-3 bg-emerald-600 text-white rounded-lg text-xs font-bold shadow-md shadow-emerald-200 uppercase tracking-widest">Enquire Now</button>

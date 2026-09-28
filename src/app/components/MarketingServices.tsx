@@ -7,8 +7,7 @@ import {
   Megaphone, 
   PenTool, 
   CheckCircle2, 
-  ArrowRight,
-  Sparkles
+  ArrowRight
 } from "lucide-react";
 import Link from "next/link";
 

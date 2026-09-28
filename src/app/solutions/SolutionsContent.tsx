@@ -1,6 +1,8 @@
 "use client";
 
-import { motion } from "motion/react";
+import React from "react";
+import { Header } from "@/app/components/Header";
+import { Footer } from "@/app/components/Footer";
 import {
   Building2,
   Heart,
@@ -10,30 +12,35 @@ import {
   Plane,
   Shield,
   Landmark,
-  Users,
   Layers,
-  Award,
   CheckCircle2,
   ArrowRight,
-  Sparkles,
-  Target,
-  Rocket,
-  Code,
   X,
-  ShoppingBag
+  ShoppingBag,
+  Sparkles,
+  Zap,
+  Lock,
+  Workflow
 } from "lucide-react";
-import { Header } from "@/app/components/Header";
-import { Footer } from "@/app/components/Footer";
-import { ImageWithFallback } from "@/app/components/figma/ImageWithFallback";
 import Link from "next/link";
+import { ImageWithFallback } from "@/app/components/figma/ImageWithFallback";
+import { openEnquiryModal } from "@/app/components/EnquiryModal";
+import { ServiceTechCanvas } from "../services/components/shared/ServiceTechCanvas";
+import { ServiceArchitectureBenchmark } from "../services/components/shared/ServiceArchitectureBenchmark";
+import { ServiceProcessTimeline } from "../services/components/shared/ServiceProcessTimeline";
+import { ServiceLiveTerminal } from "../services/components/shared/ServiceLiveTerminal";
+import { ServiceScopeEstimator } from "../services/components/shared/ServiceScopeEstimator";
+import { ServiceProjectBriefForm } from "../services/components/shared/ServiceProjectBriefForm";
+import { ServiceFaqAccordion } from "../services/components/shared/ServiceFaqAccordion";
+import { SolutionsHeroShowcase } from "./components/SolutionsHeroShowcase";
 
 const industrySolutions = [
   {
     id: "finance",
     name: "Banking & Financial Services",
     icon: Landmark,
-    problem: "Outdated systems, poor mobile experience, compliance gaps",
-    solution: "Core banking modernisation, mobile banking apps, fraud detection, compliance dashboards",
+    problem: "Legacy COBOL mainframes, slow mobile UX, compliance gaps, and high fraud risk.",
+    solution: "Core banking modernization, biometric mobile apps, real-time AI fraud detection, and PCI-DSS compliance.",
     color: "from-emerald-500 to-teal-500",
     image: "https://i.pinimg.com/736x/74/d1/32/74d1320b80747acd0234b7a458ebe1e2.jpg",
   },
@@ -41,8 +48,8 @@ const industrySolutions = [
     id: "healthcare",
     name: "Healthcare & Life Sciences",
     icon: Heart,
-    problem: "Disconnected patient records, no digital booking, poor communication",
-    solution: "Telemedicine platforms, ABDM-compliant apps, patient portals, appointment systems",
+    problem: "Disconnected EHR records, slow patient portals, and HIPAA compliance vulnerabilities.",
+    solution: "Telemedicine platforms, ABDM-compliant patient apps, FHIR interoperability, and automated triage.",
     color: "from-emerald-600 to-teal-600",
     image: "https://i.pinimg.com/1200x/24/83/de/2483dec64055ddcf8baa5e2760543d48.jpg",
   },
@@ -50,8 +57,8 @@ const industrySolutions = [
     id: "retail",
     name: "Retail & E-Commerce",
     icon: ShoppingCart,
-    problem: "Low online visibility, poor mobile shopping, high cart abandonment",
-    solution: "Omnichannel e-commerce, mobile shopping apps, personalisation engines, analytics",
+    problem: "High cart abandonment, bloated slow Shopify themes, and broken ERP inventory synchronization.",
+    solution: "Headless Next.js commerce, sub-second 1-click checkouts, personalized AI recommendations, and multi-warehouse sync.",
     color: "from-teal-500 to-emerald-500",
     image: "https://i.pinimg.com/736x/d9/c9/ca/d9c9ca3071f052121f8c70ccd8b0e89b.jpg",
   },
@@ -59,17 +66,17 @@ const industrySolutions = [
     id: "education",
     name: "Education & E-Learning",
     icon: GraduationCap,
-    problem: "No digital learning infrastructure, poor student engagement",
-    solution: "LMS platforms, live class systems, student portals, assessment tools, mobile apps",
+    problem: "Clunky legacy LMS platforms, student drop-off, and poor video streaming infrastructure.",
+    solution: "Custom interactive LMS, live WebRTC video classrooms, automated grading, and mobile learning apps.",
     color: "from-teal-600 to-emerald-600",
     image: "https://i.pinimg.com/736x/00/d7/29/00d7294e25073d9d1899e4f52e014b32.jpg",
   },
   {
     id: "manufacturing",
-    name: "Manufacturing",
+    name: "Manufacturing & Industrial IoT",
     icon: Factory,
-    problem: "Manual tracking, supply chain gaps, no real-time visibility",
-    solution: "IoT-enabled MES systems, supply chain dashboards, ERP integration, predictive maintenance",
+    problem: "Paper-based tracking, unplanned machine downtime, and fragmented supply chain visibility.",
+    solution: "IoT MES dashboards, predictive maintenance sensors, SAP/ERP connectors, and real-time floor telemetry.",
     color: "from-emerald-500 to-teal-500",
     image: "https://i.pinimg.com/1200x/23/55/87/2355876d4d8ca2d753b72aaee06f6a19.jpg",
   },
@@ -77,307 +84,454 @@ const industrySolutions = [
     id: "hospitality",
     name: "Travel & Hospitality",
     icon: Plane,
-    problem: "Outdated booking systems, no loyalty programme, poor reviews",
-    solution: "Booking platforms, guest apps, CRM, review management, loyalty systems",
+    problem: "High OTA commission losses, clunky direct booking engines, and fragmented loyalty programs.",
+    solution: "Sub-second direct booking platforms, contactless mobile guest check-in, dynamic pricing, and loyalty automation.",
     color: "from-emerald-600 to-teal-600",
     image: "https://i.pinimg.com/736x/ba/18/27/ba1827c7d0547371f27c8f379188d925.jpg",
   },
   {
     id: "real-estate",
-    name: "Real Estate",
+    name: "Real Estate & PropTech",
     icon: Building2,
-    problem: "No lead capture, poor listing management, low online presence",
-    solution: "Property listing platforms, CRM, virtual tour integration, lead nurturing automation",
+    problem: "Slow listing updates, manual agent lead assignment, and disjointed client communication.",
+    solution: "PropTech listing portals, automated CRM lead routing, 3D virtual tour integration, and digital leasing agreements.",
     color: "from-teal-500 to-emerald-500",
-    image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyZWFsJTIwZXN0YXRlJTIwbW9kZXJuJTIwYnVpbGRpbmclMjBhcGFydG1lbnR8ZW58MXx8fHwxNzA4OTEyNDAyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+    image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080",
   },
   {
     id: "food-restaurant",
-    name: "Food & Restaurant",
+    name: "Food & Restaurant Chains",
     icon: ShoppingBag,
-    problem: "Low online orders, no loyalty, poor delivery management",
-    solution: "Online ordering systems, delivery app integration, loyalty programmes, POS integration",
+    problem: "30% aggregator commission cuts, slow kitchen display systems, and fragmented customer data.",
+    solution: "Direct online ordering apps, automated delivery fleet dispatch, kitchen POS integration, and loyalty tiers.",
     color: "from-teal-600 to-emerald-600",
-    image: "https://images.unsplash.com/photo-1552566626-52f8b828add9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyZXN0YXVyYW50JTIwZGluaW5nJTIwbW9kZXJufGVufDF8fHx8MTcwODkxMjQwM3ww&ixlib=rb-4.1.0&q=80&w=1080",
+    image: "https://images.unsplash.com/photo-1552566626-52f8b828add9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080",
   },
   {
     id: "logistics",
     name: "Logistics & Supply Chain",
     icon: Layers,
-    problem: "Route inefficiency, poor tracking, high operational costs",
-    solution: "AI route optimisation, real-time tracking, warehouse management, customer portals",
+    problem: "Sub-optimal vehicle routing, blind spot shipment tracking, and expensive warehouse delays.",
+    solution: "AI dynamic route optimization, real-time GPS telemetry, digital bills of lading, and automated warehouse WMS.",
     color: "from-emerald-500 to-teal-500",
-    image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsb2dpc3RpY3MlMjB3YXJlaG91c2UlMjBzaGlwcGluZ3xlbnwxfHx8fDE3MDg5MTI0MDN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+    image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080",
   },
   {
     id: "insurance",
-    name: "Insurance",
+    name: "Insurance & InsurTech",
     icon: Shield,
-    problem: "Complex claims, low digital adoption, poor customer service",
-    solution: "Policy management portals, claims automation, chatbot support, mobile apps",
+    problem: "Multi-week manual claims processing, high fraud rates, and frustrating policyholder communication.",
+    solution: "Instant automated claims intake, AI photo damage assessment, automated underwriting, and policyholder portals.",
     color: "from-emerald-600 to-teal-600",
-    image: "https://images.unsplash.com/photo-1681505526188-b05e68c77582?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxpbnN1cmFuY2UlMjBidXNpbmVzcyUyMHByb2Zlc3Npb25hbCUyMGNvbnRyYWN0fGVufDF8fHx8MTc3MDg5MjQwMnww&ixlib=rb-4.1.0&q=80&w=1080",
+    image: "https://images.unsplash.com/photo-1681505526188-b05e68c77582?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080",
   },
 ];
 
-const solutionApproaches = [
+const comparisons = [
   {
-    icon: Target,
-    title: "Discovery & Strategy",
-    description: "We start by understanding your business challenges, goals, and requirements through comprehensive discovery sessions.",
-    steps: ["Business analysis", "Requirements gathering", "Stakeholder interviews", "Market research"],
+    title: "Domain Specificity & Workflow Fit",
+    legacy: {
+      score: "Generic One-Size-Fits-All",
+      status: "Operational Friction",
+      desc: "Off-the-shelf software forces your clinical, financial, or manufacturing teams to bend their operations around rigid third-party restrictions."
+    },
+    hiverift: {
+      score: "100% Bespoke Domain Fit",
+      status: "Engineered for Your Context",
+      desc: "Architected around your exact regulatory compliance, transactional role hierarchies, and unique commercial supply chain workflows."
+    }
   },
   {
-    icon: Layers,
-    title: "Custom Design",
-    description: "Our team designs tailored solutions that address your specific needs while ensuring scalability and future growth.",
-    steps: ["Solution architecture", "UI/UX design", "Technology selection", "Proof of concept"],
+    title: "Regulatory Compliance & Security",
+    legacy: {
+      score: "Shared Multi-Tenant Risk",
+      status: "Compliance Exposure",
+      desc: "Public SaaS platforms store sensitive patient, financial, or logistics data on shared cloud clusters, risking regulatory non-compliance."
+    },
+    hiverift: {
+      score: "HIPAA / PCI-DSS / SOC2",
+      status: "Dedicated Private Cloud",
+      desc: "Air-gapped VPCs, hardware-backed encryption keys, immutable audit trails, and 100% compliance pass guarantees."
+    }
   },
   {
-    icon: Code,
-    title: "Development & Integration",
-    description: "We build robust solutions using best practices, with seamless integration into your existing systems and workflows.",
-    steps: ["Agile development", "API integration", "Quality assurance", "Security implementation"],
+    title: "Legacy Integration & Zero-Downtime",
+    legacy: {
+      score: "Disjointed Data Silos",
+      status: "Manual CSV Re-entry",
+      desc: "Third-party tools fail to communicate with legacy AS400, SAP, or on-premise SQL servers, leading to human error and data mismatch."
+    },
+    hiverift: {
+      score: "Seamless API & ETL Mesh",
+      status: "Real-Time Event Driven",
+      desc: "Robust gRPC and Kafka event pipelines synchronize legacy databases with modern web and mobile apps with zero operational downtime."
+    }
   },
   {
-    icon: Rocket,
-    title: "Deployment & Support",
-    description: "We ensure smooth deployment and provide ongoing support to guarantee long-term success and continuous improvement.",
-    steps: ["Deployment planning", "User training", "Performance monitoring", "Continuous optimization"],
+    title: "Total Cost of Ownership (TCO)",
+    legacy: {
+      score: "Per-Seat Subscription Tax",
+      status: "Perpetual License Escalation",
+      desc: "Monthly per-seat fees skyrocket as your workforce grows, while you build zero enterprise equity or proprietary technology assets."
+    },
+    hiverift: {
+      score: "100% IP Asset Ownership",
+      status: "Zero Recurring Seat Fees",
+      desc: "You own all code repositories, infrastructure configurations, and databases outright, creating a lasting enterprise valuation asset."
+    }
+  }
+];
+
+const processSteps = [
+  {
+    step: "01",
+    title: "Vertical Discovery & Compliance Audit",
+    timeline: "Days 1–5",
+    desc: "Analyzing your specific industry regulations (HIPAA, PCI, ABDM, GDPR), legacy system constraints, and stakeholder operational workflows.",
+    tools: ["Compliance Frameworks", "Workflow Modeling", "Security Specs"],
+    deliverables: ["Regulatory Compliance Matrix", "Domain Architecture Blueprint", "Legacy Integration Map"]
   },
+  {
+    step: "02",
+    title: "Core Domain Entities & Security Mesh",
+    timeline: "Weeks 2–3",
+    desc: "Establishing secure multi-AZ cloud foundations, RBAC role hierarchies, secret key vaults, and automated audit logging pipelines.",
+    tools: ["Terraform", "PostgreSQL", "HashiCorp Vault", "Docker"],
+    deliverables: ["RBAC Security Foundation", "Database Schema Models", "Audit-Ready Infrastructure"]
+  },
+  {
+    step: "03",
+    title: "Legacy Interoperability & API Bridges",
+    timeline: "Weeks 4–7",
+    desc: "Engineering high-speed ETL connectors to integrate with legacy SAP, Oracle, core banking mainframes, and clinical EHR data stores.",
+    tools: ["Kafka", "RabbitMQ", "REST/gRPC", "Redis"],
+    deliverables: ["Bi-Directional Legacy Sync", "Event Bus Orchestration", "Zero Data Loss Pipeline"]
+  },
+  {
+    step: "04",
+    title: "High-Performance User Portals",
+    timeline: "Weeks 8–10",
+    desc: "Deploying responsive web and native mobile interfaces for operational staff, doctors, dispatchers, or end-customers with sub-second speeds.",
+    tools: ["Next.js 15", "Flutter", "Tailwind CSS", "WebSockets"],
+    deliverables: ["Role-Based Web Dashboards", "Cross-Platform Mobile Apps", "Real-Time Telemetry Views"]
+  },
+  {
+    step: "05",
+    title: "Adversarial Pentesting & Regulatory QA",
+    timeline: "Week 11",
+    desc: "Executing rigorous third-party penetration testing, load testing up to 50k transactions, and formal regulatory compliance certification.",
+    tools: ["OWASP ZAP", "k6 Load Testing", "SOC2 Auditor Tooling"],
+    deliverables: ["Pentest Security Sign-off", "Stress Test Benchmark", "Audit-Ready Documentation"]
+  },
+  {
+    step: "06",
+    title: "Zero-Downtime Cutover & Handover",
+    timeline: "Week 12+",
+    desc: "Graceful live cutover without interrupting active operations, staff training, complete IP code transfer, and ongoing SLA coverage.",
+    tools: ["Blue-Green Deploy", "Route 53", "Runbooks", "24/7 SRE"],
+    deliverables: ["Live Production Cutover", "100% Source Code Transfer", "Dedicated Enterprise SLA"]
+  }
+];
+
+const terminalLogs = [
+  { text: "enterprise-audit --domain healthcare.abdm --standard hipaa_tier1", type: "cmd" as const, tag: "compliance" },
+  { text: "Scanning 42 FHIR API endpoints and database encryption at rest... PASSED", type: "success" as const },
+  { text: "Validating tamper-evident audit logging in PostgreSQL transaction log...", type: "info" as const },
+  { text: "Hardware security module (HSM) session token verified with zero packet leakage", type: "cyan" as const },
+  { text: "Simulating 10,000 concurrent patient tele-consultations across 4 AZ regions...", type: "cmd" as const, tag: "stress" },
+  { text: "p99 WebRTC connection latency: 18.2ms. Packet drop rate: 0.00%", type: "success" as const },
+  { text: "Automated Blue-Green cluster cutover completed with ZERO operational downtime", type: "success" as const }
+];
+
+const terminalSpecs = [
+  { label: "Vertical Scope", val: "10 Specialized Sectors", status: "Tailored Models" },
+  { label: "Compliance", val: "HIPAA / PCI Level 1", status: "100% Certified" },
+  { label: "Transaction SLA", val: "< 45ms Latency", status: "Sub-Second" },
+  { label: "IP Ownership", val: "100% Code & Data", status: "Zero Lock-In" }
+];
+
+const estimatorTiers = [
+  {
+    id: "fintech-portal",
+    label: "Banking & FinTech Core System",
+    desc: "High-security core banking modernization with instant payment gateways and biometric auth.",
+    multiplier: 1.4
+  },
+  {
+    id: "healthcare-platform",
+    label: "Healthcare & Telehealth System",
+    desc: "ABDM & HIPAA-compliant patient management, tele-consultation, and EHR integration.",
+    multiplier: 1.35
+  },
+  {
+    id: "logistics-wms",
+    label: "Smart Logistics & Supply Chain WMS",
+    desc: "Fleet GPS telemetry, dynamic route optimization, and automated warehouse management.",
+    multiplier: 1.25
+  },
+  {
+    id: "omnichannel-retail",
+    label: "Omnichannel Headless Commerce",
+    desc: "High-throughput sub-second shopping platform with multi-warehouse ERP synchronization.",
+    multiplier: 1.15
+  }
+];
+
+const estimatorScales = [
+  { id: "core", label: "Core Enterprise Portal", weeksAdd: 0 },
+  { id: "regional", label: "Multi-Location Regional Mesh", weeksAdd: 3 },
+  { id: "global", label: "Global Multi-Cloud Ecosystem", weeksAdd: 6 }
+];
+
+const estimatorAddons = [
+  { id: "legacy-sync", label: "Legacy SAP / ERP Integration", weeksAdd: 1.5 },
+  { id: "hipaa-pci", label: "Formal Regulatory Audit Sign-off", weeksAdd: 1 },
+  { id: "mobile-apps", label: "iOS & Android Companion Apps", weeksAdd: 2 },
+  { id: "dr-multi-az", label: "Multi-Region Active Disaster Recovery", weeksAdd: 1 }
+];
+
+const faqs = [
+  {
+    question: "Why should we build industry-tailored systems instead of using generic enterprise SaaS?",
+    answer: "Generic software forces your specialized operational workflows into rigid third-party boxes, charges crippling recurring per-user fees, and traps your proprietary corporate data. Custom industry solutions match your exact commercial context, guarantee compliance with sector regulations (like HIPAA or PCI-DSS), and build defensible enterprise equity."
+  },
+  {
+    question: "How do you guarantee that our active operations won't be disrupted during migration?",
+    answer: "We employ phased, parallel-run architectures. We build resilient API adapters that dual-write transactions to both legacy mainframes and modern cloud microservices. This allows your teams to validate accuracy in staging and cut over gracefully with zero operational downtime."
+  },
+  {
+    question: "How do you ensure strict regulatory compliance (HIPAA, PCI-DSS, SOC2, GDPR)?",
+    answer: "Compliance is embedded directly into our code and infrastructure templates: AES-256 data encryption at rest and in transit, hardware-backed secret key management, air-gapped VPCs, granular role-based access control (RBAC), and automated immutable audit logging for third-party certifiers."
+  },
+  {
+    question: "Who owns the intellectual property and code of our custom system?",
+    answer: "You own 100% of all intellectual property, source code, database architectures, and design files from day one. Everything is deployed directly into your company's dedicated cloud accounts."
+  },
+  {
+    question: "Can these solutions integrate with our existing legacy ERP, CRM, or on-premise databases?",
+    answer: "Yes. We have engineered mission-critical integrations with SAP, Oracle, Salesforce, core banking protocols (SWIFT/ISO 20022), HL7/FHIR healthcare standards, and on-premise SQL databases with automated error retry queues."
+  }
 ];
 
 export default function SolutionsContent() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white text-slate-900 selection:bg-emerald-500 selection:text-white">
       <Header />
 
       {/* Hero Section */}
-      <section className="relative h-[500px] overflow-hidden mt-20 md:mt-32">
-        <div className="absolute inset-0">
-          <ImageWithFallback
-            src="https://images.unsplash.com/photo-1551434678-e076c223a692?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxidXNpbmVzcyUyMHNvbHV0aW9ucyUyMHRlYW0lMjBzdHJhdGVneXxlbnwwfHx8fDE3Mzk4MzA0MDB8MA&ixlib=rb-4.1.0&q=80&w=1080"
-            alt="Solutions"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/95 via-teal-900/90 to-slate-900/95"></div>
-        </div>
+      <section className="relative pt-32 pb-20 lg:pt-40 lg:pb-28 overflow-hidden bg-gradient-to-b from-[#f4fcf7] via-white to-white border-b border-emerald-100">
+        <ServiceTechCanvas mode="solutions" />
 
-        <div className="container mx-auto px-4 lg:px-8 h-full relative z-10 flex items-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="max-w-4xl"
-          >
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full mb-6">
-              <Sparkles size={16} className="text-emerald-400" />
-              <span className="text-sm font-semibold text-white tracking-wide uppercase">
-                Industry Expertise
-              </span>
-            </div>
+        <div className="container mx-auto px-4 sm:px-6 max-w-7xl relative z-10 text-center">
+          
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-100/90 border border-emerald-300 rounded-full mb-6">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#10b981]" />
+            </span>
+            <span className="text-xs font-bold text-[#15803d] uppercase tracking-wider">
+              Tailored Enterprise Digital Systems
+            </span>
+          </div>
 
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white mb-6 leading-[1.1] tracking-tight">
-              Industry-Specific <span className="text-emerald-400">Digital Solutions</span> <br className="hidden lg:block" /> for Every Sector
-            </h1>
-            <p className="text-xl md:text-2xl text-white/95 leading-relaxed font-medium">
-              We do not build generic solutions. Every industry has its own rules, regulations, customer behaviour, and operational challenges. Our solutions are built with that context from day one.
-            </p>
-          </motion.div>
+          <h1 className="text-3xl sm:text-5xl lg:text-7xl font-black text-slate-900 tracking-tight leading-[1.12] max-w-5xl mx-auto">
+            Industry-Specific Solutions Engineered for{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-600">
+              Compliance, Efficiency & Scale
+            </span>
+          </h1>
+
+          <p className="mt-6 text-base sm:text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed font-normal">
+            Generic systems fail because every sector has unique compliance, audience behaviors, and transaction workflows. We engineer specialized solutions built for your exact commercial context.
+          </p>
+
+          <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <button
+              onClick={() => {
+                const el = document.getElementById("project-brief-form");
+                el?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-sm sm:text-base shadow-lg shadow-emerald-500/25 transition-all transform hover:-translate-y-0.5"
+            >
+              <span>Explore Custom Enterprise Systems</span>
+              <ArrowRight size={18} />
+            </button>
+
+            <button
+              onClick={() => openEnquiryModal()}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-bold text-sm sm:text-base border border-slate-200 transition-all shadow-sm"
+            >
+              <Building2 size={18} className="text-emerald-600" />
+              <span>Request Solution Consultation</span>
+            </button>
+          </div>
+
+          {/* Live Solutions Showcase */}
+          <div className="mt-14 lg:mt-20">
+            <SolutionsHeroShowcase />
+          </div>
+
         </div>
       </section>
 
-      {/* Industry Solutions - GRID UPDATE */}
+      {/* Industry Solutions Matrix */}
       <section className="py-24 lg:py-32 bg-white">
-        <div className="container mx-auto px-4 lg:px-8">
+        <div className="container mx-auto px-4 sm:px-6 max-w-7xl">
+          
+          <div className="max-w-3xl mx-auto text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-4">
+              <Layers size={14} className="text-emerald-600" />
+              <span>Sector-Specific Digital Architecture</span>
+            </div>
+
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight">
+              Specialized Digital Systems for{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">
+                10 Core Global Industries
+              </span>
+            </h2>
+
+            <p className="mt-4 text-base sm:text-lg text-slate-600 leading-relaxed font-normal">
+              Click any industry sector to explore how our specialized architectures solve deep structural challenges and unlock compounding commercial scale.
+            </p>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-            {industrySolutions.map((industry, index) => (
-              <motion.div
-                key={industry.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.05 }}
-              >
-                <Link href={`/industries/${industry.id}`} className="block h-full transition-transform hover:-translate-y-2 duration-500">
-                  <div className="group bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-100 hover:shadow-2xl transition-all duration-500 flex flex-col h-full hover:border-emerald-500">
-                    <div className="relative h-44 overflow-hidden">
+            {industrySolutions.map((industry) => (
+              <div key={industry.id} className="h-full">
+                <Link href={`/industries/${industry.id}`} className="block h-full transition-transform hover:-translate-y-2 duration-300">
+                  <div className="group bg-white rounded-3xl overflow-hidden shadow-md border border-slate-200/90 hover:shadow-2xl transition-all duration-300 flex flex-col h-full hover:border-emerald-500">
+                    <div className="relative h-48 overflow-hidden">
                       <ImageWithFallback
                         src={industry.image}
                         alt={industry.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                      <div className={`absolute inset-0 bg-gradient-to-br ${industry.color} opacity-40 group-hover:opacity-20 transition-opacity duration-500`}></div>
-                      <div className="absolute top-4 left-4 w-12 h-12 bg-white rounded-xl shadow-xl flex items-center justify-center text-emerald-600">
+                      <div className={`absolute inset-0 bg-gradient-to-br ${industry.color} opacity-40 group-hover:opacity-20 transition-opacity duration-300`} />
+                      <div className="absolute top-4 left-4 w-12 h-12 bg-white rounded-2xl shadow-xl flex items-center justify-center text-emerald-600">
                         <industry.icon size={24} />
                       </div>
                     </div>
 
-                    <div className="p-6 flex flex-col flex-grow">
-                      <h3 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-emerald-600 transition-colors line-clamp-1">
-                        {industry.name}
-                      </h3>
+                    <div className="p-6 sm:p-7 flex flex-col flex-grow justify-between">
+                      <div>
+                        <h3 className="text-xl font-bold text-slate-900 mb-4 group-hover:text-emerald-600 transition-colors line-clamp-1">
+                          {industry.name}
+                        </h3>
 
-                      <div className="space-y-4 flex-grow">
-                        <div>
-                          <div className="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-1.5 flex items-center gap-2">
-                            <X size={12} />
-                            Problem We Solve
+                        <div className="space-y-4">
+                          <div>
+                            <div className="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+                              <X size={12} />
+                              <span>Friction Solved</span>
+                            </div>
+                            <p className="text-slate-600 text-xs leading-relaxed font-medium line-clamp-2">
+                              {industry.problem}
+                            </p>
                           </div>
-                          <p className="text-gray-600 text-xs leading-relaxed font-medium line-clamp-2">
-                            {industry.problem}
-                          </p>
-                        </div>
 
-                        <div>
-                          <div className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1.5 flex items-center gap-2">
-                            <CheckCircle2 size={12} />
-                            Solution We Deliver
+                          <div>
+                            <div className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+                              <CheckCircle2 size={12} />
+                              <span>Solution Delivered</span>
+                            </div>
+                            <p className="text-slate-900 text-xs leading-relaxed font-bold line-clamp-2">
+                              {industry.solution}
+                            </p>
                           </div>
-                          <p className="text-gray-900 text-xs leading-relaxed font-bold line-clamp-2">
-                            {industry.solution}
-                          </p>
                         </div>
                       </div>
 
-                      <div className="mt-6 pt-4 border-t border-gray-100">
-                        <div className="flex items-center justify-between text-emerald-600 text-sm font-bold group/btn">
-                          <span>Explore</span>
-                          <ArrowRight size={18} className="group-hover/btn:translate-x-2 transition-transform duration-300" />
-                        </div>
+                      <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-emerald-600 text-sm font-bold group-hover:translate-x-1 transition-transform">
+                        <span>Explore Sector Solutions</span>
+                        <ArrowRight size={16} />
                       </div>
                     </div>
                   </div>
                 </Link>
-              </motion.div>
+              </div>
             ))}
           </div>
+
         </div>
       </section>
 
-      {/* 3T Pillars Section */}
-      <section className="py-20 bg-gradient-to-br from-slate-50 via-white to-emerald-50/30">
-        <div className="container mx-auto px-4 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16 lg:mb-24"
-          >
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 mb-6 tracking-tight leading-tight">
-              Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">3T Approach</span>
-            </h2>
-            <p className="text-lg md:text-xl text-gray-500 max-w-3xl mx-auto font-bold leading-relaxed">
-              Every solution we deliver is built on our three foundational pillars
-            </p>
-          </motion.div>
+      {/* Architecture Benchmark */}
+      <ServiceArchitectureBenchmark
+        badgeText="Solutions Benchmark"
+        heading="Why Generic Enterprise Software Fails vs."
+        highlightHeading="HiveRift Industry-Tailored Systems"
+        subheading="Compare generic, inflexible off-the-shelf software with HiveRift's bespoke, compliant, and domain-native digital architectures."
+        legacyLabel="Off-The-Shelf Generic SaaS"
+        hiveriftLabel="HiveRift Industry-Tailored Architecture"
+        comparisons={comparisons}
+        summaryBadges={[
+          "100% Bespoke Domain Fit",
+          "HIPAA / PCI-DSS / SOC2",
+          "100% Source Code & IP Ownership"
+        ]}
+      />
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {[
-              {
-                icon: Users,
-                title: "TALENT",
-                description: "Expert teams with deep industry knowledge and technical expertise deliver solutions that drive measurable business outcomes.",
-                features: ["Industry specialists", "Certified professionals", "Cross-functional teams", "Continuous learning"],
-              },
-              {
-                icon: Layers,
-                title: "TAILORED",
-                description: "Custom-built solutions designed specifically for your business needs, challenges, and growth objectives.",
-                features: ["Custom development", "Flexible architecture", "Scalable solutions", "Future-ready design"],
-              },
-              {
-                icon: Award,
-                title: "TRUST",
-                description: "Transparent communication, reliable delivery, and long-term partnerships built on mutual success.",
-                features: ["Transparent processes", "On-time delivery", "Quality assurance", "Ongoing support"],
-              },
-            ].map((pillar, index) => {
-              const Icon = pillar.icon;
-              return (
-                <motion.div
-                  key={pillar.title}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 border-t-4 border-emerald-500"
-                >
-                  <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center mb-6 mx-auto">
-                    <Icon size={32} className="text-white" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4 text-center">{pillar.title}</h3>
-                  <p className="text-gray-700 leading-relaxed mb-6 text-center">{pillar.description}</p>
-                  <ul className="space-y-2">
-                    {pillar.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-center gap-2 text-sm text-gray-600">
-                        <CheckCircle2 size={16} className="text-emerald-500 flex-shrink-0" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </motion.div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+      {/* Execution Roadmap */}
+      <ServiceProcessTimeline
+        badgeText="Enterprise Delivery Lifecycle"
+        heading="From Regulatory Discovery to"
+        highlightHeading="Seamless Operational Cutover"
+        subheading="Our structured 6-phase enterprise delivery roadmap guarantees strict compliance, zero data loss, and smooth integration with legacy enterprise software."
+        steps={processSteps}
+      />
 
-      {/* Solution Approach */}
-      <section className="py-24 lg:py-32 bg-white border-t border-gray-50">
-        <div className="container mx-auto px-4 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16 lg:mb-24"
-          >
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 mb-6 tracking-tight leading-tight">
-              Our Solution <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">Methodology</span>
-            </h2>
-            <p className="text-lg md:text-xl text-gray-500 max-w-3xl mx-auto font-bold leading-relaxed">
-              A proven approach that ensures successful delivery and long-term value
-            </p>
-          </motion.div>
+      {/* Live Terminal */}
+      <ServiceLiveTerminal
+        badgeText="Automated Solution Stream"
+        heading="Real-Time Compliance &"
+        highlightHeading="Multi-Region Cluster Telemetry"
+        subheading="Watch our automated verification engine audit HIPAA and PCI-DSS compliance checks, run 10,000 concurrent stress transactions, and promote cluster traffic with zero downtime."
+        terminalTitle="hiverift-enterprise ~ compliance-audit"
+        branchInfo="main: fhir-abdm-v5"
+        logs={terminalLogs}
+        specs={terminalSpecs}
+      />
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
-            {solutionApproaches.map((approach, index) => {
-              const Icon = approach.icon;
-              return (
-                <motion.div
-                  key={approach.title}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="relative"
-                >
-                  <div className="bg-gradient-to-br from-slate-50 to-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 h-full">
-                    <div className="absolute -top-3 -left-3 w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
-                      {index + 1}
-                    </div>
-                    <div className="w-12 h-12 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-xl flex items-center justify-center mb-4 mt-2">
-                      <Icon size={24} className="text-emerald-600" />
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-3">{approach.title}</h3>
-                    <p className="text-gray-600 text-sm mb-4 leading-relaxed">{approach.description}</p>
-                    <ul className="space-y-1.5">
-                      {approach.steps.map((step, idx) => (
-                        <li key={idx} className="flex items-center gap-2 text-xs text-gray-500">
-                          <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
-                          <span>{step}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+      {/* Scope Estimator */}
+      <ServiceScopeEstimator
+        badgeText="Solutions Project Estimator"
+        heading="Calculate Timeline & Investment for Your"
+        highlightHeading="Enterprise Industry Platform"
+        subheading="Select your industry domain, scale, and compliance integration standards to estimate delivery timelines and project scope."
+        tierLabel="Industry Domain Architecture"
+        tierOptions={estimatorTiers}
+        scaleLabel="Enterprise Operational Scale"
+        scaleOptions={estimatorScales}
+        addonsLabel="Integration & Compliance Add-ons"
+        addonOptions={estimatorAddons}
+        baseWeeks={6}
+        basePriceUsd={4000}
+        recommendedStack={["Next.js 15", "Go / NestJS", "PostgreSQL", "Kafka", "Docker / K8s", "HashiCorp Vault"]}
+      />
+
+      {/* Project Brief Form */}
+      <ServiceProjectBriefForm
+        serviceTitle="Enterprise Solutions"
+        projectTypes={[
+          "Banking & FinTech Core System",
+          "Healthcare & ABDM / HIPAA Platform",
+          "Smart Logistics & Supply Chain WMS",
+          "Omnichannel Headless Commerce",
+          "Manufacturing IoT & MES Dashboard",
+          "InsurTech Automated Claims Portal"
+        ]}
+        defaultProjectType="Banking & FinTech Core System"
+      />
+
+      {/* FAQs */}
+      <ServiceFaqAccordion
+        badgeText="Solutions FAQs"
+        heading="Frequently Answered Questions"
+        highlightHeading="on Custom Industry Digital Solutions"
+        subheading="Authoritative clarity on migration safety, regulatory compliance, legacy ERP connectors, and intellectual property ownership."
+        faqs={faqs}
+      />
 
       <Footer />
     </div>

@@ -1,22 +1,57 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { Inter } from "next/font/google";
-import { WhatsAppButton } from "./components/WhatsAppButton";
+import { Plus_Jakarta_Sans } from "next/font/google";
+import { FloatingActions } from "./components/FloatingActions";
 import ScrollToTop from "./components/ScrollToTop";
 import "./globals.css";
 
 import { combinedJsonLdSchema } from "./config/schema";
 
-const inter = Inter({
+const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: "--font-inter",
+  weight: ["300", "400", "500", "600", "700", "800"],
+  variable: "--font-plus-jakarta",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://hiverift.com"),
-  title: "HiveRift - Premier Software Engineering & Digital Agency (India)",
+  title: "Website Development Company in Delhi NCR, Noida & Gurgaon | HiveRift",
   description:
-    "HiveRift is a premier software engineering agency in New Delhi, India. We specialize in custom web apps, mobile applications, AI/ML, and cloud solutions.",
+    "Web development company in Delhi NCR, Noida & Gurgaon. Custom websites, eCommerce, SaaS, and AI solutions for growth-focused businesses.",
+  keywords: [
+    "Web Development Company in Delhi",
+    "Website Design Company in Delhi",
+    "Website Developer in Delhi",
+    "Web Design Agency in Delhi",
+    "Custom Website Development in Delhi",
+    "Affordable Website Development in Delhi",
+    "WordPress Website Development Company in Delhi",
+    "Business Website Development in Delhi",
+    "Website Development Company in South Delhi",
+    "Website Development Company in Dwarka",
+    "Website Development Company in Noida",
+    "Website Design Company in Noida",
+    "Web Development Company in Noida",
+    "Website Developer in Noida",
+    "Web Design Agency in Noida",
+    "Custom Website Development in Noida",
+    "Affordable Website Development in Noida",
+    "WordPress Website Development Company in Noida",
+    "Website Development Company in Sector 62 Noida",
+    "Website Development Company in Sector 18 Noida",
+    "Website Development Company in Gurgaon",
+    "Website Design Company in Gurgaon",
+    "Web Development Company in Gurgaon",
+    "Website Developer in Gurgaon",
+    "Web Design Agency in Gurgaon",
+    "Custom Website Development in Gurgaon",
+    "Affordable Website Development in Gurgaon",
+    "WordPress Website Development Company in Gurgaon",
+    "Website Development Company in Cyber City Gurgaon",
+    "Website Development Company in Udyog Vihar Gurgaon",
+    "KhatuShyam Technologies"
+  ],
   alternates: {
     canonical: "https://hiverift.com",
     languages: {
@@ -33,6 +68,37 @@ export const metadata: Metadata = {
     siteName: "HiveRift",
     locale: "en_IN",
     type: "website",
+    images: [
+      {
+        url: "https://hiverift.com/logo.png",
+        width: 800,
+        height: 600,
+        alt: "HiveRift - Premier Software Engineering & Digital Agency",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "HiveRift - Premier Software Engineering & Digital Agency",
+    description:
+      "Custom web development, eCommerce platforms, mobile apps, and digital growth marketing.",
+    images: ["https://hiverift.com/logo.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  icons: {
+    icon: "/icon.png",
+    shortcut: "/icon.png",
+    apple: "/icon.png",
   },
 };
 
@@ -44,41 +110,6 @@ export default function RootLayout({
   return (
     <html lang="en-IN" suppressHydrationWarning>
       <head suppressHydrationWarning>
-        {/* Strip third-party extension attributes before React hydration */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                if (typeof window === 'undefined') return;
-                const removeExtensionAttrs = (node) => {
-                  if (node.nodeType === 1 && node.hasAttribute('bis_skin_checked')) {
-                    node.removeAttribute('bis_skin_checked');
-                  }
-                  if (node.childNodes) {
-                    node.childNodes.forEach(removeExtensionAttrs);
-                  }
-                };
-                const observer = new MutationObserver((mutations) => {
-                  mutations.forEach((m) => {
-                    if (m.type === 'attributes' && m.attributeName === 'bis_skin_checked') {
-                      m.target.removeAttribute('bis_skin_checked');
-                    } else if (m.type === 'childList') {
-                      m.addedNodes.forEach(removeExtensionAttrs);
-                    }
-                  });
-                });
-                if (document.documentElement) {
-                  observer.observe(document.documentElement, {
-                    attributes: true,
-                    subtree: true,
-                    childList: true,
-                    attributeFilter: ['bis_skin_checked']
-                  });
-                }
-              })();
-            `,
-          }}
-        />
         {/* Facebook Pixel */}
         <Script id="fb-pixel" strategy="afterInteractive">
           {`
@@ -112,6 +143,21 @@ export default function RootLayout({
           `}
         </Script>
 
+        {/* Google Analytics 4 */}
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-FL7L7KBZRR"
+          strategy="afterInteractive"
+        />
+        <Script id="ga4-config" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-FL7L7KBZRR');
+          `}
+        </Script>
+
         {/* Google Tag Manager */}
         <Script id="gtm-script" strategy="afterInteractive">
           {`
@@ -130,7 +176,7 @@ export default function RootLayout({
               j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
 
               f.parentNode.insertBefore(j,f);
-            })(window,document,'script','dataLayer','GTM-TQM5WMT6');
+            })(window,document,'script','dataLayer','GT-PLHSKGK5');
           `}
         </Script>
 
@@ -145,11 +191,11 @@ export default function RootLayout({
         />
       </head>
 
-      <body className={`antialiased ${inter.variable}`} suppressHydrationWarning>
+      <body className={`antialiased font-sans ${plusJakartaSans.variable} ${plusJakartaSans.className}`} suppressHydrationWarning>
         {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe
-            src="https://www.googletagmanager.com/ns.html?id=GTM-TQM5WMT6"
+            src="https://www.googletagmanager.com/ns.html?id=GT-PLHSKGK5"
             height="0"
             width="0"
             style={{
@@ -172,7 +218,7 @@ export default function RootLayout({
 
         <ScrollToTop />
         {children}
-        <WhatsAppButton />
+        <FloatingActions />
       </body>
     </html>
   );

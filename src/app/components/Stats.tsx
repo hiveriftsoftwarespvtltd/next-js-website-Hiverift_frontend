@@ -2,33 +2,15 @@
 
 import { motion } from "motion/react";
 import { Briefcase, Globe, Award, TrendingUp } from "lucide-react";
+import { COMPANY_METRICS } from "@/app/config/companyMetrics";
 
-const stats = [
-  {
-    icon: Briefcase,
-    value: "250+",
-    label: "Projects Delivered",
-    color: "from-emerald-500 to-teal-500",
-  },
-  {
-    icon: Globe,
-    value: "10+",
-    label: "Countries Served",
-    color: "from-emerald-600 to-teal-600",
-  },
-  {
-    icon: Award,
-    value: "99%",
-    label: "Client Retention",
-    color: "from-teal-500 to-emerald-500",
-  },
-  {
-    icon: TrendingUp,
-    value: "5+",
-    label: "Years in Business",
-    color: "from-teal-600 to-emerald-600",
-  },
-];
+const metricIcons = [Briefcase, Globe, Award, TrendingUp];
+const metricColors = ["from-emerald-500 to-teal-500", "from-emerald-600 to-teal-600", "from-teal-500 to-emerald-500", "from-teal-600 to-emerald-600"];
+const stats = COMPANY_METRICS.map((metric, index) => ({
+  ...metric,
+  icon: metricIcons[index],
+  color: metricColors[index],
+}));
 
 export function Stats() {
   return (
@@ -55,7 +37,7 @@ export function Stats() {
                 </div>
                 
                 <div className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-1 md:mb-2">
-                  {stat.value}
+                  {stat.value}{stat.suffix}
                 </div>
                 
                 <div className="text-gray-300 text-sm md:text-base lg:text-lg">

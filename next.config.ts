@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 import path from "path";
 
 const nextConfig: NextConfig = {
+  devIndicators: false,
   allowedDevOrigins: [
     "*.trycloudflare.com",
     "*.loca.lt",
@@ -12,4 +13,3 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
- 

@@ -1,10 +1,22 @@
 import { 
   Users, 
   Shield, 
-  Zap,
-  TrendingUp,
-  Settings,
-  ShoppingBag
+  Zap, 
+  TrendingUp, 
+  Settings, 
+  ShoppingBag,
+  Building2,
+  Plane,
+  GraduationCap,
+  Stethoscope,
+  Landmark,
+  Briefcase,
+  Utensils,
+  Rocket,
+  CheckCircle2,
+  Globe,
+  Database,
+  ArrowRight
 } from "lucide-react";
 
 export interface IndustryData {
@@ -19,6 +31,8 @@ export interface IndustryData {
     description: string;
     icon: any;
   }[];
+  keySolutions?: string[];
+  complianceNotice?: string;
   benefits: string[];
   caseStudy?: {
     title: string;
@@ -29,511 +43,555 @@ export interface IndustryData {
 }
 
 export const industriesData: Record<string, IndustryData> = {
+  "real-estate": {
+    id: "real-estate",
+    title: "Real Estate & Property",
+    subtitle: "Turn Property Searches Into Qualified Opportunities",
+    description: "Build a stronger digital presence with property websites, listing portals, lead management systems, CRM integrations, and automated follow-ups designed for real estate businesses.",
+    heroImage: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?q=80&w=1920",
+    challenges: [
+      "Property listing & inventory synchronization",
+      "Lead drop-offs from slow or delayed follow-ups",
+      "Lack of automated WhatsApp & CRM qualification",
+      "Poor mobile performance on search & filters",
+      "Tracking ROI across multiple property portals"
+    ],
+    solutions: [
+      {
+        title: "Property Listing & Search Portals",
+        description: "Dynamic MLS/inventory search portals with interactive map views and instant brochure downloads.",
+        icon: Building2
+      },
+      {
+        title: "Lead Management & CRM Integration",
+        description: "Centralized lead distribution pipelines connecting directly to Salesforce, HubSpot, or Zoho.",
+        icon: Users
+      },
+      {
+        title: "WhatsApp & Callback Automation",
+        description: "Instant WhatsApp triggers sending floor plans, pricing sheets, and site-visit scheduling links.",
+        icon: Zap
+      }
+    ],
+    keySolutions: [
+      "Property listing & search portals",
+      "Real estate website development",
+      "Lead management & CRM integration",
+      "WhatsApp lead automation",
+      "Property enquiry & callback systems",
+      "SEO & performance marketing"
+    ],
+    benefits: [
+      "3x Higher Lead-to-Site-Visit Conversion",
+      "Instant 30-Second Lead Response Times",
+      "Sub-second Property Search & Filter Loading",
+      "Full CRM & WhatsApp Integration",
+      "Enhanced Buyer Trust & Premium Presentation"
+    ],
+    technologies: ["React", "Next.js", "Node.js", "PostgreSQL", "Google Maps API", "WhatsApp API"]
+  },
+
+  hospitality: {
+    id: "hospitality",
+    title: "Travel & Hospitality",
+    subtitle: "Make Travel Booking Simpler From Search to Confirmation",
+    description: "Create seamless digital experiences for travel agencies, tour operators, hotels, and hospitality businesses with booking platforms, API integrations, customer portals, and automated communication.",
+    heroImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1920",
+    challenges: [
+      "Heavy reliance on OTA commissions (15-25% lost)",
+      "Complex flight and hotel API integrations",
+      "Multi-currency conversion & international payments",
+      "Fragmented guest communication across channels",
+      "High mobile cart abandonment during booking"
+    ],
+    solutions: [
+      {
+        title: "Travel & Hotel Booking Systems",
+        description: "High-conversion direct reservation engines with dynamic calendar pricing and instant confirmations.",
+        icon: Plane
+      },
+      {
+        title: "Flight & Hotel API Integration",
+        description: "Real-time GDS/aggregators sync for live availability, seating, and dynamic package pricing.",
+        icon: Zap
+      },
+      {
+        title: "Customer Dashboards & Notifications",
+        description: "Self-service booking management, itinerary downloads, and automated WhatsApp trip alerts.",
+        icon: Users
+      }
+    ],
+    keySolutions: [
+      "Travel booking websites & portals",
+      "Hotel & tour booking systems",
+      "Flight & hotel API integration",
+      "Online payment integration",
+      "Customer booking dashboards",
+      "Automated booking notifications"
+    ],
+    benefits: [
+      "+65% Growth in Direct Bookings",
+      "Zero Aggregator Commission on Direct Bookings",
+      "Real-time Inventory & Pricing Synchronization",
+      "Multi-currency Payment Gateways",
+      "Automated WhatsApp & Email Confirmations"
+    ],
+    technologies: ["Next.js", "Node.js", "Stripe", "PostgreSQL", "Amadeus API", "WhatsApp API"]
+  },
+
+  retail: {
+    id: "retail",
+    title: "Retail & eCommerce",
+    subtitle: "Build an Online Store Designed to Convert",
+    description: "From single-brand stores to multi-vendor marketplaces, HiveRift develops scalable eCommerce experiences that make product discovery, checkout, payments, and order management easier.",
+    heroImage: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1920",
+    challenges: [
+      "High mobile checkout drop-offs & cart abandonment",
+      "Multi-warehouse inventory mismatch & stockouts",
+      "Slow page speeds during high-traffic flash sales",
+      "Disjointed payment gateway and refund workflows",
+      "High customer acquisition cost without repeat retention"
+    ],
+    solutions: [
+      {
+        title: "Custom eCommerce & Headless Stores",
+        description: "Ultra-fast Next.js and Shopify Plus storefronts engineered for sub-second page loads and high AOV.",
+        icon: ShoppingBag
+      },
+      {
+        title: "Multi-Vendor Marketplaces",
+        description: "Robust marketplace architectures with merchant dashboards, split payments, and commission engines.",
+        icon: TrendingUp
+      },
+      {
+        title: "Inventory & CRM Synchronization",
+        description: "Automated stock syncing across warehouses, marketplaces, and WhatsApp re-order flows.",
+        icon: Zap
+      }
+    ],
+    keySolutions: [
+      "Custom eCommerce development",
+      "WooCommerce & Shopify solutions",
+      "Marketplace development",
+      "Payment gateway integration",
+      "Inventory & order management",
+      "WhatsApp & CRM integration"
+    ],
+    benefits: [
+      "+40% Increase in Mobile Checkout Completion",
+      "< 1s Core Web Vitals on Product Pages",
+      "Zero Inventory Mismatch Across Channels",
+      "Automated WhatsApp Abandoned Cart Recovery",
+      "Seamless Razorpay, Stripe & Cashfree Integrations"
+    ],
+    technologies: ["Next.js", "Shopify", "WooCommerce", "Node.js", "PostgreSQL", "Stripe"]
+  },
+
+  manufacturing: {
+    id: "manufacturing",
+    title: "Manufacturing & Industrial",
+    subtitle: "Digitize Operations, Orders & Business Workflows",
+    description: "Replace manual processes with connected digital systems for manufacturers, distributors, suppliers, and industrial businesses.",
+    heroImage: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1920",
+    challenges: [
+      "Reliance on offline spreadsheets and paperwork",
+      "Blind spots between shop floor production and order status",
+      "Slow dealer quotation and RFQ processing cycles",
+      "Raw material stockouts and warehouse delays",
+      "Fragmented dealer/distributor communication"
+    ],
+    solutions: [
+      {
+        title: "Custom ERP & Operations Systems",
+        description: "Tailored cloud ERPs for production scheduling, bill of materials (BOM), and inventory audits.",
+        icon: Settings
+      },
+      {
+        title: "Dealer & Distributor B2B Portals",
+        description: "Self-service ordering portals with tiered B2B pricing, credit lines, and shipment tracking.",
+        icon: Users
+      },
+      {
+        title: "Quotation & RFQ Automation",
+        description: "Instant cost estimation, automated quotation generation, and digital approval workflows.",
+        icon: Zap
+      }
+    ],
+    keySolutions: [
+      "Custom ERP development",
+      "Inventory & stock management",
+      "Dealer & distributor portals",
+      "B2B ordering systems",
+      "Quotation & RFQ automation",
+      "Production & workflow management"
+    ],
+    benefits: [
+      "-60% Manual Data Entry Overhead",
+      "Real-time Visibility Across Factory & Warehouse",
+      "5x Faster RFQ & Dealer Quote Turnaround",
+      "Reduced Material Stockouts & Wastage",
+      "Secure Role-based Access for Staff & Dealers"
+    ],
+    technologies: ["React", "Node.js", "PostgreSQL", "Docker", "AWS", "Python"]
+  },
+
+  education: {
+    id: "education",
+    title: "Education & E-Learning",
+    subtitle: "Create Better Digital Learning Experiences",
+    description: "Build modern platforms for schools, institutes, coaching centers, universities, trainers, and online education businesses.",
+    heroImage: "https://images.unsplash.com/photo-1501504905252-473c47e087f8?q=80&w=1920",
+    challenges: [
+      "Low student engagement and course completion rates",
+      "Disjointed live class links and video buffering",
+      "Manual fee collection and offline admission follow-ups",
+      "Inefficient exam grading and assignment tracking",
+      "Lack of centralized student performance analytics"
+    ],
+    solutions: [
+      {
+        title: "Custom Learning Management Systems (LMS)",
+        description: "Interactive video player, module progress tracking, course completion badges, and certificates.",
+        icon: GraduationCap
+      },
+      {
+        title: "Student & Teacher Portals",
+        description: "Secure dashboards for attendance, study materials, assignment submissions, and grading.",
+        icon: Users
+      },
+      {
+        title: "Live Classes & Online Exams",
+        description: "Integrated WebRTC/Zoom live streams, anti-cheat proctored quizzes, and automated test reports.",
+        icon: Zap
+      }
+    ],
+    keySolutions: [
+      "Learning management systems",
+      "Student & teacher portals",
+      "Online course platforms",
+      "Live & recorded classes",
+      "Online examination systems",
+      "Admission & fee management"
+    ],
+    benefits: [
+      "+45% Improvement in Course Completion",
+      "100% Automated Fee Invoicing & Reminders",
+      "Sub-second Video Streaming with DRM Protection",
+      "Streamlined Admission Inquiries & Enrolment",
+      "Parent & Student Mobile Experience"
+    ],
+    technologies: ["React", "Next.js", "Node.js", "PostgreSQL", "WebRTC", "AWS MediaLive"]
+  },
+
   healthcare: {
     id: "healthcare",
     title: "Healthcare",
-    subtitle: "Digital Solutions for Modern Healthcare",
-    description: "Transform patient care and operational efficiency with cutting-edge healthcare technology solutions. We help healthcare providers deliver better outcomes through innovative digital platforms.",
+    subtitle: "Build Connected Digital Experiences for Healthcare",
+    description: "Help patients discover services, book appointments, communicate with providers, and access information through secure and user-friendly digital platforms.",
     heroImage: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=1920",
     challenges: [
-      "Patient data management and security",
-      "Regulatory compliance (HIPAA, GDPR)",
-      "Interoperability between systems",
-      "Telemedicine and remote patient monitoring",
-      "Electronic Health Records (EHR) integration"
+      "High no-show rates and phone-line appointment congestion",
+      "Fragmented patient medical records across departments",
+      "Strict data privacy regulations (HIPAA, ABDM)",
+      "Slow, manual lab report distribution",
+      "Poor mobile discovery of doctors and specialties"
     ],
     solutions: [
       {
-        title: "Patient Management Systems",
-        description: "Comprehensive platforms for managing patient records, appointments, and care coordination",
-        icon: Users
+        title: "Doctor & Clinic Appointment Systems",
+        description: "Real-time calendar booking, doctor availability sync, and instant confirmation SMS/WhatsApp.",
+        icon: Stethoscope
       },
       {
-        title: "Telemedicine Platforms",
-        description: "Secure video consultation and remote monitoring solutions",
+        title: "Patient & Telemedicine Portals",
+        description: "End-to-end encrypted video consultations, digital prescription downloads, and e-health records.",
         icon: Zap
       },
       {
-        title: "Data Security & Compliance",
-        description: "HIPAA-compliant systems with advanced encryption and access controls",
+        title: "Lab & Report Delivery Dashboards",
+        description: "Secure patient access for pathology & radiology reports with WhatsApp notification alerts.",
         icon: Shield
       }
     ],
-    benefits: [
-      "Improved patient outcomes and satisfaction",
-      "Reduced operational costs by 30-40%",
-      "Enhanced data security and compliance",
-      "Streamlined workflows and communication",
-      "Better resource utilization"
+    keySolutions: [
+      "Healthcare website development",
+      "Doctor & clinic appointment systems",
+      "Patient portals",
+      "Telemedicine platforms",
+      "Lab & report portals",
+      "Appointment & WhatsApp automation"
     ],
-    technologies: ["React", "Node.js", "PostgreSQL", "AWS", "HL7/FHIR", "WebRTC"]
+    benefits: [
+      "-70% Reduction in Clinic Front-Desk Congestion",
+      "-50% Drop in Patient Appointment No-Shows",
+      "Secure, Compliant Data Architecture",
+      "Instant WhatsApp Lab Report Delivery",
+      "Higher Patient Trust & Online Reputation"
+    ],
+    technologies: ["React", "Next.js", "Node.js", "PostgreSQL", "WebRTC", "AWS"]
   },
+
   finance: {
     id: "finance",
-    title: "Finance & Banking",
-    subtitle: "Secure Digital Banking Solutions",
-    description: "Empower your financial institution with secure, scalable, and user-friendly digital banking solutions. From mobile banking to fraud detection, we build systems that customers trust.",
+    title: "Finance & Financial Services",
+    subtitle: "Build Secure Digital Experiences for Financial Businesses",
+    description: "Develop professional websites, customer portals, calculators, dashboards, and business applications tailored to financial service workflows. Compliance requirements are evaluated according to the specific project, jurisdiction, and technology scope.",
+    complianceNotice: "Compliance requirements are evaluated according to the specific project, jurisdiction, and technology scope.",
     heroImage: "https://images.unsplash.com/photo-1550565118-3a14e8d0386f?q=80&w=1920",
     challenges: [
-      "Security and fraud prevention",
-      "Regulatory compliance (PCI-DSS, SOX)",
-      "Real-time transaction processing",
-      "Customer experience and engagement",
-      "Legacy system modernization"
+      "Complex customer verification (KYC/AML) bottlenecks",
+      "Stringent data security, encryption, and audit readiness",
+      "Slow legacy systems failing during traffic surges",
+      "Lead drop-offs on multi-step financial application forms",
+      "Customer anxiety regarding payment and fund safety"
     ],
     solutions: [
       {
-        title: "Mobile Banking Apps",
-        description: "Secure and intuitive mobile banking experiences with biometric authentication",
-        icon: Users
+        title: "Financial Service Websites & Portals",
+        description: "Institutional-grade Next.js portals with high-trust design, sub-second latency, and SSL security.",
+        icon: Landmark
       },
       {
-        title: "Fraud Detection Systems",
-        description: "AI-powered fraud detection and prevention systems",
-        icon: Shield
-      },
-      {
-        title: "Payment Gateways",
-        description: "Fast and secure payment processing infrastructure",
-        icon: Zap
-      }
-    ],
-    benefits: [
-      "99.99% uptime and reliability",
-      "Reduced fraud by up to 60%",
-      "Improved customer satisfaction scores",
-      "Faster time-to-market for new features",
-      "Seamless integration with existing systems"
-    ],
-    technologies: ["React Native", "Java", "MongoDB", "Azure", "Blockchain", "AI/ML"]
-  },
-  retail: {
-    id: "retail",
-    title: "Retail & E-Commerce",
-    subtitle: "Transform Your Retail Experience",
-    description: "Build seamless omnichannel retail experiences that drive sales and customer loyalty. Our e-commerce solutions help retailers thrive in the digital age.",
-    heroImage: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1920",
-    challenges: [
-      "Omnichannel customer experience",
-      "Inventory management",
-      "Payment processing and security",
-      "Personalization and recommendations",
-      "Supply chain optimization"
-    ],
-    solutions: [
-      {
-        title: "E-Commerce Platforms",
-        description: "Full-featured online stores with advanced product management",
-        icon: Users
-      },
-      {
-        title: "Inventory Management",
-        description: "Real-time inventory tracking across all channels",
+        title: "Loan & EMI Calculators",
+        description: "Interactive real-time calculators that capture qualified lead details with friction-free UX.",
         icon: TrendingUp
       },
       {
-        title: "AI-Powered Recommendations",
-        description: "Personalized product recommendations to increase conversions",
-        icon: Zap
-      }
-    ],
-    benefits: [
-      "30-50% increase in online sales",
-      "Improved inventory turnover",
-      "Better customer insights and analytics",
-      "Reduced cart abandonment rates",
-      "Seamless omnichannel experience"
-    ],
-    technologies: ["React", "Shopify", "WooCommerce", "Magento", "Stripe", "AI/ML"]
-  },
-  education: {
-    id: "education",
-    title: "Education",
-    subtitle: "Digital Learning Solutions",
-    description: "Empower educators and students with innovative e-learning platforms and educational technology. Create engaging, accessible, and effective learning experiences.",
-    heroImage: "https://images.unsplash.com/photo-1501504905252-473c47e087f8?q=80&w=1920",
-    challenges: [
-      "Remote learning infrastructure",
-      "Student engagement and retention",
-      "Assessment and grading automation",
-      "Content management and delivery",
-      "Accessibility and inclusivity"
-    ],
-    solutions: [
-      {
-        title: "Learning Management Systems",
-        description: "Comprehensive LMS platforms for course delivery and management",
-        icon: Users
-      },
-      {
-        title: "Virtual Classrooms",
-        description: "Interactive online classroom solutions with real-time collaboration",
-        icon: Zap
-      },
-      {
-        title: "Assessment Tools",
-        description: "Automated grading and analytics for better learning outcomes",
-        icon: TrendingUp
-      }
-    ],
-    benefits: [
-      "Increased student engagement by 40%",
-      "Scalable learning infrastructure",
-      "Better learning outcome tracking",
-      "Reduced administrative overhead",
-      "Accessible education for all"
-    ],
-    technologies: ["React", "Node.js", "MongoDB", "WebRTC", "AWS", "Canvas LMS"]
-  },
-  "real-estate": {
-    id: "real-estate",
-    title: "Real Estate",
-    subtitle: "Smart Property Solutions",
-    description: "Modernize your real estate business with digital solutions for property management, virtual tours, and customer relationship management.",
-    heroImage: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?q=80&w=1920",
-    challenges: [
-      "Property listing management",
-      "Virtual property tours",
-      "Lead generation and nurturing",
-      "Document management",
-      "Market analytics and insights"
-    ],
-    solutions: [
-      {
-        title: "Property Management Platforms",
-        description: "Comprehensive systems for managing properties, tenants, and maintenance",
-        icon: Users
-      },
-      {
-        title: "Virtual Tour Solutions",
-        description: "3D virtual tours and augmented reality property viewing",
-        icon: Zap
-      },
-      {
-        title: "CRM Systems",
-        description: "Lead management and client relationship tools",
-        icon: TrendingUp
-      }
-    ],
-    benefits: [
-      "50% faster property sales cycles",
-      "Reduced operational costs",
-      "Better lead conversion rates",
-      "Enhanced customer experience",
-      "Data-driven market insights"
-    ],
-    technologies: ["React", "Three.js", "Node.js", "MongoDB", "AWS", "Matterport"]
-  },
-  manufacturing: {
-    id: "manufacturing",
-    title: "Manufacturing",
-    subtitle: "Industry 4.0 Solutions",
-    description: "Optimize your manufacturing operations with IoT, automation, and data analytics solutions for the smart factory of the future.",
-    heroImage: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1920",
-    challenges: [
-      "Production optimization",
-      "Supply chain management",
-      "Quality control and assurance",
-      "Predictive maintenance",
-      "Inventory and resource management"
-    ],
-    solutions: [
-      {
-        title: "IoT & Automation",
-        description: "Connected devices and automated workflows for smart manufacturing",
-        icon: Zap
-      },
-      {
-        title: "Predictive Analytics",
-        description: "AI-powered insights for maintenance and optimization",
-        icon: TrendingUp
-      },
-      {
-        title: "Supply Chain Management",
-        description: "End-to-end visibility and optimization of supply chains",
+        title: "Customer Dashboards & Application Workflows",
+        description: "Document upload vaults, multi-stage application trackers, and secure CRM integrations.",
         icon: Shield
       }
     ],
-    benefits: [
-      "20-30% increase in productivity",
-      "Reduced downtime and maintenance costs",
-      "Improved product quality",
-      "Better resource utilization",
-      "Real-time operational insights"
+    keySolutions: [
+      "Financial service websites",
+      "Loan & EMI calculators",
+      "Customer dashboards",
+      "Lead & application management",
+      "CRM integrations",
+      "Business process automation"
     ],
-    technologies: ["React", "IoT", "Python", "TensorFlow", "AWS IoT", "PostgreSQL"]
+    benefits: [
+      "Bank-grade SSL & Data Encryption Protocols",
+      "3x Increase in Completed Financial Inquiries",
+      "Audit-Ready Architecture & Role-based Access",
+      "Sub-second Calculation & Page Load Speeds",
+      "Automated Lead Scoring for Loan Officers"
+    ],
+    technologies: ["Next.js", "Node.js", "PostgreSQL", "Docker", "AWS", "Python"]
   },
+
+  "professional-services": {
+    id: "professional-services",
+    title: "Professional Services",
+    subtitle: "Turn Your Expertise Into a Strong Digital Business",
+    description: "From law firms and consultants to agencies, accounting firms, and corporate service providers, HiveRift creates digital experiences that build credibility and generate enquiries.",
+    heroImage: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1920",
+    challenges: [
+      "Outdated websites failing to reflect professional authority",
+      "Manual phone and email back-and-forth for scheduling consultations",
+      "Unorganized intake documents and client discovery notes",
+      "Poor search engine visibility against large competitors",
+      "Inability to track which marketing channels drive high-value clients"
+    ],
+    solutions: [
+      {
+        title: "High-Authority Corporate Websites",
+        description: "Editorial, clean, and commanding websites showcasing case studies, credentials, and practice areas.",
+        icon: Briefcase
+      },
+      {
+        title: "Client Intake & Consultation Booking",
+        description: "Integrated calendar booking with automated pre-qualification forms and calendar sync.",
+        icon: Zap
+      },
+      {
+        title: "Secure Client Document Portals",
+        description: "Encrypted vaults for client agreements, briefs, invoices, and project milestones.",
+        icon: Shield
+      }
+    ],
+    keySolutions: [
+      "Corporate website development",
+      "Lead generation systems",
+      "CRM integration",
+      "Appointment booking",
+      "Client portals",
+      "SEO & digital marketing"
+    ],
+    benefits: [
+      "Elevated Brand Credibility & Market Authority",
+      "Automated Pre-Screened Consultation Booking",
+      "Consistent First-Page Google Local & Organic Ranks",
+      "Encrypted Client Confidentiality & Data Storage",
+      "Higher Retainer & Client Deal Sizes"
+    ],
+    technologies: ["Next.js", "React", "Node.js", "PostgreSQL", "HubSpot API", "Stripe"]
+  },
+
+  "food-restaurant": {
+    id: "food-restaurant",
+    title: "Restaurants & Food Businesses",
+    subtitle: "Give Customers a Direct Way to Order",
+    description: "Create digital ordering experiences that help restaurants, cafés, cloud kitchens, and food brands connect directly with their customers.",
+    heroImage: "https://images.unsplash.com/photo-1552566626-52f8b828add9?q=80&w=1920",
+    challenges: [
+      "Heavy 25-35% commission loss to food aggregator apps",
+      "Zero direct relationship or data ownership with diners",
+      "Chaotic order handling during peak dining hours",
+      "Manual table booking mistakes and double bookings",
+      "Low repeat customer loyalty without direct re-marketing"
+    ],
+    solutions: [
+      {
+        title: "Direct Online Food Ordering",
+        description: "Zero-commission custom online ordering system with instant kitchen ticket printing.",
+        icon: Utensils
+      },
+      {
+        title: "Digital QR Menus & Table Reservation",
+        description: "Contactless digital QR menus, table booking systems, and automated SMS confirmation.",
+        icon: Zap
+      },
+      {
+        title: "POS Integration & WhatsApp Loyalty",
+        description: "Seamless connection to Petpooja/POSist, with automated WhatsApp re-order promotions.",
+        icon: ShoppingBag
+      }
+    ],
+    keySolutions: [
+      "Restaurant website development",
+      "Online food ordering",
+      "Digital menus",
+      "Table reservation systems",
+      "POS integration",
+      "Local SEO & digital marketing"
+    ],
+    benefits: [
+      "Save 25-35% Aggregator Commissions on Direct Orders",
+      "100% Customer Contact & Order History Ownership",
+      "Real-time Kitchen Display & POS Synchronization",
+      "Automated WhatsApp Loyalty & Birthday Promotions",
+      "Top Local Google Maps Rankings for Food Queries"
+    ],
+    technologies: ["React", "Next.js", "Node.js", "Firebase", "Stripe", "WhatsApp API"]
+  },
+
+  startups: {
+    id: "startups",
+    title: "Startups & Emerging Businesses",
+    subtitle: "From Business Idea to Launch-Ready Product",
+    description: "Turn your concept into a working digital product with strategy, UI/UX, development, testing, deployment, and ongoing support.",
+    heroImage: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1920",
+    challenges: [
+      "Running out of runway before launching an MVP",
+      "Choosing the wrong tech stack leading to costly rewrites",
+      "Freelancers delivering buggy, unmaintainable code",
+      "Lack of cohesive product design, branding, and marketing",
+      "Difficulty demonstrating traction to investors"
+    ],
+    solutions: [
+      {
+        title: "Rapid MVP & Prototype Development",
+        description: "Ship a functional, production-ready MVP in 4 to 8 weeks with scalable Next.js architecture.",
+        icon: Rocket
+      },
+      {
+        title: "SaaS Application Development",
+        description: "Multi-tenant architectures, subscription billing, user authentication, and analytics dashboards.",
+        icon: Zap
+      },
+      {
+        title: "Go-to-Market Landing Pages & Apps",
+        description: "High-converting investor pitch websites, waitlist funnels, and iOS/Android applications.",
+        icon: TrendingUp
+      }
+    ],
+    keySolutions: [
+      "MVP development",
+      "SaaS application development",
+      "Startup websites",
+      "Mobile app development",
+      "API & third-party integrations",
+      "Cloud-ready application architecture"
+    ],
+    benefits: [
+      "Launch in Weeks, Not Months",
+      "Clean, Production-Ready, VC-Diligence Codebase",
+      "Fixed Milestone Pricing Guarantee",
+      "Scalable Cloud-Native Foundation on AWS/Vercel",
+      "Complete Strategy, Design, Tech & GTM Support"
+    ],
+    technologies: ["Next.js", "TypeScript", "Node.js", "PostgreSQL", "Supabase", "TailwindCSS"]
+  },
+
+  // Backward compatibility aliases & additional sectors
+  legal: {
+    id: "legal",
+    title: "Professional Services & Legal",
+    subtitle: "Turn Your Expertise Into a Strong Digital Business",
+    description: "From law firms and consultants to agencies, accounting firms, and corporate service providers, HiveRift creates digital experiences that build credibility and generate enquiries.",
+    heroImage: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1920",
+    challenges: [
+      "Outdated websites hurting credibility",
+      "Unorganized client intake emails",
+      "Manual appointment scheduling friction"
+    ],
+    solutions: [
+      {
+        title: "Corporate Website Development",
+        description: "Authority-building websites designed to win high-value corporate clients.",
+        icon: Briefcase
+      },
+      {
+        title: "Client Intake & Scheduling",
+        description: "Automated booking with pre-qualification forms.",
+        icon: Zap
+      }
+    ],
+    keySolutions: [
+      "Corporate website development",
+      "Lead generation systems",
+      "CRM integration",
+      "Appointment booking",
+      "Client portals",
+      "SEO & digital marketing"
+    ],
+    benefits: [
+      "Authority Positioning",
+      "Automated Intake",
+      "Confidential Client Portals"
+    ],
+    technologies: ["Next.js", "React", "Node.js", "PostgreSQL"]
+  },
+
   logistics: {
     id: "logistics",
-    title: "Logistics",
+    title: "Logistics & Supply Chain",
     subtitle: "Smart Transportation & Delivery",
     description: "Streamline your logistics operations with intelligent routing, real-time tracking, and automated warehouse management solutions.",
     heroImage: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1920",
     challenges: [
       "Route optimization",
       "Real-time tracking and visibility",
-      "Warehouse management",
-      "Last-mile delivery efficiency",
-      "Fleet management"
+      "Warehouse management"
     ],
     solutions: [
       {
         title: "Route Optimization",
-        description: "AI-powered route planning for faster, cost-effective deliveries",
+        description: "AI-powered route planning for faster, cost-effective deliveries.",
         icon: TrendingUp
       },
       {
         title: "Real-Time Tracking",
-        description: "GPS tracking and delivery status updates",
+        description: "GPS tracking and delivery status updates for consignees.",
         icon: Zap
-      },
-      {
-        title: "Warehouse Automation",
-        description: "Automated inventory and warehouse management systems",
-        icon: Shield
       }
     ],
     benefits: [
       "25-35% reduction in delivery costs",
       "Improved delivery times",
-      "Better fleet utilization",
-      "Enhanced customer satisfaction",
-      "Real-time operational visibility"
+      "Real-time visibility"
     ],
-    technologies: ["React", "Google Maps API", "Node.js", "MongoDB", "IoT", "Machine Learning"]
-  },
-  hospitality: {
-    id: "hospitality",
-    title: "Hospitality",
-    subtitle: "Guest Experience Excellence",
-    description: "Enhance guest experiences and streamline operations with digital solutions for hotels, restaurants, and hospitality businesses.",
-    heroImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1920",
-    challenges: [
-      "Reservation and booking management",
-      "Guest experience personalization",
-      "Staff coordination",
-      "Revenue management",
-      "Online reputation management"
-    ],
-    solutions: [
-      {
-        title: "Booking Management",
-        description: "Integrated reservation systems with dynamic pricing",
-        icon: Users
-      },
-      {
-        title: "Guest Experience Apps",
-        description: "Mobile apps for seamless guest services and communication",
-        icon: Zap
-      },
-      {
-        title: "Revenue Optimization",
-        description: "AI-powered pricing and revenue management systems",
-        icon: TrendingUp
-      }
-    ],
-    benefits: [
-      "Increased booking conversions",
-      "Higher guest satisfaction scores",
-      "Optimized pricing and revenue",
-      "Streamlined operations",
-      "Better staff productivity"
-    ],
-    technologies: ["React", "Node.js", "MongoDB", "Stripe", "AWS", "Analytics"]
-  },
-  "food-restaurant": {
-    id: "food-restaurant",
-    title: "Food & Restaurant",
-    subtitle: "Digital Ordering & Management Solutions",
-    description: "Empower your restaurant with seamless online ordering, delivery management, and loyalty programs to drive customer engagement and revenue.",
-    heroImage: "https://images.unsplash.com/photo-1552566626-52f8b828add9?q=80&w=1920",
-    challenges: [
-      "Online order fragmentation",
-      "High third-party delivery commissions",
-      "Customer data ownership",
-      "Inventory and kitchen management",
-      "Loyalty and retention programs"
-    ],
-    solutions: [
-      {
-        title: "Direct Ordering Platforms",
-        description: "Build your own website and apps to avoid high commissions",
-        icon: ShoppingBag
-      },
-      {
-        title: "Kitchen Display Systems",
-        description: "Streamline orders between front-of-house and kitchen",
-        icon: Zap
-      },
-      {
-        title: "POS Integration",
-        description: "Seamlessly integrate online orders with your physical POS",
-        icon: Settings
-      }
-    ],
-    benefits: [
-      "Reduced commission costs by 60%",
-      "Increased repeat orders via loyalty",
-      "Full ownership of customer data",
-      "Faster order processing times",
-      "Better inventory control"
-    ],
-    technologies: ["React", "Firebase", "Node.js", "MongoDB", "Stripe", "PostgreSQL"]
-  },
-  energy: {
-    id: "energy",
-    title: "Energy & Utilities",
-    subtitle: "Smart Grid & Sustainable Energy Solutions",
-    description: "Modernize energy infrastructure with smart grid solutions and sustainable energy management systems. We help utility providers optimize distribution and enhance consumer engagement.",
-    heroImage: "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?q=80&w=1920",
-    challenges: [
-      "Smart grid integration and management",
-      "Renewable energy source optimization",
-      "Real-time energy consumption monitoring",
-      "Infrastructure security and resilience",
-      "Regulatory compliance and reporting"
-    ],
-    solutions: [
-      {
-        title: "Smart Metering Systems",
-        description: "Advanced metering infrastructure for real-time tracking and automated billing.",
-        icon: Zap
-      },
-      {
-        title: "Grid Analytics",
-        description: "AI-powered platforms for predictive maintenance and load balancing.",
-        icon: TrendingUp
-      },
-      {
-        title: "Renewable Portals",
-        description: "Dashboards for managing solar, wind, and other green energy assets.",
-        icon: Shield
-      }
-    ],
-    benefits: [
-      "25% reduction in energy wastage",
-      "Improved grid reliability and uptime",
-      "Faster response to power outages",
-      "Seamless integration of green energy",
-      "Data-driven consumption insights"
-    ],
-    technologies: ["IoT", "Python", "React", "AWS IoT Core", "PostgreSQL", "Time Series DB"]
-  },
-  insurance: {
-    id: "insurance",
-    title: "Insurance",
-    subtitle: "Modern Digital Insurance Solutions",
-    description: "Transform your insurance business with digital platforms that automate claims processing, enhance risk assessment, and improve customer engagement.",
-    heroImage: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?q=80&w=1920",
-    challenges: [
-      "Manual and slow claims processing",
-      "Accurate risk assessment and underwriting",
-      "Customer retention and personalized offerings",
-      "Legacy system integration",
-      "Fraud detection and prevention"
-    ],
-    solutions: [
-      {
-        title: "Claims Automation",
-        description: "AI-driven platforms to speed up claim settlements and reduce paperwork.",
-        icon: Zap
-      },
-      {
-        title: "Customer Portals",
-        description: "Self-service mobile and web apps for policy management and renewals.",
-        icon: Users
-      },
-      {
-        title: "Fraud Analytics",
-        description: "Advanced algorithms to detect suspicious patterns and prevent insurance fraud.",
-        icon: Shield
-      }
-    ],
-    benefits: [
-      "40% faster claims settlement",
-      "Improved underwriting accuracy",
-      "Higher customer satisfaction scores",
-      "Reduced operational overhead",
-      "Enhanced data-driven decision making"
-    ],
-    technologies: ["React", "Node.js", "AI/ML", "MongoDB", "AWS", "Python"]
-  },
-  automotive: {
-    id: "automotive",
-    title: "Automotive",
-    subtitle: "Connected Vehicle Solutions",
-    description: "Drive innovation in the automotive industry with connected car technologies, dealership management systems, and customer engagement platforms.",
-    heroImage: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=1920",
-    challenges: [
-      "Vehicle connectivity and IoT",
-      "Dealership management",
-      "Customer experience",
-      "Predictive maintenance",
-      "Supply chain optimization"
-    ],
-    solutions: [
-      {
-        title: "Connected Car Platforms",
-        description: "IoT solutions for vehicle connectivity and telematics",
-        icon: Zap
-      },
-      {
-        title: "Dealership Management",
-        description: "Comprehensive CRM and inventory management for dealerships",
-        icon: Users
-      },
-      {
-        title: "Predictive Maintenance",
-        description: "AI-powered vehicle health monitoring and maintenance alerts",
-        icon: Shield
-      }
-    ],
-    benefits: [
-      "Enhanced vehicle safety and performance",
-      "Improved customer satisfaction",
-      "Better inventory management",
-      "Reduced maintenance costs",
-      "Data-driven business insights"
-    ],
-    technologies: ["React", "IoT", "AWS", "Machine Learning", "MongoDB", "APIs"]
-  },
-  government: {
-    id: "government",
-    title: "Government",
-    subtitle: "Digital Governance Solutions",
-    description: "Modernize public services with secure, accessible, and efficient digital platforms for citizen engagement and government operations.",
-    heroImage: "https://images.unsplash.com/photo-1541872703-74c5e443d1f0?q=80&w=1920",
-    challenges: [
-      "Citizen service delivery",
-      "Data security and privacy",
-      "Regulatory compliance",
-      "Legacy system modernization",
-      "Transparency and accountability"
-    ],
-    solutions: [
-      {
-        title: "Citizen Portals",
-        description: "Self-service platforms for government services and information",
-        icon: Users
-      },
-      {
-        title: "Secure Data Management",
-        description: "Compliant data storage and management systems",
-        icon: Shield
-      },
-      {
-        title: "Workflow Automation",
-        description: "Streamlined processes for government operations",
-        icon: Zap
-      }
-    ],
-    benefits: [
-      "Improved citizen satisfaction",
-      "Reduced processing times",
-      "Enhanced transparency",
-      "Better resource allocation",
-      "Secure and compliant systems"
-    ],
-    technologies: ["React", "Node.js", "PostgreSQL", "Security Tools", "Blockchain", "AWS GovCloud"]
+    technologies: ["React", "Google Maps API", "Node.js", "MongoDB"]
   }
 };

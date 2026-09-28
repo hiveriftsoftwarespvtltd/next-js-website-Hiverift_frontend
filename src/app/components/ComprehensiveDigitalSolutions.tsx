@@ -11,7 +11,6 @@ import {
   Palette, 
   Search, 
   BarChart3,
-  Sparkles,
   ArrowRight,
   CheckCircle2
 } from "lucide-react";
@@ -91,7 +90,6 @@ export function ComprehensiveDigitalSolutions() {
           className="text-center mb-12 md:mb-16"
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-full mb-4">
-            <Sparkles size={16} className="text-emerald-600" />
             <span className="text-sm font-semibold text-emerald-700 tracking-wide uppercase">
               Our Expertise
             </span>

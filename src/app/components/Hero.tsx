@@ -1,227 +1,434 @@
 "use client";
 
-
-import { motion } from "motion/react";
+import { useState } from "react";
 import {
   ArrowRight,
-  CheckCircle2,
-  TrendingUp,
-  Users,
-  Award,
-  BarChart3,
+  Check,
   Phone,
-  HelpCircle,
+  User,
+  Building2,
+  Lock,
+  Clock,
+  ShieldCheck,
+  ChevronDown,
+  Gauge,
+  BarChart3,
   Target,
-  Trophy
+  Layers,
+  Calendar
 } from "lucide-react";
-import { Button } from "./ui/button";
-import { ImageWithFallback } from "./figma/ImageWithFallback";
-import Link from "next/link";
+import { submitContactForm } from "@/app/actions/contactActions";
+import { openEnquiryModal } from "./EnquiryModal";
+import { TechGlobeBackground } from "./TechGlobeBackground";
+import Swal from "sweetalert2";
 
 export function Hero() {
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    company: "",
+    service: "Corporate Website Development",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const scrollTo = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
     }
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    if (!formData.name.trim()) {
+      Swal.fire({
+        icon: "warning",
+        title: "Name Required",
+        text: "Please enter your full name.",
+        confirmButtonColor: "#10b981",
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!formData.phone.trim() || formData.phone.trim().length < 8) {
+      Swal.fire({
+        icon: "warning",
+        title: "Phone Required",
+        text: "Please enter a valid phone number.",
+        confirmButtonColor: "#10b981",
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
+    try {
+      const data = new FormData();
+      data.append("name", formData.name.trim());
+      data.append("phone", formData.phone.trim());
+      data.append("company", formData.company.trim() || "Not Specified");
+      data.append("service", formData.service);
+      data.append("message", `Instant Proposal Request for ${formData.service}`);
+
+      const res = await submitContactForm(data);
+      if (res.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Proposal Request Received!",
+          text: "Thank you! Our technical architect will review your project and connect with you within 30 minutes.",
+          confirmButtonColor: "#10b981",
+        });
+        setFormData({
+          name: "",
+          phone: "",
+          company: "",
+          service: "Corporate Website Development",
+        });
+      } else {
+        throw new Error(res.message || "Failed to submit request.");
+      }
+    } catch (err: any) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission Notice",
+        text: err?.message || "Could not send request right now. Please call us directly.",
+        confirmButtonColor: "#10b981",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Professional, non-AI commercial outcome metrics
+  const outcomeMetrics = [
+    {
+      title: "Performance Optimized",
+      shortTitle: "Performance",
+      desc: "Clean modern code, high responsiveness & fast loading times",
+      icon: Gauge,
+      badge: "Core Vitals",
+    },
+    {
+      title: "SEO-Ready Architecture",
+      shortTitle: "SEO Architecture",
+      desc: "Structured data, semantic hierarchy & search-friendly indexing",
+      icon: BarChart3,
+      badge: "Visibility",
+    },
+    {
+      title: "Conversion-Focused UX",
+      shortTitle: "High Conversion",
+      desc: "Engineered lead pathways designed to convert visitors into clients",
+      icon: Target,
+      badge: "Lead Flow",
+    },
+    {
+      title: "Lead & CRM Integration",
+      shortTitle: "CRM & Leads",
+      desc: "Automated enquiry notifications, lead routing & Admin CMS",
+      icon: Layers,
+      badge: "Instant Sync",
+    },
+  ];
+
+  const websiteTypes = [
+    "Corporate Websites",
+    "Dynamic Business Sites",
+    "eCommerce Stores",
+    "Custom Web Portals",
+    "High-Converting Landing Pages",
+  ];
+
   return (
-    <section id="home" className="relative min-h-screen overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-50">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle at 2px 2px, rgba(16, 185, 129, 0.4) 1px, transparent 0)`,
-          backgroundSize: '40px 40px'
-        }}></div>
-      </div>
+    <section
+      id="home"
+      className="relative min-h-screen bg-gradient-to-br from-[#eaf8f0] via-[#f5fbf7] to-[#ffffff] text-slate-900 pt-[172px] sm:pt-32 lg:pt-36 pb-12 sm:pb-16 lg:pb-24 overflow-hidden"
+    >
+      {/* Background Subtle Geometric Mesh & Soft Radial Accents */}
+      <div 
+        className="absolute inset-0 opacity-40 pointer-events-none"
+        style={{
+          backgroundImage: `radial-gradient(circle at 1px 1px, rgba(16, 185, 129, 0.15) 1px, transparent 0)`,
+          backgroundSize: "36px 36px"
+        }}
+      />
+      <div className="absolute top-1/4 -left-20 w-96 h-96 bg-emerald-300/20 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/3 -right-20 w-96 h-96 bg-teal-300/20 rounded-full blur-[120px] pointer-events-none" />
 
+      {/* Animated Tech Globe Background */}
+      <TechGlobeBackground />
+
+      {/* Restored Full-Width Standard Container */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center min-h-screen pt-28 pb-12 sm:pt-32 sm:pb-16 lg:pt-40 lg:pb-24">
-          {/* Left Side - Content (Order 2 on mobile, Order 1 on desktop) */}
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-            className="space-y-6 sm:space-y-8 lg:space-y-10 order-2 lg:order-1"
-          >
+        <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          
+          {/* ============================================================ */}
+          {/* LEFT COLUMN: High-Intent Value Proposition & Proof (7 cols)  */}
+          {/* ============================================================ */}
+          <div className="lg:col-span-7 space-y-4 sm:space-y-6 text-left">
+            
+            {/* Top Pill Badge (Professional Authority Marker) */}
+            <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-full bg-white border border-slate-200 shadow-sm text-[11px] sm:text-xs font-semibold max-w-full">
+              <span className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse inline-block shrink-0" />
+              <span className="text-slate-800">Top Web Development Company in Delhi NCR</span>
+            </div>
 
-
-            {/* Main Headline */}
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight text-gray-900 "
-            >
-              Grow Your Business <br />
-              With <span className="text-emerald-600">High Converting</span> <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">
-                Website Development
+            {/* Semantic SEO H1 */}
+            <h1 className="text-[1.85rem] sm:text-4xl md:text-5xl lg:text-[3.35rem] font-black leading-[1.18] sm:leading-[1.14] tracking-tight text-slate-900">
+              Need a Website That <br className="hidden sm:inline" />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#059669] via-[#10b981] to-[#0d9488]">
+                Actually Brings You Customers?
               </span>
-            </motion.h1>
+            </h1>
 
-            {/* Description / Subheadline */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-              className="space-y-4"
-            >
-              <p className="text-lg sm:text-xl md:text-2xl text-gray-700 font-bold leading-relaxed max-w-2xl">
-                Get a <span className="text-emerald-600  decoration-emerald-200 underline-offset-4">High Converting</span> website <br className="hidden sm:block" />
-                with result driven marketing.
-              </p>
+            {/* Supporting Copy (Concise on mobile, comprehensive on desktop) */}
+            <p className="text-sm sm:text-base lg:text-lg text-slate-700 font-normal leading-relaxed max-w-2xl">
+              Fast, SEO-ready websites built to turn visitors into enquiries, leads and sales.
+              <span className="hidden sm:inline"> We design and develop bespoke corporate websites, dynamic business portals, and eCommerce storefronts built to scale your business.</span>
+            </p>
 
-              {/* Features Checklist */}
-              <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-2">
-                {[
-                  "No Hidden Cost",
-                  "SEO Optimized",
-                  "Mobile Friendly"
-                ].map((feature, i) => (
-                  <div key={i} className="flex items-center gap-2 text-sm sm:text-base font-bold text-gray-600">
-                    <CheckCircle2 className="text-emerald-500" size={18} />
-                    <span>{feature}</span>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* CTA Section */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.7 }}
-              className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-4 sm:pt-6"
-            >
-              <Button
-                asChild
-                className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-7 text-lg font-black rounded-full shadow-xl shadow-emerald-200 hover:shadow-2xl transition-all transform hover:scale-105 group w-full sm:w-auto"
-              >
-                <Link href="/contact">
-                   Free Consultation
-                  <ArrowRight className="mt-1 group-hover:translate-x-1 transition-transform" size={20} />
-                </Link>
-              </Button>
-
-              <Link href="/services" className="w-full sm:w-auto">
-                <Button
-                  variant="outline"
-                  className="border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-50 px-8 py-7 text-lg font-black rounded-full transition-all w-full sm:w-auto"
+            {/* Website Development Scope Tags (Top 3 on mobile, all 5 on desktop) */}
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 pt-0.5">
+              {websiteTypes.map((type, i) => (
+                <span
+                  key={i}
+                  className={`inline-flex items-center gap-1 sm:gap-1.5 px-2.5 py-1 sm:px-3 rounded-full bg-white border border-slate-200 text-slate-800 text-[11px] sm:text-xs font-semibold shadow-xs ${
+                    i >= 3 ? "hidden sm:inline-flex" : ""
+                  }`}
                 >
-                  View Our Services
-                </Button>
-              </Link>
-            </motion.div>
-          </motion.div>
-
-          {/* Right Side - Mockup Image (Order 1 on mobile, Order 2 on desktop) */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8, x: 50 }}
-            animate={{ opacity: 1, scale: 1, x: 0 }}
-            transition={{ duration: 1, delay: 0.2 }}
-            className="relative order-1 lg:order-2 flex items-center justify-center"
-          >
-            <div className="relative w-full max-w-2xl lg:max-w-3xl">
-              {/* Floating 100% Free Badge */}
-             
-
-              <div className="relative rounded-[2rem] overflow-hidden shadow-[0_32px_64px_-16px_rgba(16,185,129,0.2)] border-8 border-white bg-white">
-                <ImageWithFallback
-                  src="/hero_hiverift_mockup.png"
-                  alt="Digital Marketing Mockup"
-                  className="w-full h-auto object-cover"
-                />
-              </div>
-
-              {/* Decorative Background Glow */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-emerald-400/20 rounded-full blur-[100px] -z-10"></div>
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Quick Answers Section (AEO Optimized) - Full Width Bottom Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="mt-2 md:mt-4 pb-8"
-        >
-          <div className="py-6 md:py-10">
-            <div className="text-center mb-12">
-              <motion.h2
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="text-3xl md:text-5xl font-black text-gray-900 mb-4 tracking-tight"
-              >
-                Quick <span className="text-emerald-600">Answers</span>
-              </motion.h2>
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 }}
-                className="text-gray-500 max-w-2xl mx-auto font-medium text-base md:text-lg leading-relaxed"
-              >
-                Expert insights for instant clarity on your business growth and digital transformation.
-              </motion.p>
-              <div className="mt-4 flex justify-center">
-                <span className="text-[10px] text-emerald-600 font-black uppercase tracking-[0.3em] bg-emerald-50 px-4 py-1 rounded-full border border-emerald-100">AEO Optimized Knowledge Base</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {[
-                {
-                  q: "What is digital marketing?",
-                  a: "Digital marketing is the process of promoting your business online using SEO, social media, and ads to generate leads and sales.",
-                  icon: HelpCircle,
-                  href: "/q/what-is-digital-marketing"
-                },
-                {
-                  q: "Why is a website important?",
-                  a: "A website builds trust, increases visibility, and helps convert visitors into paying customers for your business.",
-                  icon: TrendingUp,
-                  href: "/q/why-website-important"
-                },
-                {
-                  q: "How can you help my business?",
-                  a: "We create a website, drive targeted traffic, and generate quality leads using proven strategies that deliver results.",
-                  icon: Users,
-                  href: "/q/how-can-we-help"
-                },
-                {
-                  q: "How long does it take to see results?",
-                  a: "SEO takes 3-6 months for strong results, while paid ads can start generating leads and sales within days.",
-                  icon: Target,
-                  href: "/q/results-timeline"
-                }
-              ].map((item, i) => (
-                <div key={i} className="bg-white border border-gray-100 p-8 rounded-[2rem] shadow-sm hover:shadow-2xl hover:border-emerald-200 transition-all duration-500 group flex flex-col h-full relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-50/50 rounded-bl-[4rem] -mr-8 -mt-8 group-hover:bg-emerald-100 transition-colors duration-500"></div>
-
-                  <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 mb-6 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500 shadow-sm">
-                    <item.icon size={28} />
-                  </div>
-
-                  <h3 className="text-xl font-black text-gray-900 mb-3 leading-tight group-hover:text-emerald-600 transition-colors">{item.q}</h3>
-                  <p className="text-sm text-gray-600 font-medium leading-relaxed mb-6 flex-grow">{item.a}</p>
-
-                  <Link
-                    href={item.href}
-                    className="inline-flex items-center gap-2 text-xs font-black text-emerald-600 uppercase tracking-widest group/link mt-auto"
-                  >
-                    Read More
-                    <ArrowRight size={14} className="group-hover/link:translate-x-1 transition-transform" />
-                  </Link>
-                </div>
+                  <Check size={11} className="text-[#10b981]" strokeWidth={2.5} />
+                  <span>{type}</span>
+                </span>
               ))}
             </div>
+
+            {/* 4 Professional Outcome Proof Cards (Hidden on mobile, visible on desktop) */}
+            <div className="hidden sm:grid sm:grid-cols-2 gap-3 pt-1">
+              {outcomeMetrics.map((metric, i) => {
+                const IconComponent = metric.icon;
+                return (
+                  <div
+                    key={i}
+                    className="flex items-start gap-3 p-3.5 rounded-xl bg-white border border-slate-200/90 shadow-xs hover:border-emerald-300 transition-colors"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-slate-100/90 border border-slate-200 flex items-center justify-center text-slate-700 shrink-0 mt-0.5">
+                      <IconComponent size={16} strokeWidth={2} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-1">
+                        <span className="text-xs sm:text-sm font-bold text-slate-900 truncate">
+                          {metric.title}
+                        </span>
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200 shrink-0">
+                          {metric.badge}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-600 font-normal leading-snug mt-0.5">
+                        {metric.desc}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Primary CTA Buttons & Direct Contact Bar */}
+            <div className="pt-1 sm:pt-2 space-y-3 sm:space-y-3.5">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-4">
+                <button
+                  onClick={() => scrollTo("enquiry")}
+                  className="w-full sm:w-auto bg-[#10b981] hover:bg-[#059669] text-white font-bold px-6 sm:px-8 py-3 sm:py-3.5 text-sm sm:text-base rounded-full shadow-md shadow-emerald-500/20 hover:shadow-emerald-500/35 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span>Get My Website Proposal</span>
+                  <ArrowRight size={16} strokeWidth={2.5} />
+                </button>
+
+                <button
+                  onClick={() => scrollTo("work")}
+                  className="w-full sm:w-auto bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 font-semibold px-6 py-3.5 text-sm rounded-full shadow-xs transition-all hidden sm:flex text-center justify-center"
+                >
+                  View Selected Work
+                </button>
+              </div>
+
+              {/* Social Proof & Quick Contacts Bar */}
+              <div className="pt-0.5 sm:pt-1">
+                <div className="inline-flex flex-wrap items-center justify-center sm:justify-start gap-2.5 sm:gap-4 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-white/90 border border-slate-200/90 shadow-xs text-xs font-semibold text-slate-700 w-full sm:w-auto">
+                  <a
+                    href="tel:+918814930229"
+                    className="flex items-center gap-1.5 hover:text-emerald-600 transition-colors font-bold"
+                  >
+                    <Phone size={13} strokeWidth={2} className="text-[#0284c7]" />
+                    <span>88149 30229</span>
+                  </a>
+                  <span className="text-slate-300">|</span>
+                  <button
+                    onClick={openEnquiryModal}
+                    className="flex items-center gap-1.5 text-emerald-700 hover:text-emerald-800 font-bold transition-colors cursor-pointer"
+                  >
+                    <Calendar size={13} strokeWidth={2} className="text-[#10b981]" />
+                    <span>Book Free Consultation</span>
+                  </button>
+                  <span className="text-slate-300 hidden sm:inline">|</span>
+                  <span className="text-slate-700 hidden sm:inline flex items-center gap-1 font-bold">
+                    <Check size={13} strokeWidth={2.5} className="text-emerald-600" />
+                    <span>1000+ Projects Delivered</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
           </div>
-        </motion.div>
+
+          {/* ============================================================ */}
+          {/* RIGHT COLUMN: Properly Proportioned Proposal Form Card (5 cols) */}
+          {/* ============================================================ */}
+          <div className="lg:col-span-5 flex justify-center lg:justify-end">
+            <div className="w-full max-w-[475px] bg-white rounded-3xl p-6 sm:p-8 border-2 border-emerald-400 shadow-xl shadow-slate-900/5 text-left relative">
+              
+              {/* Top Promo Tag */}
+              <div className="text-center mb-3">
+                <span className="inline-block bg-emerald-50 text-[#059669] text-[10px] font-bold uppercase tracking-wider px-3.5 py-1 rounded-full border border-emerald-200">
+                  ● FREE ESTIMATE & ARCHITECTURE BLUEPRINT
+                </span>
+              </div>
+
+              {/* Card Title & Subtitle */}
+              <h3 className="text-xl sm:text-2xl font-black text-slate-900 text-center leading-snug mb-1">
+                Get Free Website Cost Estimate
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-600 text-center font-normal leading-relaxed mb-6">
+                Custom website design, eCommerce, and digital solutions tailored to your business roadmap.
+              </p>
+
+              {/* Form */}
+              <form onSubmit={handleFormSubmit} className="space-y-4">
+                
+                {/* Your Name */}
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-slate-800 block">
+                    Your Name
+                  </label>
+                  <div className="relative">
+                    <User size={15} strokeWidth={2} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      placeholder="Enter your full name"
+                      required
+                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50/50 border border-slate-200 focus:border-emerald-500 focus:bg-white rounded-xl text-xs sm:text-sm text-slate-900 placeholder-slate-400 outline-none transition-all"
+                    />
+                  </div>
+                </div>
+
+                {/* Phone Number */}
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-slate-800 block">
+                    Phone Number
+                  </label>
+                  <div className="relative">
+                    <Phone size={15} strokeWidth={2} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      placeholder="Enter 10-digit mobile number"
+                      required
+                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50/50 border border-slate-200 focus:border-emerald-500 focus:bg-white rounded-xl text-xs sm:text-sm text-slate-900 placeholder-slate-400 outline-none transition-all"
+                    />
+                  </div>
+                </div>
+
+                {/* Business / Company Name */}
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-slate-800 block">
+                    Business / Company Name
+                  </label>
+                  <div className="relative">
+                    <Building2 size={15} strokeWidth={2} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="text"
+                      name="company"
+                      value={formData.company}
+                      onChange={handleInputChange}
+                      placeholder="Enter your business name"
+                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50/50 border border-slate-200 focus:border-emerald-500 focus:bg-white rounded-xl text-xs sm:text-sm text-slate-900 placeholder-slate-400 outline-none transition-all"
+                    />
+                  </div>
+                </div>
+
+                {/* Select Package or Type */}
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-slate-800 block">
+                    Select Requirement or Type
+                  </label>
+                  <div className="relative">
+                    <Layers size={15} strokeWidth={2} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                    <select
+                      name="service"
+                      value={formData.service}
+                      onChange={handleInputChange}
+                      className="w-full pl-9 pr-8 py-2.5 bg-slate-50/50 border border-slate-200 focus:border-emerald-500 focus:bg-white rounded-xl text-xs sm:text-sm text-slate-900 outline-none transition-all appearance-none cursor-pointer font-medium"
+                    >
+                      <option value="Corporate Website Development">Corporate Website Development</option>
+                      <option value="Business Website Development">Business Website Development</option>
+                      <option value="eCommerce Storefront & Payment Gateways">eCommerce Storefront & Payments</option>
+                      <option value="Custom Web Application / SaaS">Custom Web Application / SaaS</option>
+                      <option value="Mobile App Development (iOS/Android)">Mobile App Development</option>
+                      <option value="Digital Marketing & Local SEO">Digital Marketing & Local SEO</option>
+                      <option value="Website Redesign & Speed Optimization">Website Redesign & Optimization</option>
+                    </select>
+                    <ChevronDown size={14} strokeWidth={2} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                  </div>
+                </div>
+
+                {/* Primary Button */}
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full bg-[#10b981] hover:bg-[#059669] text-white font-bold py-3.5 rounded-xl text-sm shadow-md shadow-emerald-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer mt-1"
+                >
+                  {isSubmitting ? (
+                    <span>Submitting Request...</span>
+                  ) : (
+                    <>
+                      <span>Get My Website Proposal</span>
+                      <ArrowRight size={16} strokeWidth={2.5} />
+                    </>
+                  )}
+                </button>
+
+                {/* Trust Badges */}
+                <div className="pt-2.5 flex items-center justify-between text-[10px] text-slate-500 font-medium border-t border-slate-100">
+                  <span className="flex items-center gap-1">
+                    <Lock size={11} strokeWidth={2} className="text-slate-600" /> 100% Confidential
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Clock size={11} strokeWidth={2} className="text-slate-600" /> 30-Min Response
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <ShieldCheck size={11} strokeWidth={2} className="text-slate-600" /> Verified & Secure
+                  </span>
+                </div>
+
+              </form>
+
+            </div>
+          </div>
+
+        </div>
       </div>
     </section>
   );

@@ -2,13 +2,12 @@
 
 export const siteConfig = {
   name: "HiveRift",
-  legalName: "KhatuShyam Technologies",
+  legalName: "HiveRift Softwares Pvt Ltd",
   url: "https://hiverift.com",
   logo: "https://hiverift.com/logo.png",
   phone: "+91-8814930229",
   email: "info@hiverift.com",
   supportEmail: "support@hiverift.com",
-  foundingDate: "2019",
   address: {
     streetAddress:
       "3rd Floor, Right Portion House No. 8577 (New) / Plot No. XVI/6501 (Old), Ward No. XVI, New Rohtak Road, Karol Bagh",
@@ -45,22 +44,11 @@ export const organizationSchema = {
   image: { "@id": "https://hiverift.com/#logo" },
   description:
     "HiveRift is a premier software engineering agency in New Delhi, India. We deliver custom web apps, mobile apps, AI/ML, and digital growth solutions.",
-  foundingDate: siteConfig.foundingDate,
-  numberOfEmployees: {
-    "@type": "QuantitativeValue",
-    value: "50",
-  },
   sameAs: siteConfig.socialLinks,
   subOrganization: [
     { "@id": "https://hiverift.com/#org-india" },
     { "@id": "https://hiverift.com/#org-canada" },
   ],
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: "4.9",
-    reviewCount: "250",
-    "bestRating": "5",
-  },
   contactPoint: [
     {
       "@type": "ContactPoint",
@@ -90,7 +78,6 @@ export const indiaOperatingEntitySchema = {
   url: siteConfig.url,
   telephone: siteConfig.phone,
   email: siteConfig.email,
-  priceRange: "₹₹",
   address: {
     "@type": "PostalAddress",
     streetAddress: siteConfig.address.streetAddress,
@@ -104,7 +91,20 @@ export const indiaOperatingEntitySchema = {
     latitude: siteConfig.geo.latitude,
     longitude: siteConfig.geo.longitude,
   },
-  areaServed: { "@type": "Country", name: "India" },
+  areaServed: [
+    { "@type": "Country", name: "India" },
+    { "@type": "City", name: "Delhi" },
+    { "@type": "AdministrativeArea", name: "South Delhi" },
+    { "@type": "AdministrativeArea", name: "Dwarka" },
+    { "@type": "City", name: "Noida" },
+    { "@type": "AdministrativeArea", name: "Sector 62 Noida" },
+    { "@type": "AdministrativeArea", name: "Sector 18 Noida" },
+    { "@type": "City", name: "Gurgaon" },
+    { "@type": "City", name: "Gurugram" },
+    { "@type": "AdministrativeArea", name: "Cyber City Gurgaon" },
+    { "@type": "AdministrativeArea", name: "Udyog Vihar Gurgaon" },
+    { "@type": "AdministrativeArea", name: "Delhi NCR" }
+  ],
 };
 
 export const canadaOperatingEntitySchema = {
@@ -143,49 +143,55 @@ export const servicesSchema = {
   provider: {
     "@id": "https://hiverift.com/#organization",
   },
-  areaServed: {
-    "@type": "Country",
-    name: "India",
-  },
+  areaServed: [
+    { "@type": "Country", name: "India" },
+    { "@type": "City", name: "Delhi" },
+    { "@type": "AdministrativeArea", name: "South Delhi" },
+    { "@type": "AdministrativeArea", name: "Dwarka" },
+    { "@type": "City", name: "Noida" },
+    { "@type": "AdministrativeArea", name: "Sector 62 Noida" },
+    { "@type": "AdministrativeArea", name: "Sector 18 Noida" },
+    { "@type": "City", name: "Gurgaon" },
+    { "@type": "City", name: "Gurugram" },
+    { "@type": "AdministrativeArea", name: "Cyber City Gurgaon" },
+    { "@type": "AdministrativeArea", name: "Udyog Vihar Gurgaon" },
+    { "@type": "AdministrativeArea", name: "Delhi NCR" }
+  ],
   hasOfferCatalog: {
     "@type": "OfferCatalog",
-    name: "HiveRift Services & Pricing Packages",
+    name: "HiveRift Services & Digital Solutions",
     itemListElement: [
       {
-        "@type": "OfferCatalog",
-        name: "Web Development",
-        itemListElement: [
-          {
-            "@type": "Offer",
-            itemOffered: {
-              "@type": "Service",
-              name: "Starter Web Package",
-              description: "Responsive website development for growing businesses",
-            },
-            price: "44999",
-            priceCurrency: "INR",
-          },
-          {
-            "@type": "Offer",
-            itemOffered: {
-              "@type": "Service",
-              name: "Professional Web Package",
-              description: "Full-featured web application development",
-            },
-            price: "59999",
-            priceCurrency: "INR",
-          },
-          {
-            "@type": "Offer",
-            itemOffered: {
-              "@type": "Service",
-              name: "Enterprise Web Package",
-              description: "Custom scalable web platform development",
-            },
-            price: "149999",
-            priceCurrency: "INR",
-          },
-        ],
+        "@type": "Offer",
+        itemOffered: {
+          "@type": "Service",
+          name: "Web Development Company in Delhi, Noida & Gurgaon",
+          description: "Custom web development, business website design, and WordPress development in South Delhi, Dwarka, Sector 62 Noida, and Cyber City Gurgaon.",
+        },
+      },
+      {
+        "@type": "Offer",
+        itemOffered: {
+          "@type": "Service",
+          name: "Website Development",
+          description: "High-performance business websites, web portals, and custom web applications",
+        },
+      },
+      {
+        "@type": "Offer",
+        itemOffered: {
+          "@type": "Service",
+          name: "eCommerce Development",
+          description: "Modern online store development, payment gateways, and shopping carts",
+        },
+      },
+      {
+        "@type": "Offer",
+        itemOffered: {
+          "@type": "Service",
+          name: "Digital Marketing & SEO",
+          description: "Data-backed SEO, Google Ads, Meta Ads, and performance lead generation",
+        },
       },
       {
         "@type": "Offer",

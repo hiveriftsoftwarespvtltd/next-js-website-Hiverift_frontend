@@ -8,7 +8,6 @@ import {
   Mail, 
   Briefcase, 
   Send, 
-  Sparkles, 
   CheckCircle2, 
   ArrowRight,
   ShieldCheck,
@@ -25,6 +24,7 @@ import { Header } from "@/app/components/Header";
 import { Footer } from "@/app/components/Footer";
 import Swal from "sweetalert2";
 import { submitContactForm } from "@/app/actions/contactActions";
+import { COMPANY_METRICS } from "@/app/config/companyMetrics";
 
 const services = [
   "Website Development",
@@ -45,12 +45,12 @@ const faqs = [
   { q: "What is your pricing model?", a: "We offer flexible pricing including fixed-cost projects, hourly rates, and retainer-based models depending on your needs." }
 ];
 
-const stats = [
-  { icon: BarChart3, value: "150+", label: "Projects Delivered" },
-  { icon: Users2, value: "98%", label: "Client Satisfaction" },
-  { icon: Trophy, value: "12+", label: "Industry Awards" },
-  { icon: Globe, value: "15+", label: "Global Presence" }
-];
+const metricIcons = [BarChart3, Users2, Trophy, Globe];
+const stats = COMPANY_METRICS.map((metric, index) => ({
+  icon: metricIcons[index],
+  value: `${metric.value}${metric.suffix}`,
+  label: metric.label,
+}));
 
 export default function LandingContactContent() {
   const [formData, setFormData] = useState({
@@ -115,11 +115,6 @@ export default function LandingContactContent() {
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="space-y-8"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-100 rounded-full text-emerald-700 border border-emerald-200 shadow-sm">
-              <Sparkles size={16} className="animate-pulse" />
-              <span className="text-xs font-bold uppercase tracking-wider">Trusted by 500+ Businesses</span>
-            </div>
-
             <h1 className="text-5xl md:text-7xl font-black text-slate-900 leading-[1.1]">
               Transform Your Ideas into <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500 italic">Digital Reality</span>
             </h1>

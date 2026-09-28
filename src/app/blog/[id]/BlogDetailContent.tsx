@@ -12,7 +12,6 @@ import {
   Bookmark,
   CheckCircle2,
   Quote,
-  Sparkles,
   Facebook,
   Twitter,
   Linkedin,
@@ -168,7 +167,6 @@ export default function BlogDetailContent({ post }: BlogDetailContentProps) {
                 {/* Key Takeaways Box */}
                 <div className="my-10 p-6 sm:p-8 bg-gradient-to-br from-emerald-50 to-slate-50 border border-emerald-200/80 rounded-3xl relative overflow-hidden">
                   <div className="flex items-center gap-3 mb-4 text-emerald-700 font-black text-lg">
-                    <Sparkles size={22} className="text-emerald-600" />
                     <span>Key Takeaways</span>
                   </div>
                   <ul className="space-y-3">

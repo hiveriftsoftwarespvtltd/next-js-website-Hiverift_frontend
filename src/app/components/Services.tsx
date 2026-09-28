@@ -13,8 +13,7 @@ import {
   Palette,
   Cloud,
   CheckCircle2,
-  ArrowRight,
-  Sparkles
+  ArrowRight
 } from "lucide-react";
 import Link from "next/link";
 
@@ -124,7 +123,6 @@ export function Services() {
           className="text-center mb-8"
         >
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 border border-emerald-100 rounded-full mb-3">
-            <Sparkles size={12} className="text-emerald-500" />
             <span className="text-[9px] font-black text-emerald-700 uppercase tracking-[0.2em]">
               Excellence in Execution
             </span>

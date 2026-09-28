@@ -1,23 +1,23 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { logoutAdmin } from "@/app/config/auth";
+import { logoutAdmin, getAdminUser, AdminUser, RoleType, normalizeRole } from "@/app/config/auth";
 import {
+  LayoutDashboard,
   FileText,
   Briefcase,
   ExternalLink,
   LogOut,
   X,
   Inbox,
+  Shield,
+  UserCheck,
+  Sparkles,
+  Star,
+  Layers,
 } from "lucide-react";
-
-const navItems = [
-  { name: "Blog Posts", href: "/admin/blogs", icon: FileText },
-  { name: "Form Inquiries", href: "/admin/inquiries", icon: Inbox },
-  { name: "Careers Page", href: "/careers", icon: Briefcase, external: true },
-  { name: "Live Website", href: "/", icon: ExternalLink, external: true },
-];
 
 interface AdminSidebarProps {
   isOpen?: boolean;
@@ -27,11 +27,100 @@ interface AdminSidebarProps {
 export function AdminSidebar({ isOpen = false, onClose }: AdminSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const [currentUser, setCurrentUser] = useState<AdminUser | null>(null);
+
+  useEffect(() => {
+    setCurrentUser(getAdminUser());
+  }, []);
 
   const handleLogout = () => {
     logoutAdmin();
     router.push("/login");
   };
+
+  const userRole: RoleType = normalizeRole(currentUser?.role);
+
+  // Build navigation items filtered by RBAC
+  const allNavItems = [
+    {
+      name: "Dashboard",
+      href: "/admin",
+      icon: LayoutDashboard,
+      roles: ["Admin", "Sales", "Blog"] as RoleType[],
+    },
+    {
+      name: "Form Inquiries",
+      href: "/admin/inquiries",
+      icon: Inbox,
+      roles: ["Admin", "Sales"] as RoleType[],
+      badge: "Leads",
+    },
+    {
+      name: "Blog Posts",
+      href: "/admin/blogs",
+      icon: FileText,
+      roles: ["Admin", "Blog"] as RoleType[],
+      badge: "CMS",
+    },
+    {
+      name: "Google Reviews",
+      href: "/admin/testimonials",
+      icon: Star,
+      roles: ["Admin", "Sales"] as RoleType[],
+      badge: "4.9 ★",
+    },
+    {
+      name: "Case Studies",
+      href: "/admin/case-studies",
+      icon: Layers,
+      roles: ["Admin", "Sales"] as RoleType[],
+      badge: "Portfolio",
+    },
+    {
+      name: userRole === "Admin" ? "Users & Security" : "Account Security",
+      href: "/admin/security",
+      icon: Shield,
+      roles: ["Admin", "Sales", "Blog"] as RoleType[],
+    },
+    {
+      name: "Careers Page",
+      href: "/careers",
+      icon: Briefcase,
+      external: true,
+      roles: ["Admin", "Sales", "Blog"] as RoleType[],
+    },
+    {
+      name: "Live Website",
+      href: "/",
+      icon: ExternalLink,
+      external: true,
+      roles: ["Admin", "Sales", "Blog"] as RoleType[],
+    },
+  ];
+
+  const visibleNavItems = allNavItems.filter((item) =>
+    item.roles.includes(userRole)
+  );
+
+  const roleStyles = {
+    Admin: {
+      label: "Super Admin",
+      badgeClass: "bg-emerald-950/80 border-emerald-800 text-emerald-400",
+      avatarClass: "bg-emerald-500 text-slate-950",
+    },
+    Sales: {
+      label: "Sales Team",
+      badgeClass: "bg-blue-950/80 border-blue-800 text-blue-400",
+      avatarClass: "bg-blue-500 text-white",
+    },
+    Blog: {
+      label: "Blog Team",
+      badgeClass: "bg-purple-950/80 border-purple-800 text-purple-400",
+      avatarClass: "bg-purple-500 text-white",
+    },
+  };
+
+  const currentRoleStyle = roleStyles[userRole] || roleStyles.Admin;
 
   return (
     <>
@@ -49,17 +138,19 @@ export function AdminSidebar({ isOpen = false, onClose }: AdminSidebarProps) {
           isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >
-        <div className="space-y-8">
+        <div className="space-y-6">
           {/* Brand Header */}
           <div className="flex items-center justify-between px-2 py-2">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white font-black flex items-center justify-center shadow-lg shadow-emerald-900/50">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white font-black flex items-center justify-center shadow-lg shadow-emerald-900/50">
                 H
               </div>
               <div>
                 <h1 className="font-black text-white text-lg tracking-tight">HiveRift</h1>
-                <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest bg-emerald-950/80 border border-emerald-800 px-2 py-0.5 rounded-full">
-                  Admin Panel
+                <span
+                  className={`text-[10px] font-bold uppercase tracking-wider border px-2 py-0.5 rounded-full ${currentRoleStyle.badgeClass}`}
+                >
+                  {currentRoleStyle.label}
                 </span>
               </div>
             </div>
@@ -68,7 +159,7 @@ export function AdminSidebar({ isOpen = false, onClose }: AdminSidebarProps) {
             {onClose && (
               <button
                 onClick={onClose}
-                className="lg:hidden p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                className="lg:hidden p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
               >
                 <X size={20} />
               </button>
@@ -78,9 +169,10 @@ export function AdminSidebar({ isOpen = false, onClose }: AdminSidebarProps) {
           {/* Navigation Links */}
           <nav className="space-y-1">
             <div className="px-3 text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">
-              Management
+              Management Modules
             </div>
-            {navItems.map((item) => {
+
+            {visibleNavItems.map((item) => {
               const isActive = pathname === item.href;
               const Icon = item.icon;
 
@@ -92,39 +184,52 @@ export function AdminSidebar({ isOpen = false, onClose }: AdminSidebarProps) {
                   target={item.external ? "_blank" : undefined}
                   className={`flex items-center justify-between px-3.5 py-3 rounded-xl font-bold text-xs transition-all ${
                     isActive
-                      ? "bg-emerald-600 text-white shadow-lg shadow-emerald-900/40"
-                      : "hover:bg-slate-800 text-slate-400 hover:text-white"
+                      ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-900/40"
+                      : "hover:bg-slate-800/80 text-slate-400 hover:text-white"
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <Icon size={18} />
                     <span>{item.name}</span>
                   </div>
-                  {item.external && <ExternalLink size={14} className="opacity-60" />}
+                  <div className="flex items-center gap-1.5">
+                    {item.badge && (
+                      <span className="px-1.5 py-0.5 rounded bg-slate-800 text-[9px] font-mono text-emerald-400">
+                        {item.badge}
+                      </span>
+                    )}
+                    {item.external && <ExternalLink size={13} className="opacity-50" />}
+                  </div>
                 </Link>
               );
             })}
           </nav>
         </div>
 
-        {/* Admin User Badge & Footer */}
-        <div className="space-y-4 pt-4 border-t border-slate-800">
-          <div className="bg-slate-800/60 p-3 rounded-xl flex items-center gap-3 border border-slate-800">
-            <div className="w-8 h-8 rounded-full bg-emerald-500 text-slate-900 font-black text-xs flex items-center justify-center shrink-0">
-              A
+        {/* User Profile Badge & Logout Footer */}
+        <div className="space-y-3 pt-4 border-t border-slate-800/80">
+          <div className="bg-slate-800/60 p-3 rounded-2xl flex items-center gap-3 border border-slate-700/60">
+            <div
+              className={`w-9 h-9 rounded-xl font-black text-xs flex items-center justify-center shrink-0 shadow-md ${currentRoleStyle.avatarClass}`}
+            >
+              {currentUser?.name ? currentUser.name.charAt(0).toUpperCase() : "U"}
             </div>
-            <div className="overflow-hidden">
-              <div className="text-xs font-black text-white truncate">Administrator</div>
-              <div className="text-[10px] text-slate-400 truncate">admin@hiverift.com</div>
+            <div className="overflow-hidden flex-1 min-w-0">
+              <div className="text-xs font-black text-white truncate">
+                {currentUser?.name || "HiveRift Staff"}
+              </div>
+              <div className="text-[10px] text-slate-400 truncate">
+                {currentUser?.email || "staff@hiverift.com"}
+              </div>
             </div>
           </div>
 
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-rose-400 hover:bg-rose-950/40 rounded-xl transition-colors"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-bold text-rose-400 hover:bg-rose-950/40 border border-transparent hover:border-rose-900/60 rounded-xl transition-all cursor-pointer"
           >
-            <LogOut size={16} />
-            <span>Logout Admin</span>
+            <LogOut size={15} />
+            <span>Sign Out Session</span>
           </button>
         </div>
       </aside>

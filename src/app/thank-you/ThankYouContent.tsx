@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
-import { CheckCircle2, ArrowLeft, Clock, MessageSquare, Sparkles } from "lucide-react";
+import { CheckCircle2, ArrowLeft, Clock, MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { Header } from "@/app/components/Header";
 
@@ -45,7 +45,6 @@ export default function ThankYouContent() {
             transition={{ delay: 0.3 }}
           >
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 border border-emerald-100 rounded-full mb-4 md:mb-6">
-              <Sparkles size={12} className="text-emerald-500" />
               <span className="text-[9px] md:text-[10px] font-black text-emerald-700 uppercase tracking-[0.2em]">
                 Success Submission
               </span>

@@ -23,25 +23,20 @@ export function getImageUrl(image?: string): string {
     return "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800";
   }
 
-  const isLocalEnv =
-    API_BASE_URL.includes("localhost") ||
-    API_BASE_URL.includes("127.0.0.1") ||
-    (typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"));
-
-  if (isLocalEnv) {
-    return `http://localhost:4000/uploads/${filename}`;
-  }
-
-  // In production, uploads are hosted under /hiverift_api/uploads/
   if (process.env.NEXT_PUBLIC_UPLOADS_URL) {
     const base = process.env.NEXT_PUBLIC_UPLOADS_URL.replace(/\/$/, "");
-    if (base.includes("/hiverift_api")) {
-      return `${base}/uploads/${filename}`;
-    }
-    return `${base}/hiverift_api/uploads/${filename}`;
+    return `${base}/uploads/${filename}`;
   }
 
-  return `https://hiverift.com/hiverift_api/uploads/${filename}`;
+  const isLocalApi =
+    API_BASE_URL.includes("localhost") ||
+    API_BASE_URL.includes("127.0.0.1");
+
+  if (isLocalApi) {
+    return `http://localhost:7001/uploads/${filename}`;
+  }
+
+  return `https://api.hiverift.com/uploads/${filename}`;
 }
 
 export async function getBlogsFromApi(category?: string, search?: string): Promise<BlogPost[]> {

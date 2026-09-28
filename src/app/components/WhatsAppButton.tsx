@@ -15,8 +15,8 @@ export function WhatsAppButton() {
 
   if (!mounted) return null;
 
-  // Hide WhatsApp floating button on Admin Dashboard and Login page
-  if (pathname?.startsWith("/admin") || pathname === "/login") {
+  // Hide WhatsApp floating button on Homepage (which has dedicated FloatingActions), Admin Dashboard, and Login page
+  if (pathname === "/" || pathname?.startsWith("/admin") || pathname === "/login") {
     return null;
   }
 

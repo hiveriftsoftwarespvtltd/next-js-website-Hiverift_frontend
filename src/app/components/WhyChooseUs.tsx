@@ -25,7 +25,7 @@ const features = [
   {
     icon: Award,
     title: "Proven in India & Globally",
-    description: "5+ years, 387+ clients, 98% success rate. From Delhi startups to global enterprises we have delivered it all.",
+    description: "Our team combines technical expertise with a clear, collaborative delivery process for businesses in India and around the world.",
     gradient: "from-teal-600 to-emerald-600",
   },
   {
@@ -36,8 +36,8 @@ const features = [
   },
   {
     icon: CircleDollarSign,
-    title: "Transparent Pricing",
-    description: "No hidden charges. No surprise invoices. What we quote is what you pay with GST clearly stated upfront.",
+    title: "Clear Scoping & Deliverables",
+    description: "No hidden charges. No surprise invoices. Clear milestones, agreed deliverables, and 100% transparent project agreements.",
     gradient: "from-emerald-600 to-teal-600",
   },
 ];
@@ -65,7 +65,7 @@ export function WhyChooseUs() {
           </div>
 
           <h2 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 mb-4 md:mb-6 px-4">
-            Why <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">387+ Businesses</span> Choose HiveRift
+            Why Businesses Choose HiveRift
           </h2>
           <p className="text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-4">
             We combine technical expertise with business strategy to deliver solutions that actually grow your revenue not just look good.

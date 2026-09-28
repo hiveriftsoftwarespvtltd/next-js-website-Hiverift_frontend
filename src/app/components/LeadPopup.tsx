@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useRouter } from "next/navigation";
-import { X, Send, Sparkles, CheckCircle2 } from "lucide-react";
+import { X, Send, CheckCircle2 } from "lucide-react";
 import Swal from "sweetalert2";
 import { submitContactForm } from "@/app/actions/contactActions";
 
@@ -125,7 +125,6 @@ export function LeadPopup({ isOpen, onClose, selectedPlan }: LeadPopupProps) {
                 <X size={20} />
               </button>
               <div className="flex items-center gap-3 mb-2">
-                <Sparkles size={24} className="text-emerald-300" />
                 <h2 className="text-2xl font-bold tracking-tight">Ready to Elevate Your Business?</h2>
               </div>
               <p className="text-emerald-50/90 text-sm font-medium">
@@ -138,7 +137,7 @@ export function LeadPopup({ isOpen, onClose, selectedPlan }: LeadPopupProps) {
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <label htmlFor="name" className="block text-sm font-bold text-gray-700 mb-2">
-                      Full Name *
+                      Full Name
                     </label>
                     <input
                       type="text"
@@ -153,7 +152,7 @@ export function LeadPopup({ isOpen, onClose, selectedPlan }: LeadPopupProps) {
                   </div>
                   <div>
                     <label htmlFor="email" className="block text-sm font-bold text-gray-700 mb-2">
-                      Email Address *
+                      Email Address
                     </label>
                     <input
                       type="email"
@@ -171,7 +170,7 @@ export function LeadPopup({ isOpen, onClose, selectedPlan }: LeadPopupProps) {
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <label htmlFor="phone" className="block text-sm font-bold text-gray-700 mb-2">
-                      Phone Number *
+                      Phone Number
                     </label>
                     <input
                       type="tel"
@@ -202,7 +201,7 @@ export function LeadPopup({ isOpen, onClose, selectedPlan }: LeadPopupProps) {
 
                 <div>
                   <label htmlFor="service" className="block text-sm font-bold text-gray-700 mb-2">
-                    Service / Plan Interested In *
+                    Service / Plan Interested In
                   </label>
                   <select
                     id="service"
@@ -227,7 +226,7 @@ export function LeadPopup({ isOpen, onClose, selectedPlan }: LeadPopupProps) {
 
                 <div className="relative">
                   <label htmlFor="message" className="block text-sm font-bold text-gray-700 mb-2 flex justify-between">
-                    <span>Project Details *</span>
+                    <span>Project Details</span>
                     <span className={`text-[10px] font-bold ${formData.message.length >= 10 ? 'text-emerald-600' : 'text-gray-400'}`}>
                       {formData.message.length} / 500 characters
                     </span>

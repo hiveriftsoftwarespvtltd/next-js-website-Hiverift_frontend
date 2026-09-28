@@ -22,7 +22,7 @@ const pillars = [
     icon: Award,
     title: "TRUST",
     subtitle: "Transparent, Reliable, Long-Term",
-    desc: "We communicate clearly, deliver on time, and never hide behind fine print. Over 99% of our clients return for their next project and that says everything.",
+    desc: "We communicate clearly, set expectations early, and keep project decisions and delivery progress transparent.",
     color: "cyan"
   }
 ];

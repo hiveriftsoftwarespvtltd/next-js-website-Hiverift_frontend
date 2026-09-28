@@ -10,7 +10,6 @@ import {
   Trash2,
   ExternalLink,
   RefreshCw,
-  Sparkles,
   CheckCircle2,
   FileText,
   Layers
@@ -108,7 +107,7 @@ export default function AdminBlogsPage() {
   });
 
   return (
-    <AdminGuard>
+    <AdminGuard allowedRoles={["Admin", "Blog"]}>
       <div suppressHydrationWarning className="min-h-screen bg-slate-100 flex font-['Roboto',sans-serif]">
         {/* Sidebar */}
         <AdminSidebar

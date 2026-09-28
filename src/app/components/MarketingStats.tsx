@@ -1,38 +1,20 @@
 "use client";
 
 import { motion } from "motion/react";
-import { Users, Star, Award, Briefcase } from "lucide-react";
+import { Briefcase, Users, Calendar, Layers } from "lucide-react";
+import { COMPANY_METRICS } from "@/app/config/companyMetrics";
 
-const stats = [
-  {
-    label: "Projects Delivered",
-    value: "250+",
-    icon: Briefcase,
-    color: "text-purple-600",
-    bgColor: "bg-purple-50"
-  },
-  {
-    label: "Global Clients",
-    value: "150+",
-    icon: Users,
-    color: "text-blue-600",
-    bgColor: "bg-blue-50"
-  },
-  {
-    label: "Customer Satisfaction",
-    value: "4.9/5",
-    icon: Star,
-    color: "text-orange-600",
-    bgColor: "bg-orange-50"
-  },
-  {
-    label: "Years of Excellence",
-    value: "5+",
-    icon: Award,
-    color: "text-red-600",
-    bgColor: "bg-red-50"
-  }
+const metricStyles = [
+  { icon: Briefcase, color: "text-emerald-700", bgColor: "bg-emerald-50" },
+  { icon: Users, color: "text-teal-700", bgColor: "bg-teal-50" },
+  { icon: Calendar, color: "text-cyan-700", bgColor: "bg-cyan-50" },
+  { icon: Layers, color: "text-green-700", bgColor: "bg-green-50" },
 ];
+
+const stats = COMPANY_METRICS.map((metric, index) => ({
+  ...metric,
+  ...metricStyles[index],
+}));
 
 export function MarketingStats() {
   return (
@@ -49,32 +31,19 @@ export function MarketingStats() {
                 We combine strategy, creativity, and technology to help businesses scale faster with impactful digital solutions and performance-driven results.
               </p>
 
-              <div className="flex items-center -space-x-4">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <div key={i} className="w-12 h-12 rounded-full border-4 border-white overflow-hidden shadow-sm">
-                    <img
-                      src={`https://i.pravatar.cc/100?img=${i + 10}`}
-                      alt="User"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                ))}
-                <div className="w-12 h-12 rounded-full border-4 border-white bg-emerald-600 flex items-center justify-center text-white text-xs font-black shadow-sm">
-                  +200
-                </div>
-              </div>
             </div>
 
             {/* Right side: Stats cards */}
-            <div className="lg:col-span-3 grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="lg:col-span-3 grid grid-cols-2 gap-4">
               {stats.map((stat, i) => (
                 <div key={i} className="bg-white p-6 rounded-3xl shadow-sm text-center space-y-3">
                   <div className={`w-12 h-12 ${stat.bgColor} ${stat.color} rounded-2xl flex items-center justify-center mx-auto`}>
                     <stat.icon size={24} />
                   </div>
                   <div>
-                    <div className="text-2xl font-black text-gray-900">{stat.value}</div>
+                    <div className="text-2xl font-black text-gray-900">{stat.value}{stat.suffix}</div>
                     <div className="text-[10px] font-black text-gray-400 uppercase tracking-tighter leading-tight">{stat.label}</div>
+                    <p className="mt-2 text-xs leading-relaxed text-slate-500">{stat.supporting}</p>
                   </div>
                 </div>
               ))}

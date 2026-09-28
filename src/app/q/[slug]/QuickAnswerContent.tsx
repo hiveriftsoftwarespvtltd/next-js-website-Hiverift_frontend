@@ -5,7 +5,7 @@ import { motion, useScroll, useSpring } from "motion/react";
 import { Header } from "@/app/components/Header";
 import { Footer } from "@/app/components/Footer";
 import { WhatsAppButton } from "@/app/components/WhatsAppButton";
-import { CheckCircle2, ArrowRight, HelpCircle, TrendingUp, Users, Target, ChevronLeft, Sparkles, MessageSquare, Zap } from "lucide-react";
+import { CheckCircle2, ArrowRight, HelpCircle, TrendingUp, Users, Target, ChevronLeft, MessageSquare, Zap } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -131,7 +131,6 @@ export default function QuickAnswerContent({ slug, answer }: { slug: string, ans
                   {/* Detailed Section */}
                   <div>
                     <h2 className="text-2xl md:text-3xl font-black text-gray-900 mb-8 flex items-center gap-3">
-                      <Sparkles className="text-emerald-500" size={28} />
                       Strategic Overview
                     </h2>
                     <p className="text-base md:text-lg text-gray-600 leading-[1.8] font-medium text-justify">

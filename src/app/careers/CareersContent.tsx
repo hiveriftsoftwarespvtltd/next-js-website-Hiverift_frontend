@@ -86,37 +86,31 @@ export default function CareersContent() {
     <div className="min-h-screen bg-white">
       <Header />
 
-      {/* Hero Section */}
-      <section className="relative min-h-[400px] md:h-[500px] overflow-hidden mt-20 md:mt-32 flex items-center">
-        <div className="absolute inset-0">
-          <ImageWithFallback
-            src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0ZWFtd29yayUyMG9mZmljZSUyMG1vZGVybiUyMGNvbGxhYm9yYXRpb258ZW58MHx8fHwxNzM5ODMwNDAwfDA&ixlib=rb-4.1.0&q=80&w=1080"
-            alt="Join the Hiverift"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-950/95 via-emerald-900/90 to-slate-900/95"></div>
-        </div>
-
-        <div className="container mx-auto px-4 lg:px-8 relative z-10 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="max-w-4xl mx-auto"
-          >
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 backdrop-blur-md border border-emerald-500/20 rounded-full mb-6">
-              <Briefcase size={16} className="text-emerald-400" />
-              <span className="text-sm font-black text-emerald-400 tracking-widest uppercase">
-                Join the Hiverift
+      {/* Hero Section - Light Theme Matching Home Page */}
+      <section className="pt-32 pb-14 lg:pt-40 lg:pb-16 bg-gradient-to-b from-[#f4fcf7] via-white to-white relative overflow-hidden border-b border-emerald-100">
+        <div className="container mx-auto px-4 sm:px-6 max-w-7xl relative z-10 text-center">
+          <div className="max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-100/90 border border-emerald-300 rounded-full mb-6">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#10b981]" />
+              </span>
+              <span className="text-xs font-bold text-[#15803d] uppercase tracking-wider">
+                Join HiveRift • Build With Senior Engineers
               </span>
             </div>
-            <h1 className="text-4xl md:text-7xl font-black text-white mb-6 leading-[1.1]">
-              Build the Future of <span className="text-emerald-400">Indian Tech</span>
+
+            <h1 className="text-3xl sm:text-4xl lg:text-6xl font-black text-[#0f172a] tracking-tight leading-[1.15]">
+              Build the Future of{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#16a34a] via-[#10b981] to-[#0ea5e9]">
+                Digital Engineering
+              </span>
             </h1>
-            <p className="text-lg md:text-2xl text-white/90 leading-relaxed max-w-3xl mx-auto font-medium">
-              HiveRift is hiring curious, ambitious people who want to do the best work of their lives and have fun doing it. Work with top global tech.
+
+            <p className="mt-5 text-base sm:text-xl text-slate-600 leading-relaxed font-normal">
+              We're hiring ambitious full-stack developers, UI/UX designers, and growth marketers who want to work on mission-critical client projects with top modern technology.
             </p>
-          </motion.div>
+          </div>
         </div>
       </section>
 
