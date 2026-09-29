@@ -269,7 +269,7 @@ export default function LoginPage() {
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="admin@hiverift.com"
+                      placeholder="hiverift@gmail.com"
                       className="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 pl-11 pr-4 text-xs font-bold text-white outline-none focus:border-emerald-500 transition-all placeholder:text-slate-600"
                     />
                     <Mail size={16} className="absolute left-4 text-slate-500" />
