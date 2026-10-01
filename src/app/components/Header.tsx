@@ -236,7 +236,8 @@ export function Header() {
                     : "text-slate-700 hover:text-slate-900 hover:bg-slate-50"
                 }`}
               >
-                <span>Locations We Serve</span>
+                <span className="hidden 2xl:inline">Locations We Serve</span>
+                <span className="2xl:hidden">Locations</span>
                 <ChevronDown
                   size={14}
                   className={`transition-transform duration-200 ${
@@ -332,7 +333,7 @@ export function Header() {
               transition={{ duration: 0.2, ease: "easeOut" }}
               onMouseEnter={() => handleMouseEnter("services")}
               onMouseLeave={handleMouseLeave}
-              className="hidden lg:block absolute left-0 right-0 top-full bg-white border-b border-slate-200/90 shadow-2xl overflow-hidden z-40"
+              className="hidden 2xl:block absolute left-0 right-0 top-full bg-white border-b border-slate-200/90 shadow-2xl overflow-hidden z-40"
             >
               <div className="relative container mx-auto px-6 max-w-7xl py-8">
                 
@@ -519,7 +520,7 @@ export function Header() {
               transition={{ duration: 0.2, ease: "easeOut" }}
               onMouseEnter={() => handleMouseEnter("solutions")}
               onMouseLeave={handleMouseLeave}
-              className="hidden lg:block absolute left-0 right-0 top-full bg-white border-b border-slate-200/90 shadow-2xl overflow-hidden z-40"
+              className="hidden 2xl:block absolute left-0 right-0 top-full bg-white border-b border-slate-200/90 shadow-2xl overflow-hidden z-40"
             >
               <div className="relative container mx-auto px-6 max-w-7xl py-8">
                 
@@ -713,7 +714,7 @@ export function Header() {
               transition={{ duration: 0.2, ease: "easeOut" }}
               onMouseEnter={() => handleMouseEnter("industries")}
               onMouseLeave={handleMouseLeave}
-              className="hidden lg:block absolute left-0 right-0 top-full bg-white border-b border-slate-200/90 shadow-2xl overflow-hidden z-40"
+              className="hidden 2xl:block absolute left-0 right-0 top-full bg-white border-b border-slate-200/90 shadow-2xl overflow-hidden z-40"
             >
               <div className="relative container mx-auto px-6 max-w-7xl py-8">
                 
@@ -913,7 +914,7 @@ export function Header() {
               transition={{ duration: 0.2, ease: "easeOut" }}
               onMouseEnter={() => handleMouseEnter("company")}
               onMouseLeave={handleMouseLeave}
-              className="hidden lg:block absolute left-0 right-0 top-full bg-white border-b border-slate-200/90 shadow-2xl overflow-hidden z-40"
+              className="hidden 2xl:block absolute left-0 right-0 top-full bg-white border-b border-slate-200/90 shadow-2xl overflow-hidden z-40"
             >
               <div className="relative container mx-auto px-6 max-w-7xl py-8">
                 
@@ -1077,7 +1078,7 @@ export function Header() {
               transition={{ duration: 0.2, ease: "easeOut" }}
               onMouseEnter={() => handleMouseEnter("locations")}
               onMouseLeave={handleMouseLeave}
-              className="hidden lg:block absolute left-0 right-0 top-full bg-white border-b border-slate-200/90 shadow-2xl overflow-hidden z-40 max-h-[85vh] overflow-y-auto"
+              className="hidden 2xl:block absolute left-0 right-0 top-full bg-white border-b border-slate-200/90 shadow-2xl overflow-hidden z-40 max-h-[85vh] overflow-y-auto"
             >
               {/* Clean Background & Watermark */}
               <div className="absolute right-6 bottom-1 text-[130px] font-black text-slate-100/90 select-none pointer-events-none tracking-tighter leading-none -z-0">
@@ -1213,9 +1214,9 @@ export function Header() {
         {/* ========================================================================= */}
 
         {isMobileMenuOpen && (
-          <div className="lg:hidden bg-white border-t border-slate-200 shadow-2xl px-4 py-6 max-h-[85vh] overflow-y-auto">
-            
-            <nav className="flex flex-col space-y-2">
+          <div className="2xl:hidden bg-white border-t border-slate-200 shadow-2xl px-4 sm:px-6 md:px-8 py-6 max-h-[85vh] overflow-y-auto">
+            <div className="max-w-4xl mx-auto">
+              <nav className="flex flex-col space-y-2.5">
               
               {/* 1. Mobile Services Accordion */}
               <div className="border border-slate-200/80 rounded-2xl overflow-hidden bg-slate-50/50">
@@ -1237,64 +1238,74 @@ export function Header() {
                 </button>
 
                 {mobileExpanded === "services" && (
-                  <div className="px-4 pb-4 pt-1 space-y-2 border-t border-slate-100 bg-white">
+                  <div className="px-4 pb-4 pt-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1.5 border-t border-slate-100 bg-white">
                     <Link
                       href="/services/web-development"
-                      className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600 hover:bg-emerald-50/50 rounded-lg transition-colors"
                     >
                       › Website Development
                     </Link>
                     <Link
                       href="/services/ecommerce"
-                      className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600 hover:bg-emerald-50/50 rounded-lg transition-colors"
                     >
                       › eCommerce Development
                     </Link>
                     <Link
                       href="/services/software-development"
-                      className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600 hover:bg-emerald-50/50 rounded-lg transition-colors"
                     >
                       › Software Development
                     </Link>
                     <Link
                       href="/services/mobile-development"
-                      className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600 hover:bg-emerald-50/50 rounded-lg transition-colors"
                     >
                       › Mobile Development
                     </Link>
                     <Link
                       href="/services/ai-ml"
-                      className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600 hover:bg-emerald-50/50 rounded-lg transition-colors"
                     >
                       › AI & Automation
                     </Link>
                     <Link
                       href="/services/cloud-devops"
-                      className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600 hover:bg-emerald-50/50 rounded-lg transition-colors"
                     >
                       › Cloud & DevOps
                     </Link>
                     <Link
                       href="/services/data-annotation"
-                      className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600 hover:bg-emerald-50/50 rounded-lg transition-colors"
                     >
                       › Data Annotation
                     </Link>
                     <Link
                       href="/services/digital-marketing"
-                      className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600 hover:bg-emerald-50/50 rounded-lg transition-colors"
                     >
                       › Digital Marketing
                     </Link>
                     <Link
                       href="/services/ui-ux"
-                      className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600 hover:bg-emerald-50/50 rounded-lg transition-colors"
                     >
                       › UI/UX Design
                     </Link>
                     <Link
                       href="/services"
-                      className="block p-2 text-xs font-extrabold text-emerald-600 border-t border-slate-100 pt-2"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block p-2 text-xs font-extrabold text-emerald-600 border-t border-slate-100 pt-2 sm:col-span-2 md:col-span-3"
                     >
                       View All 9 Services &rarr;
                     </Link>
@@ -1322,46 +1333,53 @@ export function Header() {
                 </button>
 
                 {mobileExpanded === "solutions" && (
-                  <div className="px-4 pb-4 pt-1 space-y-2 border-t border-slate-100 bg-white">
+                  <div className="px-4 pb-4 pt-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1.5 border-t border-slate-100 bg-white">
                     <Link
                       href="/services/software-development"
-                      className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600 hover:bg-emerald-50/50 rounded-lg transition-colors"
                     >
                       › ERP & CRM
                     </Link>
                     <Link
                       href="/solutions"
-                      className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600 hover:bg-emerald-50/50 rounded-lg transition-colors"
                     >
                       › SaaS Platforms
                     </Link>
                     <Link
                       href="/services/cloud-devops"
-                      className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600 hover:bg-emerald-50/50 rounded-lg transition-colors"
                     >
                       › Cloud & DevOps
                     </Link>
                     <Link
                       href="/solutions"
-                      className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600 hover:bg-emerald-50/50 rounded-lg transition-colors"
                     >
                       › Business Automation
                     </Link>
                     <Link
                       href="/solutions"
-                      className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600 hover:bg-emerald-50/50 rounded-lg transition-colors"
                     >
                       › API Integrations
                     </Link>
                     <Link
                       href="/services/data-annotation"
-                      className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600 hover:bg-emerald-50/50 rounded-lg transition-colors"
                     >
                       › Data Annotation
                     </Link>
                     <Link
                       href="/solutions"
-                      className="block p-2 text-xs font-extrabold text-emerald-600 border-t border-slate-100 pt-2"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block p-2 text-xs font-extrabold text-emerald-600 border-t border-slate-100 pt-2 sm:col-span-2 md:col-span-3"
                     >
                       View All 10 Solutions &rarr;
                     </Link>
@@ -1389,38 +1407,38 @@ export function Header() {
                 </button>
 
                 {mobileExpanded === "industries" && (
-                  <div className="px-4 pb-4 pt-1 space-y-1.5 border-t border-slate-100 bg-white">
-                    <Link href="/industries/real-estate" className="block p-1.5 text-xs font-bold text-slate-800 hover:text-emerald-600">
+                  <div className="px-4 pb-4 pt-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1.5 border-t border-slate-100 bg-white">
+                    <Link href="/industries/real-estate" onClick={() => setIsMobileMenuOpen(false)} className="block p-1.5 text-xs font-bold text-slate-800 hover:text-emerald-600 hover:bg-emerald-50/50 rounded-lg transition-colors">
                       › Real Estate & Property
                     </Link>
-                    <Link href="/industries/hospitality" className="block p-1.5 text-xs font-bold text-slate-800 hover:text-emerald-600">
+                    <Link href="/industries/hospitality" onClick={() => setIsMobileMenuOpen(false)} className="block p-1.5 text-xs font-bold text-slate-800 hover:text-emerald-600 hover:bg-emerald-50/50 rounded-lg transition-colors">
                       › Travel & Hospitality
                     </Link>
-                    <Link href="/industries/retail" className="block p-1.5 text-xs font-bold text-slate-800 hover:text-emerald-600">
+                    <Link href="/industries/retail" onClick={() => setIsMobileMenuOpen(false)} className="block p-1.5 text-xs font-bold text-slate-800 hover:text-emerald-600 hover:bg-emerald-50/50 rounded-lg transition-colors">
                       › Retail & eCommerce
                     </Link>
-                    <Link href="/industries/manufacturing" className="block p-1.5 text-xs font-bold text-slate-800 hover:text-emerald-600">
+                    <Link href="/industries/manufacturing" onClick={() => setIsMobileMenuOpen(false)} className="block p-1.5 text-xs font-bold text-slate-800 hover:text-emerald-600 hover:bg-emerald-50/50 rounded-lg transition-colors">
                       › Manufacturing & Industrial
                     </Link>
-                    <Link href="/industries/education" className="block p-1.5 text-xs font-bold text-slate-800 hover:text-emerald-600">
+                    <Link href="/industries/education" onClick={() => setIsMobileMenuOpen(false)} className="block p-1.5 text-xs font-bold text-slate-800 hover:text-emerald-600 hover:bg-emerald-50/50 rounded-lg transition-colors">
                       › Education & E-Learning
                     </Link>
-                    <Link href="/industries/healthcare" className="block p-1.5 text-xs font-bold text-slate-800 hover:text-emerald-600">
+                    <Link href="/industries/healthcare" onClick={() => setIsMobileMenuOpen(false)} className="block p-1.5 text-xs font-bold text-slate-800 hover:text-emerald-600 hover:bg-emerald-50/50 rounded-lg transition-colors">
                       › Healthcare
                     </Link>
-                    <Link href="/industries/finance" className="block p-1.5 text-xs font-bold text-slate-800 hover:text-emerald-600">
+                    <Link href="/industries/finance" onClick={() => setIsMobileMenuOpen(false)} className="block p-1.5 text-xs font-bold text-slate-800 hover:text-emerald-600 hover:bg-emerald-50/50 rounded-lg transition-colors">
                       › Finance & Financial Services
                     </Link>
-                    <Link href="/industries/professional-services" className="block p-1.5 text-xs font-bold text-slate-800 hover:text-emerald-600">
+                    <Link href="/industries/professional-services" onClick={() => setIsMobileMenuOpen(false)} className="block p-1.5 text-xs font-bold text-slate-800 hover:text-emerald-600 hover:bg-emerald-50/50 rounded-lg transition-colors">
                       › Professional Services
                     </Link>
-                    <Link href="/industries/food-restaurant" className="block p-1.5 text-xs font-bold text-slate-800 hover:text-emerald-600">
+                    <Link href="/industries/food-restaurant" onClick={() => setIsMobileMenuOpen(false)} className="block p-1.5 text-xs font-bold text-slate-800 hover:text-emerald-600 hover:bg-emerald-50/50 rounded-lg transition-colors">
                       › Restaurants & Food Businesses
                     </Link>
-                    <Link href="/industries/startups" className="block p-1.5 text-xs font-bold text-slate-800 hover:text-emerald-600">
+                    <Link href="/industries/startups" onClick={() => setIsMobileMenuOpen(false)} className="block p-1.5 text-xs font-bold text-slate-800 hover:text-emerald-600 hover:bg-emerald-50/50 rounded-lg transition-colors">
                       › Startups & Emerging Businesses
                     </Link>
-                    <Link href="/industries" className="block p-2 text-xs font-extrabold text-emerald-600 border-t border-slate-100 pt-2">
+                    <Link href="/industries" onClick={() => setIsMobileMenuOpen(false)} className="block p-2 text-xs font-extrabold text-emerald-600 border-t border-slate-100 pt-2 sm:col-span-2 md:col-span-3">
                       View All Industries &rarr;
                     </Link>
                   </div>
@@ -1447,23 +1465,23 @@ export function Header() {
                 </button>
 
                 {mobileExpanded === "company" && (
-                  <div className="px-4 pb-4 pt-1 space-y-2 border-t border-slate-100 bg-white">
-                    <Link href="/about" className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600">
+                  <div className="px-4 pb-4 pt-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1.5 border-t border-slate-100 bg-white">
+                    <Link href="/about" onClick={() => setIsMobileMenuOpen(false)} className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600 hover:bg-emerald-50/50 rounded-lg transition-colors">
                       › About HiveRift
                     </Link>
-                    <Link href="/industries" className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600">
+                    <Link href="/industries" onClick={() => setIsMobileMenuOpen(false)} className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600 hover:bg-emerald-50/50 rounded-lg transition-colors">
                       › Industries We Serve
                     </Link>
-                    <Link href="/case-studies" className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600">
+                    <Link href="/case-studies" onClick={() => setIsMobileMenuOpen(false)} className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600 hover:bg-emerald-50/50 rounded-lg transition-colors">
                       › Selected Work & Case Studies
                     </Link>
-                    <Link href="/blog" className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600">
+                    <Link href="/blog" onClick={() => setIsMobileMenuOpen(false)} className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600 hover:bg-emerald-50/50 rounded-lg transition-colors">
                       › Insights & Blog
                     </Link>
-                    <Link href="/careers" className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600">
+                    <Link href="/careers" onClick={() => setIsMobileMenuOpen(false)} className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600 hover:bg-emerald-50/50 rounded-lg transition-colors">
                       › Careers
                     </Link>
-                    <Link href="/contact" className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600">
+                    <Link href="/contact" onClick={() => setIsMobileMenuOpen(false)} className="block p-2 text-xs font-bold text-slate-800 hover:text-emerald-600 hover:bg-emerald-50/50 rounded-lg transition-colors">
                       › Contact Us
                     </Link>
                   </div>
@@ -1490,7 +1508,7 @@ export function Header() {
                 </button>
 
                 {mobileExpanded === "locations" && (
-                  <div className="px-4 pb-4 pt-2 space-y-3 border-t border-slate-100 bg-white">
+                  <div className="px-4 pb-4 pt-2 space-y-4 border-t border-slate-100 bg-white">
                     {/* Delhi NCR Quick Link Banner */}
                     <Link
                       href="/locations"
@@ -1507,55 +1525,63 @@ export function Header() {
                       <ArrowRight size={14} className="text-emerald-600 group-hover:translate-x-1 transition-transform" />
                     </Link>
 
-                    {/* Delhi Hub */}
-                    <div>
-                      <div className="pt-1 text-[11px] font-black text-emerald-700 uppercase tracking-wider mb-1">
-                        Delhi Hub
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                      {/* Delhi Hub */}
+                      <div>
+                        <div className="text-[11px] font-black text-emerald-700 uppercase tracking-wider mb-1.5 pb-1 border-b border-emerald-100">
+                          Delhi Hub
+                        </div>
+                        <div className="space-y-1">
+                          {delhiLocations.map((item) => (
+                            <Link
+                              key={item.slug}
+                              href={`/locations/${item.slug}`}
+                              onClick={() => setIsMobileMenuOpen(false)}
+                              className="block py-1 text-[11px] text-slate-700 hover:text-emerald-600 hover:translate-x-0.5 transition-transform"
+                            >
+                              › {item.keyword}
+                            </Link>
+                          ))}
+                        </div>
                       </div>
-                      {delhiLocations.map((item) => (
-                        <Link
-                          key={item.slug}
-                          href={`/locations/${item.slug}`}
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className="block py-1 text-[11px] text-slate-700 hover:text-emerald-600"
-                        >
-                          › {item.keyword}
-                        </Link>
-                      ))}
-                    </div>
 
-                    {/* Noida Hub */}
-                    <div>
-                      <div className="pt-2 text-[11px] font-black text-emerald-700 uppercase tracking-wider mb-1">
-                        Noida Hub
+                      {/* Noida Hub */}
+                      <div>
+                        <div className="text-[11px] font-black text-emerald-700 uppercase tracking-wider mb-1.5 pb-1 border-b border-emerald-100">
+                          Noida Hub
+                        </div>
+                        <div className="space-y-1">
+                          {noidaLocations.map((item) => (
+                            <Link
+                              key={item.slug}
+                              href={`/locations/${item.slug}`}
+                              onClick={() => setIsMobileMenuOpen(false)}
+                              className="block py-1 text-[11px] text-slate-700 hover:text-emerald-600 hover:translate-x-0.5 transition-transform"
+                            >
+                              › {item.keyword}
+                            </Link>
+                          ))}
+                        </div>
                       </div>
-                      {noidaLocations.map((item) => (
-                        <Link
-                          key={item.slug}
-                          href={`/locations/${item.slug}`}
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className="block py-1 text-[11px] text-slate-700 hover:text-emerald-600"
-                        >
-                          › {item.keyword}
-                        </Link>
-                      ))}
-                    </div>
 
-                    {/* Gurgaon Hub */}
-                    <div>
-                      <div className="pt-2 text-[11px] font-black text-emerald-700 uppercase tracking-wider mb-1">
-                        Gurgaon / Gurugram Hub
+                      {/* Gurgaon Hub */}
+                      <div>
+                        <div className="text-[11px] font-black text-emerald-700 uppercase tracking-wider mb-1.5 pb-1 border-b border-emerald-100">
+                          Gurgaon / Gurugram Hub
+                        </div>
+                        <div className="space-y-1">
+                          {gurgaonLocations.map((item) => (
+                            <Link
+                              key={item.slug}
+                              href={`/locations/${item.slug}`}
+                              onClick={() => setIsMobileMenuOpen(false)}
+                              className="block py-1 text-[11px] text-slate-700 hover:text-emerald-600 hover:translate-x-0.5 transition-transform"
+                            >
+                              › {item.keyword}
+                            </Link>
+                          ))}
+                        </div>
                       </div>
-                      {gurgaonLocations.map((item) => (
-                        <Link
-                          key={item.slug}
-                          href={`/locations/${item.slug}`}
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className="block py-1 text-[11px] text-slate-700 hover:text-emerald-600"
-                        >
-                          › {item.keyword}
-                        </Link>
-                      ))}
                     </div>
                   </div>
                 )}
@@ -1564,7 +1590,8 @@ export function Header() {
               {/* 5. Case Studies Direct Link */}
               <Link
                 href="/case-studies"
-                className="px-4 py-3.5 rounded-2xl border border-slate-200/80 bg-slate-50/50 text-sm font-black text-slate-900 flex items-center justify-between"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="px-4 py-3.5 rounded-2xl border border-slate-200/80 bg-slate-50/50 text-sm font-black text-slate-900 flex items-center justify-between hover:bg-emerald-50/50 hover:text-emerald-600 transition-colors"
               >
                 <span>Case Studies</span>
                 <ArrowRight size={15} className="text-emerald-600" />
@@ -1574,7 +1601,7 @@ export function Header() {
               <div className="pt-4 space-y-2.5">
                 <button
                   onClick={() => openEnquiryModal()}
-                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 text-white font-extrabold text-sm shadow-md flex items-center justify-center gap-2"
+                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 text-white font-extrabold text-sm shadow-md flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <Calendar size={16} />
                   <span>Get Proposal</span>
@@ -1590,6 +1617,7 @@ export function Header() {
               </div>
 
             </nav>
+            </div>
 
           </div>
         )}
