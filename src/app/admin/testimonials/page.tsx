@@ -641,7 +641,7 @@ export default function AdminTestimonialsPage() {
                     </label>
                     <input
                       type="text"
-                      placeholder="e.g., Karol Bagh, New Delhi"
+                      placeholder="e.g., Dwarka, New Delhi"
                       value={formLocation}
                       onChange={(e) => setFormLocation(e.target.value)}
                       className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:border-emerald-500"

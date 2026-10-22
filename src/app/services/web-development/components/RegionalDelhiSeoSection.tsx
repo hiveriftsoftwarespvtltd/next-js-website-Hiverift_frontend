@@ -226,7 +226,7 @@ const LOCAL_COVERAGE_HUBS = [
   },
   {
     region: "Delhi NCR, Pan-India & Global Delivery",
-    areas: "Karol Bagh HQ, Faridabad, Ghaziabad, Pan-India & Global Remote Delivery",
+    areas: "Dwarka HQ, Faridabad, Ghaziabad, Pan-India & Global Remote Delivery",
     keyword: "Website Developer Near Me",
     href: "/locations"
   }
@@ -525,7 +525,7 @@ export function RegionalDelhiSeoSection() {
                       Visit Our New Delhi Headquarters or Schedule a Video Walkthrough
                     </h5>
                     <p className="text-xs text-slate-300 mt-0.5">
-                      New Rohtak Road, Karol Bagh, New Delhi – 110005. Speak directly with a Senior Solutions Architect.
+                    4th Floor, A-49, CRPF Rd, Block A, Sector 8 Dwarka, Dwarka, New Delhi, Delhi, 110077. Speak directly with a Senior Solutions Architect.
                     </p>
                   </div>
                 </div>

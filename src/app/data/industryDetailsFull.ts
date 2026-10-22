@@ -57,7 +57,7 @@ const REGIONAL_HUBS_DEFAULT = [
   {
     city: "Delhi Hub",
     badge: "Central, South & West Delhi",
-    areas: "Karol Bagh, Connaught Place, South Extension, Okhla, Dwarka Expressway",
+    areas: "Dwarka Expressway, Connaught Place, South Extension, Okhla, Dwarka Expressway",
     focus: "Corporate web development, high-trust regulatory architectures, local Google 3-Pack SEO & digital growth."
   },
   {

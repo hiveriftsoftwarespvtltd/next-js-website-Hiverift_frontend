@@ -252,7 +252,7 @@ export function Footer() {
             {/* Address */}
             <div className="flex items-start gap-2 text-xs text-slate-300">
               <MapPin size={14} className="text-[#00e599] shrink-0 mt-0.5" />
-              <span>Karol Bagh, New Delhi - 110005, India</span>
+              <span> 4th Floor, A-49, CRPF Rd, Block A, Sector 8 Dwarka, Dwarka, New Delhi, Delhi, 110077</span>
             </div>
 
             {/* Emails */}

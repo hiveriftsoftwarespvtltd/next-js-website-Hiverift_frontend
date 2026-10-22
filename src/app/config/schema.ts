@@ -10,10 +10,10 @@ export const siteConfig = {
   supportEmail: "support@hiverift.com",
   address: {
     streetAddress:
-      "3rd Floor, Right Portion House No. 8577 (New) / Plot No. XVI/6501 (Old), Ward No. XVI, New Rohtak Road, Karol Bagh",
+      "4th Floor, A-49, CRPF Rd, Block A, Sector 8 Dwarka, Dwarka, New Delhi, Delhi, 110077",
     addressLocality: "New Delhi",
     addressRegion: "Delhi",
-    postalCode: "110005",
+    postalCode: "110077",
     addressCountry: "IN",
   },
   geo: {
