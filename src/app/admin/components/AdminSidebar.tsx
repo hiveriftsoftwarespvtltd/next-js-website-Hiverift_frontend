@@ -134,7 +134,7 @@ export function AdminSidebar({ isOpen = false, onClose }: AdminSidebarProps) {
 
       {/* Sidebar Container */}
       <aside
-        className={`w-64 bg-slate-900 text-slate-300 min-h-screen flex flex-col justify-between p-4 fixed left-0 top-0 bottom-0 z-50 border-r border-slate-800 transition-transform duration-300 ease-in-out ${
+        className={`w-64 bg-slate-900 text-slate-300 h-screen flex flex-col justify-between p-4 fixed left-0 top-0 bottom-0 z-50 border-r border-slate-800 transition-transform duration-300 ease-in-out overflow-y-auto ${
           isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >

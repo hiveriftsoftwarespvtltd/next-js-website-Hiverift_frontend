@@ -530,9 +530,9 @@ export default function AdminInquiriesPage() {
             {/* Filter Bar & Search Controls */}
             <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl space-y-4">
               {/* Row 1: Search & Dropdown Filters */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
                 {/* Search Input */}
-                <div className="relative flex items-center lg:col-span-2">
+                <div className="relative flex items-center sm:col-span-2 xl:col-span-2">
                   <input
                     type="text"
                     value={searchQuery}

@@ -41,6 +41,7 @@ export default function AdminTestimonialsPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "published" | "hidden">("all");
   const [ratingFilter, setRatingFilter] = useState<number | "all">("all");
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -224,15 +225,22 @@ export default function AdminTestimonialsPage() {
 
   return (
     <AdminGuard allowedRoles={["Admin", "Sales"]}>
-      <div className="flex h-screen bg-[#070b14] text-slate-100 overflow-hidden font-sans">
+      <div className="min-h-screen bg-[#070b14] text-slate-100 flex font-sans">
         {/* Sidebar */}
-        <AdminSidebar />
+        <AdminSidebar
+          isOpen={isMobileSidebarOpen}
+          onClose={() => setIsMobileSidebarOpen(false)}
+        />
 
         {/* Main Content Area */}
-        <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0">
-          <AdminHeader />
+        <div className="flex-1 lg:pl-64 flex flex-col min-w-0">
+          <AdminHeader
+            title="Google Reviews & Testimonials"
+            subtitle="Manage real client feedback and authentic Google ratings"
+            onOpenSidebar={() => setIsMobileSidebarOpen(true)}
+          />
 
-          <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
+          <main className="p-4 sm:p-6 lg:p-8 space-y-6 flex-1">
             {/* Top Bar: Title & Actions */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
@@ -251,7 +259,7 @@ export default function AdminTestimonialsPage() {
                 </p>
               </div>
 
-              <div className="flex items-center gap-3 shrink-0">
+              <div className="flex items-center gap-3 shrink-0 flex-wrap">
                 <a
                   href={OFFICIAL_GOOGLE_PROFILE_URL}
                   target="_blank"
@@ -274,7 +282,7 @@ export default function AdminTestimonialsPage() {
             </div>
 
             {/* KPI Cards Strip */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
               <div className="p-4 rounded-2xl bg-[#0c1220] border border-slate-800 shadow-sm flex items-center justify-between">
                 <div>
                   <div className="text-xs text-slate-400 font-medium">Total Reviews</div>
@@ -325,8 +333,8 @@ export default function AdminTestimonialsPage() {
             </div>
 
             {/* Filter & Search Bar */}
-            <div className="p-4 rounded-2xl bg-[#0c1220] border border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="relative w-full md:w-80">
+            <div className="p-4 rounded-2xl bg-[#0c1220] border border-slate-800 flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-4">
+              <div className="relative w-full xl:w-80">
                 <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
                 <input
                   type="text"
@@ -337,7 +345,7 @@ export default function AdminTestimonialsPage() {
                 />
               </div>
 
-              <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+              <div className="flex flex-wrap items-center gap-2 w-full xl:w-auto">
                 {/* Status Filter */}
                 <div className="inline-flex rounded-xl bg-slate-900 p-1 border border-slate-800">
                   <button

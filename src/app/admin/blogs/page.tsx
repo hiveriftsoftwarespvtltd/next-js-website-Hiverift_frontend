@@ -116,17 +116,18 @@ export default function AdminBlogsPage() {
         />
 
         {/* Main Content Area */}
-        <div className="flex-1 lg:ml-64 ml-0 flex flex-col min-w-0 transition-all duration-300">
+        <div className="flex-1 lg:pl-64 flex flex-col min-w-0">
           <AdminHeader
             title="Blog Management"
             subtitle="Create, edit, delete, and organize all website articles & content."
+            onOpenSidebar={() => setIsMobileSidebarOpen(true)}
             onMenuClick={() => setIsMobileSidebarOpen(true)}
           />
 
           <main className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8 flex-1">
             
             {/* Action Header & Quick Stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
               <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 font-black flex items-center justify-center shrink-0">
                   <FileText size={24} />

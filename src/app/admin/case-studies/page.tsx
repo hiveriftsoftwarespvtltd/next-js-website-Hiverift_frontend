@@ -48,6 +48,7 @@ export default function AdminCaseStudiesPage() {
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<"all" | "published" | "draft">("all");
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -319,13 +320,20 @@ export default function AdminCaseStudiesPage() {
 
   return (
     <AdminGuard allowedRoles={["Admin", "Sales"]}>
-      <div className="flex h-screen bg-[#070d18] text-slate-100 overflow-hidden font-sans">
-        <AdminSidebar />
+      <div className="min-h-screen bg-[#070d18] text-slate-100 flex font-sans">
+        <AdminSidebar
+          isOpen={isMobileSidebarOpen}
+          onClose={() => setIsMobileSidebarOpen(false)}
+        />
 
-        <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-          <AdminHeader />
+        <div className="flex-1 lg:pl-64 flex flex-col min-w-0">
+          <AdminHeader
+            title="Case Studies & Work Management"
+            subtitle="Upload, edit, and publish live client case studies"
+            onOpenSidebar={() => setIsMobileSidebarOpen(true)}
+          />
 
-          <main className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-6">
+          <main className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-6 flex-1">
             
             {/* Top Title Banner */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900/60 p-6 rounded-3xl border border-slate-800 shadow-xl">
@@ -342,7 +350,7 @@ export default function AdminCaseStudiesPage() {
                 </p>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 flex-wrap">
                 <button
                   onClick={loadData}
                   className="p-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-colors cursor-pointer"
@@ -361,7 +369,7 @@ export default function AdminCaseStudiesPage() {
             </div>
 
             {/* Statistics Row */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
               <div className="p-4 rounded-2xl bg-slate-900/70 border border-slate-800/80">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Total</span>
                 <span className="text-2xl font-black text-white font-mono mt-1 block">{stats.total}</span>
@@ -389,8 +397,8 @@ export default function AdminCaseStudiesPage() {
             </div>
 
             {/* Filters & Search Bar */}
-            <div className="flex flex-col md:flex-row gap-3 items-center justify-between bg-slate-900/60 p-4 rounded-2xl border border-slate-800">
-              <div className="relative w-full md:w-80">
+            <div className="flex flex-col xl:flex-row gap-3 items-stretch xl:items-center justify-between bg-slate-900/60 p-4 rounded-2xl border border-slate-800">
+              <div className="relative w-full xl:w-80">
                 <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   type="text"
@@ -401,7 +409,7 @@ export default function AdminCaseStudiesPage() {
                 />
               </div>
 
-              <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+              <div className="flex flex-wrap items-center gap-2 w-full xl:w-auto">
                 <div className="flex items-center gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
                   <span className="text-slate-400 px-2 font-bold text-[11px]">Category:</span>
                   {(["all", "web", "ecommerce", "software"] as const).map((cat) => (
@@ -441,7 +449,7 @@ export default function AdminCaseStudiesPage() {
             {/* Case Studies Table / Grid */}
             <div className="bg-slate-900/60 rounded-3xl border border-slate-800 overflow-hidden shadow-xl">
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
+                <table className="w-full text-left text-xs min-w-[700px]">
                   <thead className="bg-slate-950/80 text-slate-400 uppercase tracking-wider font-mono text-[10px] border-b border-slate-800">
                     <tr>
                       <th className="py-4 px-5">Project &amp; Preview</th>
