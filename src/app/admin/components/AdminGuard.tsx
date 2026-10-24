@@ -19,6 +19,8 @@ export function AdminGuard({ children, allowedRoles }: AdminGuardProps) {
   const [userRole, setUserRole] = useState<RoleType>("Admin");
   const router = useRouter();
 
+  const rolesKey = (allowedRoles || []).join(",");
+
   useEffect(() => {
     setMounted(true);
     if (!isAuthenticated()) {
@@ -43,7 +45,7 @@ export function AdminGuard({ children, allowedRoles }: AdminGuardProps) {
 
     setAuthorized(true);
     setChecking(false);
-  }, [router, allowedRoles]);
+  }, [router, rolesKey]);
 
   if (!mounted || checking || !authorized) {
     return (

@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import Link from "next/link";
 import { AdminGuard } from "../components/AdminGuard";
 import { AdminSidebar } from "../components/AdminSidebar";
 import { AdminHeader } from "../components/AdminHeader";
+import { getImageUrl } from "@/app/actions/adminActions";
 import {
   CaseStudyItem,
   getAdminCaseStudiesApi,
@@ -37,6 +38,8 @@ import {
   Users,
   Compass,
   ArrowRight,
+  Image as ImageIcon,
+  Check,
 } from "lucide-react";
 
 export default function AdminCaseStudiesPage() {
@@ -66,6 +69,9 @@ export default function AdminCaseStudiesPage() {
   const [formProjectUrl, setFormProjectUrl] = useState("https://");
   const [formImageUrl, setFormImageUrl] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>("");
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Human Story & Touchpoints
   const [formHowWeStarted, setFormHowWeStarted] = useState("");
@@ -147,6 +153,7 @@ export default function AdminCaseStudiesPage() {
     setFormProjectUrl("https://");
     setFormImageUrl("");
     setSelectedFile(null);
+    setPreviewUrl("");
     setFormHowWeStarted("");
     setStep1Title("Initial Discovery & Deep Listening");
     setStep1Desc("Direct strategy session auditing operational hurdles and user personas without corporate jargon.");
@@ -181,6 +188,7 @@ export default function AdminCaseStudiesPage() {
     setFormProjectUrl(item.projectUrl || "");
     setFormImageUrl(item.image || "");
     setSelectedFile(null);
+    setPreviewUrl(item.image ? getImageUrl(item.image) : "");
     setFormHowWeStarted(item.howWeStarted || "");
 
     const steps = item.humanTouchPoints || [];
@@ -451,11 +459,15 @@ export default function AdminCaseStudiesPage() {
                         {/* Project Info & Thumbnail */}
                         <td className="py-4 px-5">
                           <div className="flex items-center gap-3.5">
-                            <div className="w-16 h-11 rounded-lg overflow-hidden bg-slate-950 border border-slate-700/80 shrink-0 relative">
+                            <div className="w-16 h-11 rounded-lg overflow-hidden bg-slate-950 border border-slate-700/80 shrink-0 relative group/thumb">
                               <img
-                                src={item.image}
+                                src={getImageUrl(item.image)}
                                 alt={item.title}
                                 className="w-full h-full object-cover object-top"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).src =
+                                    "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800";
+                                }}
                               />
                             </div>
                             <div className="min-w-0">
@@ -733,40 +745,186 @@ export default function AdminCaseStudiesPage() {
                   </div>
                 </div>
 
-                {/* 2. Image Upload / Screenshot */}
+                {/* 2. Image Upload / Screenshot with Live Visual Preview */}
                 <div className="p-5 rounded-2xl bg-slate-950/60 border border-slate-800/80 space-y-4">
-                  <h3 className="text-sm font-bold text-emerald-400 uppercase tracking-wider font-mono">
-                    2. Project Screenshot &amp; Mockup
-                  </h3>
-
-                  <div className="grid sm:grid-cols-2 gap-4 items-center">
-                    <div>
-                      <label className="block text-xs font-bold text-slate-300 mb-1.5">
-                        Upload Screenshot (.webp, .png, .jpg)
-                      </label>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          if (e.target.files && e.target.files[0]) {
-                            setSelectedFile(e.target.files[0]);
-                          }
-                        }}
-                        className="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-600 file:text-white hover:file:bg-emerald-500 cursor-pointer"
-                      />
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <ImageIcon size={16} className="text-emerald-400" />
+                      <h3 className="text-sm font-bold text-emerald-400 uppercase tracking-wider font-mono">
+                        2. Project Screenshot &amp; Live UI Preview
+                      </h3>
                     </div>
+                    {previewUrl && (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                        <Check size={11} />
+                        <span>{selectedFile ? "Ready to Upload" : "Active Image"}</span>
+                      </span>
+                    )}
+                  </div>
 
-                    <div>
-                      <label className="block text-xs font-bold text-slate-300 mb-1.5">
-                        Or Screenshot URL / Path
-                      </label>
+                  {/* Hidden Real File Input */}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,image/jpg"
+                    className="hidden"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        const file = e.target.files[0];
+                        setSelectedFile(file);
+                        setPreviewUrl(URL.createObjectURL(file));
+                      }
+                    }}
+                  />
+
+                  {/* Live Visual Preview Frame or Drag & Drop Box */}
+                  {previewUrl ? (
+                    <div className="rounded-2xl overflow-hidden border border-slate-700/80 bg-slate-950 shadow-2xl">
+                      {/* Browser Mockup Top Bar */}
+                      <div className="flex items-center justify-between px-4 py-2.5 bg-slate-900 border-b border-slate-800">
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80" />
+                          <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
+                          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
+                          <div className="ml-2 px-3 py-0.5 rounded-md bg-slate-950 border border-slate-800 text-[10px] font-mono text-slate-400 truncate max-w-xs">
+                            {formProjectUrl && formProjectUrl !== "https://"
+                              ? formProjectUrl.replace(/^https?:\/\//, "")
+                              : `${formProjectId || "project"}.hiverift.com`}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-600/90 hover:bg-emerald-500 text-white text-[11px] font-bold transition-all shadow-xs cursor-pointer"
+                          >
+                            <Upload size={12} />
+                            <span>Replace Image</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedFile(null);
+                              setFormImageUrl("");
+                              setPreviewUrl("");
+                              if (fileInputRef.current) fileInputRef.current.value = "";
+                            }}
+                            className="p-1 rounded-lg bg-slate-800 hover:bg-rose-600/90 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                            title="Remove Image"
+                          >
+                            <X size={14} />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Preview Image Viewport */}
+                      <div className="relative aspect-[16/9] w-full max-h-[300px] overflow-hidden bg-slate-950">
+                        <img
+                          src={previewUrl}
+                          alt="Case study screenshot preview"
+                          className="w-full h-full object-cover object-top"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src =
+                              "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800";
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent pointer-events-none" />
+
+                        <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-[11px]">
+                          <div className="px-2.5 py-1 rounded-md bg-slate-900/90 backdrop-blur-md border border-slate-700/80 text-white font-mono truncate max-w-md">
+                            {selectedFile ? (
+                              <span>
+                                📁 {selectedFile.name} ({(selectedFile.size / 1024).toFixed(0)} KB)
+                              </span>
+                            ) : (
+                              <span>🔗 {formImageUrl || "Saved Image"}</span>
+                            )}
+                          </div>
+                          <span className="px-2.5 py-1 rounded-md bg-emerald-500 text-slate-950 font-bold font-mono uppercase text-[10px]">
+                            Live Preview
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    /* Drag & Drop Upload Zone */
+                    <div
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        setIsDragging(true);
+                      }}
+                      onDragLeave={() => setIsDragging(false)}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        setIsDragging(false);
+                        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                          const file = e.dataTransfer.files[0];
+                          setSelectedFile(file);
+                          setPreviewUrl(URL.createObjectURL(file));
+                        }
+                      }}
+                      onClick={() => fileInputRef.current?.click()}
+                      className={`relative flex flex-col items-center justify-center p-8 rounded-2xl border-2 border-dashed transition-all duration-200 cursor-pointer text-center group ${
+                        isDragging
+                          ? "border-emerald-400 bg-emerald-950/30 scale-[1.01]"
+                          : "border-slate-700/80 hover:border-emerald-500/80 bg-slate-900/50 hover:bg-slate-900"
+                      }`}
+                    >
+                      <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                        <Upload size={24} />
+                      </div>
+                      <h4 className="text-sm font-bold text-white mb-1">
+                        Click to browse or drag &amp; drop screenshot
+                      </h4>
+                      <p className="text-xs text-slate-400 max-w-xs mb-3">
+                        Upload high-resolution client project mockup or website screenshot.
+                      </p>
+                      <div className="flex flex-wrap items-center justify-center gap-2">
+                        <span className="px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-mono text-[10px]">
+                          WEBP, PNG, JPG
+                        </span>
+                        <span className="px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-mono text-[10px]">
+                          Up to 10MB
+                        </span>
+                        <span className="px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-mono text-[10px]">
+                          16:9 / 16:10 Recommended
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Fallback Manual URL Input */}
+                  <div className="pt-2">
+                    <label className="block text-xs font-bold text-slate-400 mb-1.5">
+                      Or Direct Image URL / Public File Path:
+                    </label>
+                    <div className="flex gap-2">
                       <input
                         type="text"
                         value={formImageUrl}
-                        onChange={(e) => setFormImageUrl(e.target.value)}
-                        placeholder="/case-studies/image_01.webp or full URL"
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs font-mono focus:outline-none focus:border-emerald-500"
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setFormImageUrl(val);
+                          if (!selectedFile) {
+                            setPreviewUrl(val ? getImageUrl(val) : "");
+                          }
+                        }}
+                        placeholder="e.g. /case-studies/image_01.webp or https://images.unsplash.com/..."
+                        className="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs font-mono focus:outline-none focus:border-emerald-500"
                       />
+                      {formImageUrl && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedFile(null);
+                            setPreviewUrl(getImageUrl(formImageUrl));
+                          }}
+                          className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 transition-colors cursor-pointer"
+                        >
+                          Preview
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>

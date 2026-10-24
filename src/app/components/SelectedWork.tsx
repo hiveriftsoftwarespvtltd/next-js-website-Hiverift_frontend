@@ -15,6 +15,7 @@ import {
 import { Button } from "./ui/button";
 import { portfolioProjects } from "@/app/data/portfolioProjects";
 import { getPublicCaseStudiesApi } from "@/app/config/auth";
+import { getImageUrl } from "@/app/actions/adminActions";
 
 const filterTabs = [
   { id: "all", label: "All Projects" },
@@ -47,7 +48,7 @@ export function SelectedWork() {
             client: item.client || "Client Partner",
             industry: item.industry || "Technology",
             timeline: item.timeline || "4-6 Weeks",
-            image: item.image || "/case-studies/image_01.webp",
+            image: getImageUrl(item.image) || "/case-studies/image_01.webp",
             projectUrl: item.projectUrl || "https://hiverift.com/",
             isPublished: item.isPublished ?? true,
           }));

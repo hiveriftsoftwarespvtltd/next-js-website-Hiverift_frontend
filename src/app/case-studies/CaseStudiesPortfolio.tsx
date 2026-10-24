@@ -8,6 +8,7 @@ import { Header } from "@/app/components/Header";
 import { Footer } from "@/app/components/Footer";
 import { portfolioProjects, PortfolioProject } from "@/app/data/portfolioProjects";
 import { getPublicCaseStudiesApi, CaseStudyItem } from "@/app/config/auth";
+import { getImageUrl } from "@/app/actions/adminActions";
 
 const filterTabs = [
   { id: "all", label: "All Projects" },
@@ -44,7 +45,7 @@ export default function CaseStudiesPortfolio() {
             keyFeatures: item.keyFeatures || [],
             howWeStarted: item.howWeStarted || "",
             humanTouchPoints: item.humanTouchPoints || [],
-            image: item.image || "/case-studies/image_01.webp",
+            image: getImageUrl(item.image) || "/case-studies/image_01.webp",
             projectUrl: item.projectUrl || "https://hiverift.com/",
             isPublished: item.isPublished ?? true,
           }));

@@ -22,6 +22,7 @@ import { Header } from "@/app/components/Header";
 import { Footer } from "@/app/components/Footer";
 import { portfolioProjects } from "@/app/data/portfolioProjects";
 import { getCaseStudyByIdOrSlugApi } from "@/app/config/auth";
+import { getImageUrl } from "@/app/actions/adminActions";
 
 type Props = {
   params: Promise<{ projectId: string }>;
@@ -41,6 +42,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       project = {
         ...apiRes.data,
         id: apiRes.data.projectId,
+        image: getImageUrl(apiRes.data.image),
       };
     }
   }
@@ -99,6 +101,7 @@ export default async function CaseStudyDetailPage({ params }: Props) {
       project = {
         ...apiRes.data,
         id: apiRes.data.projectId,
+        image: getImageUrl(apiRes.data.image),
       };
     }
   }

@@ -328,7 +328,7 @@ function EcommerceFlowAnimation() {
       {/* LIVE ECOMMERCE STORE PAGE VIEW (DYNAMIC FOR EACH FUNCTION)     */}
       {/* ============================================================ */}
       <div className="mb-4">
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="popLayout">
           
           {/* 1. PRODUCT PAGE VIEW */}
           {activeStep === 0 && (
@@ -757,7 +757,7 @@ function MarketingDashboardAnimation() {
             </span>
           </div>
 
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="popLayout">
             {activeStage === 0 && (
               <motion.div
                 key="stage-0"

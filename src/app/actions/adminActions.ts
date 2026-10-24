@@ -11,6 +11,18 @@ export function getImageUrl(image?: string): string {
     return image;
   }
 
+  // Local static public assets in frontend Next.js public directory
+  if (
+    image.startsWith("/case-studies/") ||
+    image.startsWith("/images/") ||
+    image.startsWith("/hero_") ||
+    image.startsWith("/driven") ||
+    image.startsWith("/logo") ||
+    image.startsWith("/delhi-")
+  ) {
+    return image;
+  }
+
   // External images (Unsplash, Pexels, etc.) without /uploads/
   if ((image.startsWith("http://") || image.startsWith("https://")) && !image.includes("/uploads/")) {
     return image;

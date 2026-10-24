@@ -1,4 +1,4 @@
-import { apiClient, ENDPOINTS } from "@/app/config/api.config";
+import { apiClient, ENDPOINTS, API_BASE_URL } from "@/app/config/api.config";
 
 export const ADMIN_SESSION_KEY = "hiverift_admin_session";
 
@@ -404,14 +404,27 @@ export async function getAdminCaseStudiesApi(): Promise<{ success: boolean; data
  */
 export async function createCaseStudyApi(payload: FormData | Partial<CaseStudyItem>) {
   try {
-    const headers = { ...getAuthHeaders() };
-    if (payload instanceof FormData) {
-      delete headers["Content-Type"];
+    const isFormData = typeof FormData !== "undefined" && payload instanceof FormData;
+    const baseUrl = API_BASE_URL.replace(/\/$/, "");
+    if (isFormData) {
+      const res = await fetch(`${baseUrl}/case-studies`, {
+        method: "POST",
+        headers: {
+          ...getAuthHeaders(),
+        },
+        body: payload,
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        const errMsg = Array.isArray(json.message) ? json.message.join(", ") : (json.message || `Upload failed with status ${res.status}`);
+        throw new Error(errMsg);
+      }
+      return { success: true, data: json.data, message: json.message || "Case study created successfully." };
     }
-    const response = await apiClient.post("/case-studies", payload, { headers });
+    const response = await apiClient.post("/case-studies", payload, { headers: getAuthHeaders() });
     return { success: true, data: response.data?.data, message: response.data?.message || "Case study created successfully." };
   } catch (error: any) {
-    return { success: false, message: error?.response?.data?.message || "Failed to create case study." };
+    return { success: false, message: error?.response?.data?.message || error?.message || "Failed to create case study." };
   }
 }
 
@@ -420,14 +433,27 @@ export async function createCaseStudyApi(payload: FormData | Partial<CaseStudyIt
  */
 export async function updateCaseStudyApi(id: string, payload: FormData | Partial<CaseStudyItem>) {
   try {
-    const headers = { ...getAuthHeaders() };
-    if (payload instanceof FormData) {
-      delete headers["Content-Type"];
+    const isFormData = typeof FormData !== "undefined" && payload instanceof FormData;
+    const baseUrl = API_BASE_URL.replace(/\/$/, "");
+    if (isFormData) {
+      const res = await fetch(`${baseUrl}/case-studies/${id}`, {
+        method: "PATCH",
+        headers: {
+          ...getAuthHeaders(),
+        },
+        body: payload,
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        const errMsg = Array.isArray(json.message) ? json.message.join(", ") : (json.message || `Update failed with status ${res.status}`);
+        throw new Error(errMsg);
+      }
+      return { success: true, data: json.data, message: json.message || "Case study updated successfully." };
     }
-    const response = await apiClient.patch(`/case-studies/${id}`, payload, { headers });
+    const response = await apiClient.patch(`/case-studies/${id}`, payload, { headers: getAuthHeaders() });
     return { success: true, data: response.data?.data, message: response.data?.message || "Case study updated successfully." };
   } catch (error: any) {
-    return { success: false, message: error?.response?.data?.message || "Failed to update case study." };
+    return { success: false, message: error?.response?.data?.message || error?.message || "Failed to update case study." };
   }
 }
 
