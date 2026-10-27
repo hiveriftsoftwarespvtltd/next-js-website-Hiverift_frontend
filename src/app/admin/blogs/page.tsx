@@ -22,6 +22,7 @@ import { BlogFormModal } from "./components/BlogFormModal";
 import { BlogPost } from "@/app/data/blogData";
 import {
   getBlogsFromApi,
+  getBlogByIdFromApi,
   getImageUrl,
   createBlogApi,
   updateBlogApi,
@@ -53,6 +54,19 @@ export default function AdminBlogsPage() {
   useEffect(() => {
     fetchBlogs();
   }, []);
+
+  const handleOpenEdit = async (blog: BlogPost) => {
+    setEditingBlog(blog);
+    setIsModalOpen(true);
+    try {
+      const fullBlog = await getBlogByIdFromApi(String(blog.id || (blog as any)._id));
+      if (fullBlog) {
+        setEditingBlog(fullBlog);
+      }
+    } catch (e) {
+      console.error("Could not fetch full blog details:", e);
+    }
+  };
 
   const handleSaveBlog = async (formData: FormData) => {
     try {
@@ -300,10 +314,7 @@ export default function AdminBlogsPage() {
                             </Link>
 
                             <button
-                              onClick={() => {
-                                setEditingBlog(blog);
-                                setIsModalOpen(true);
-                              }}
+                              onClick={() => handleOpenEdit(blog)}
                               className="p-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg inline-flex items-center transition-colors"
                               title="Edit"
                             >

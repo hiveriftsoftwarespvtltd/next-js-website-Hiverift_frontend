@@ -59,7 +59,6 @@ export async function getBlogsFromApi(category?: string, search?: string): Promi
 
     const response = await apiClient.get(ENDPOINTS.BLOGS, {
       params,
-      headers: { "Cache-Control": "no-cache, no-store, must-revalidate", "Pragma": "no-cache" }
     });
     const json = response.data;
 
