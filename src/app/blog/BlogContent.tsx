@@ -33,6 +33,22 @@ import { ImageWithFallback } from "@/app/components/figma/ImageWithFallback";
 import { blogPosts, BlogPost } from "@/app/data/blogData";
 import { getBlogsFromApi } from "@/app/actions/adminActions";
 
+const CATEGORY_FALLBACKS: Record<string, string> = {
+  "Web Development": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=800",
+  "Digital Marketing": "https://images.unsplash.com/photo-1533750349088-cd871a92f312?auto=format&fit=crop&q=80&w=800",
+  "SEO": "https://images.unsplash.com/photo-1571721795195-a2ca2d3370a9?auto=format&fit=crop&q=80&w=800",
+  "Tech & AI": "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=800",
+  "Business Growth": "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=800",
+  "Mobile Apps": "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=80&w=800",
+};
+
+const getBlogFallbackImage = (category?: string) => {
+  if (category && CATEGORY_FALLBACKS[category]) {
+    return CATEGORY_FALLBACKS[category];
+  }
+  return "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=800";
+};
+
 export default function BlogContent() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
@@ -138,7 +154,7 @@ export default function BlogContent() {
                       loading="lazy"
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800";
+                        (e.target as HTMLImageElement).src = getBlogFallbackImage(post.category);
                       }}
                     />
                     <div className="absolute top-4 left-4 px-3 py-1.5 bg-white/95 backdrop-blur-md rounded-lg text-[9px] font-black text-emerald-600 tracking-widest uppercase shadow-sm border border-white/20">
@@ -249,7 +265,7 @@ export default function BlogContent() {
                           alt={post.title}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                           onError={(e) => {
-                            (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800";
+                            (e.target as HTMLImageElement).src = getBlogFallbackImage(post.category);
                           }}
                         />
                       </div>
