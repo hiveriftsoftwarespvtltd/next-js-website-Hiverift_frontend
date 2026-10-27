@@ -126,20 +126,17 @@ export default function BlogContent() {
             {/* Left Column - Blog List (Smaller Horizontal Layout) */}
             <div className="lg:col-span-8 space-y-8">
               {filteredPosts.map((post, idx) => (
-                <motion.article
-                  key={post.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: idx * 0.1 }}
-                  className="group flex flex-col md:flex-row bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl hover:border-emerald-200 transition-all duration-500"
+                <article
+                  key={String(post.id || idx)}
+                  className="group flex flex-col md:flex-row bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl hover:border-emerald-200 transition-all duration-300"
                 >
                   {/* Left: Image (Smaller) */}
-                  <div className="md:w-[30%] relative aspect-video md:aspect-auto overflow-hidden">
+                  <div className="md:w-[30%] relative aspect-video md:aspect-auto min-h-[160px] bg-slate-100 overflow-hidden">
                     <img
                       src={post.image}
                       alt={post.title}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      loading="lazy"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800";
                       }}
@@ -176,7 +173,7 @@ export default function BlogContent() {
                       </div>
                     </div>
                   </div>
-                </motion.article>
+                </article>
               ))}
 
               {filteredPosts.length === 0 && (
