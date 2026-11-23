@@ -9,9 +9,10 @@ import Link from "next/link";
 interface AdminGuardProps {
   children: React.ReactNode;
   allowedRoles?: RoleType[];
+  permission?: string;
 }
 
-export function AdminGuard({ children, allowedRoles }: AdminGuardProps) {
+export function AdminGuard({ children, allowedRoles, permission }: AdminGuardProps) {
   const [mounted, setMounted] = useState(false);
   const [authorized, setAuthorized] = useState(false);
   const [hasPermission, setHasPermission] = useState(true);
@@ -33,8 +34,14 @@ export function AdminGuard({ children, allowedRoles }: AdminGuardProps) {
     const cleanRole = normalizeRole(user?.role);
     setUserRole(cleanRole);
 
-    // Super Admin / Admin role has universal bypass to all modules
-    if (cleanRole === "Admin") {
+    const userPerms = Array.isArray(user?.permissions) ? user.permissions : [];
+
+    // SuperAdmin always has universal bypass to all modules
+    if (cleanRole === "SuperAdmin") {
+      setHasPermission(true);
+    } else if (permission && userPerms.length > 0) {
+      setHasPermission(userPerms.includes(permission));
+    } else if (cleanRole === "Admin") {
       setHasPermission(true);
     } else if (allowedRoles && allowedRoles.length > 0) {
       const allowed = hasRole(allowedRoles);
@@ -45,7 +52,7 @@ export function AdminGuard({ children, allowedRoles }: AdminGuardProps) {
 
     setAuthorized(true);
     setChecking(false);
-  }, [router, rolesKey]);
+  }, [router, rolesKey, permission]);
 
   if (!mounted || checking || !authorized) {
     return (

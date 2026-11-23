@@ -121,7 +121,7 @@ export default function AdminBlogsPage() {
   });
 
   return (
-    <AdminGuard allowedRoles={["Admin", "Blog"]}>
+    <AdminGuard allowedRoles={["SuperAdmin", "Admin", "Blog"]} permission="blogs">
       <div suppressHydrationWarning className="min-h-screen bg-slate-100 flex font-['Roboto',sans-serif]">
         {/* Sidebar */}
         <AdminSidebar

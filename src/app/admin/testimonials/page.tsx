@@ -224,7 +224,7 @@ export default function AdminTestimonialsPage() {
   };
 
   return (
-    <AdminGuard allowedRoles={["Admin", "Sales"]}>
+    <AdminGuard allowedRoles={["SuperAdmin", "Admin", "Sales"]} permission="testimonials">
       <div className="min-h-screen bg-[#070b14] text-slate-100 flex font-sans">
         {/* Sidebar */}
         <AdminSidebar

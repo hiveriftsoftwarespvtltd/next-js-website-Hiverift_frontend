@@ -468,7 +468,7 @@ export default function AdminInquiriesPage() {
   };
 
   return (
-    <AdminGuard allowedRoles={["Admin", "Sales"]}>
+    <AdminGuard allowedRoles={["SuperAdmin", "Admin", "Sales"]} permission="inquiries">
       <div className="min-h-screen bg-slate-950 text-slate-100 flex font-['Roboto',sans-serif]">
         <AdminSidebar
           isOpen={isMobileSidebarOpen}

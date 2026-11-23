@@ -2,13 +2,14 @@ import { apiClient, ENDPOINTS, API_BASE_URL } from "@/app/config/api.config";
 
 export const ADMIN_SESSION_KEY = "hiverift_admin_session";
 
-export type RoleType = "Admin" | "Sales" | "Blog";
+export type RoleType = "SuperAdmin" | "Admin" | "Sales" | "Blog";
 
 export interface AdminUser {
   id?: string;
   email: string;
   name: string;
   role: RoleType;
+  permissions?: string[];
   token?: string;
 }
 
@@ -16,6 +17,8 @@ export interface LoginResponse {
   success: boolean;
   requireOtp?: boolean;
   tempToken?: string;
+  token?: string;
+  user?: AdminUser;
   targetEmail?: string;
   maskedEmail?: string;
   userRole?: RoleType;
@@ -32,6 +35,7 @@ export function isAuthenticated(): boolean {
 export function normalizeRole(role?: string): RoleType {
   if (!role) return "Admin";
   const r = role.toLowerCase().trim();
+  if (r.includes("super")) return "SuperAdmin";
   if (r.includes("admin")) return "Admin";
   if (r.includes("sale")) return "Sales";
   if (r.includes("blog")) return "Blog";
@@ -45,6 +49,7 @@ export function getAdminUser(): AdminUser | null {
   try {
     const parsed = JSON.parse(session);
     parsed.role = normalizeRole(parsed.role);
+    parsed.permissions = Array.isArray(parsed.permissions) ? parsed.permissions : [];
     return parsed;
   } catch {
     return null;
@@ -65,7 +70,7 @@ export function hasRole(allowed: RoleType | RoleType[]): boolean {
   const user = getAdminUser();
   if (!user) return false;
   const role = normalizeRole(user.role);
-  if (role === "Admin") return true; // Super Admin has access to all modules
+  if (role === "SuperAdmin" || role === "Admin") return true; // SuperAdmin and Admin have universal access
   const roles = (Array.isArray(allowed) ? allowed : [allowed]).map((r) => normalizeRole(r));
   return roles.includes(role);
 }
@@ -77,7 +82,9 @@ export function logoutAdmin() {
 }
 
 /**
- * Step 1 of 2FA: Submit Email and Password to trigger OTP
+ * Step 1: Submit Email and Password
+ * - SuperAdmin: requires OTP verification (requireOtp: true)
+ * - Admin & Staff: logs in directly (requireOtp: false)
  */
 export async function loginAdminApi(email: string, pass: string): Promise<LoginResponse> {
   try {
@@ -88,16 +95,40 @@ export async function loginAdminApi(email: string, pass: string): Promise<LoginR
 
     const json = response.data;
     if (json.success) {
-      return {
-        success: true,
-        requireOtp: json.requireOtp ?? true,
-        tempToken: json.tempToken,
-        targetEmail: json.targetEmail || "hiverift@gmail.com",
-        maskedEmail: json.maskedEmail || "hi***@gmail.com",
-        userRole: json.userRole || "Admin",
-        userName: json.userName || "HiveRift Staff",
-        message: json.message,
-      };
+      if (json.requireOtp) {
+        return {
+          success: true,
+          requireOtp: true,
+          tempToken: json.tempToken,
+          targetEmail: json.targetEmail || "hiverift@gmail.com",
+          maskedEmail: json.maskedEmail || "hi***@gmail.com",
+          userRole: normalizeRole(json.userRole || "SuperAdmin"),
+          userName: json.userName || "HiveRift SuperAdmin",
+          message: json.message,
+        };
+      } else {
+        // Direct Login without OTP (Admin / Staff)
+        const user: AdminUser = {
+          id: json.user?.id,
+          email: json.user?.email || email.trim(),
+          name: json.user?.name || "Staff Member",
+          role: normalizeRole(json.user?.role || "Admin"),
+          permissions: Array.isArray(json.user?.permissions) ? json.user.permissions : [],
+          token: json.token,
+        };
+
+        if (typeof window !== "undefined") {
+          localStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify(user));
+        }
+
+        return {
+          success: true,
+          requireOtp: false,
+          token: json.token,
+          user,
+          message: json.message || "Login successful.",
+        };
+      }
     }
     return { success: false, message: json.message || "Invalid credentials." };
   } catch (error: any) {
@@ -122,7 +153,19 @@ export async function verifyOtpApi(tempToken: string, otp: string): Promise<{ su
         id: json.user?.id,
         email: json.user?.email,
         name: json.user?.name || "HiveRift Administrator",
-        role: json.user?.role || "Admin",
+        role: normalizeRole(json.user?.role || "SuperAdmin"),
+        permissions: Array.isArray(json.user?.permissions)
+          ? json.user.permissions
+          : [
+              "dashboard",
+              "inquiries",
+              "blogs",
+              "testimonials",
+              "case-studies",
+              "security",
+              "careers",
+              "website",
+            ],
         token: json.token,
       };
 
@@ -213,7 +256,13 @@ export async function getUsersApi() {
 /**
  * Admin: Create New CMS User
  */
-export async function createUserApi(payload: { name: string; email: string; password: string; role: RoleType }) {
+export async function createUserApi(payload: {
+  name: string;
+  email: string;
+  password: string;
+  role: RoleType;
+  permissions?: string[];
+}) {
   try {
     const response = await apiClient.post("/auth/users", payload, { headers: getAuthHeaders() });
     return { success: true, data: response.data?.data, message: response.data?.message };
@@ -223,9 +272,17 @@ export async function createUserApi(payload: { name: string; email: string; pass
 }
 
 /**
- * Admin: Update User (role or active status)
+ * Admin: Update User (role, active status, name, permissions)
  */
-export async function updateUserApi(id: string, payload: { role?: RoleType; isActive?: boolean; name?: string }) {
+export async function updateUserApi(
+  id: string,
+  payload: {
+    role?: RoleType;
+    isActive?: boolean;
+    name?: string;
+    permissions?: string[];
+  }
+) {
   try {
     const response = await apiClient.patch(`/auth/users/${id}`, payload, { headers: getAuthHeaders() });
     return { success: true, message: response.data?.message };

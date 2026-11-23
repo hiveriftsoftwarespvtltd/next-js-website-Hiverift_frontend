@@ -319,7 +319,7 @@ export default function AdminCaseStudiesPage() {
   };
 
   return (
-    <AdminGuard allowedRoles={["Admin", "Sales"]}>
+    <AdminGuard allowedRoles={["SuperAdmin", "Admin", "Sales"]} permission="case-studies">
       <div className="min-h-screen bg-[#070d18] text-slate-100 flex font-sans">
         <AdminSidebar
           isOpen={isMobileSidebarOpen}

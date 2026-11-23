@@ -71,16 +71,37 @@ export default function LoginPage() {
 
     try {
       const res = await loginAdminApi(email, password);
-      if (res.success && res.tempToken) {
-        setTempToken(res.tempToken);
-        setTargetEmail(res.targetEmail || "hiverift@gmail.com");
-        setStep("otp");
-        setResendCooldown(60);
-        setCanResend(false);
-        // Focus first OTP input after render
-        setTimeout(() => {
-          otpInputRefs.current[0]?.focus();
-        }, 150);
+      if (res.success) {
+        if (res.requireOtp && res.tempToken) {
+          // SuperAdmin: Enforce 2FA OTP
+          setTempToken(res.tempToken);
+          setTargetEmail(res.targetEmail || "hiverift@gmail.com");
+          setStep("otp");
+          setResendCooldown(60);
+          setCanResend(false);
+          // Focus first OTP input after render
+          setTimeout(() => {
+            otpInputRefs.current[0]?.focus();
+          }, 150);
+        } else {
+          // Admin / Staff: Direct login via Email & Password (No OTP required)
+          Swal.fire({
+            toast: true,
+            position: "top-end",
+            icon: "success",
+            title: `Welcome back, ${res.user?.name || "Admin"}!`,
+            showConfirmButton: false,
+            timer: 1500,
+            background: "#0f172a",
+            color: "#ffffff",
+          });
+
+          if (res.user?.role === "Blog") {
+            router.replace("/admin/blogs");
+          } else {
+            router.replace("/admin");
+          }
+        }
       } else {
         setError(res.message || "Invalid credentials.");
       }

@@ -14,6 +14,7 @@ import {
   updateUserApi,
   deleteUserApi,
   RoleType,
+  ADMIN_SESSION_KEY,
 } from "@/app/config/auth";
 import {
   ShieldCheck,
@@ -31,8 +32,22 @@ import {
   Users,
   ShieldAlert,
   Clock,
+  Shield,
+  Check,
+  Sliders,
 } from "lucide-react";
 import Swal from "sweetalert2";
+
+const SIDEBAR_MODULES = [
+  { id: "dashboard", name: "Dashboard", description: "Analytics & KPI metrics", icon: "📊" },
+  { id: "inquiries", name: "Form Inquiries", description: "Leads pipeline & queries", icon: "📥" },
+  { id: "blogs", name: "Blog Posts", description: "Write & publish articles", icon: "📝" },
+  { id: "testimonials", name: "Google Reviews", description: "Customer reviews management", icon: "⭐" },
+  { id: "case-studies", name: "Case Studies", description: "Client portfolios & case studies", icon: "💼" },
+  { id: "security", name: "Users & Security", description: "Manage team access & credentials", icon: "🛡️" },
+  { id: "careers", name: "Careers Page", description: "Job postings & applications portal", icon: "🎯" },
+  { id: "website", name: "Live Website", description: "Public website portal link", icon: "🌐" },
+];
 
 export default function AdminSecurityPage() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -60,8 +75,16 @@ export default function AdminSecurityPage() {
   const [newUserName, setNewUserName] = useState("");
   const [newUserEmail, setNewUserEmail] = useState("");
   const [newUserPassword, setNewUserPassword] = useState("");
-  const [newUserRole, setNewUserRole] = useState<RoleType>("Sales");
+  const [newUserRole, setNewUserRole] = useState<RoleType>("Admin");
+  const [newUserPermissions, setNewUserPermissions] = useState<string[]>(
+    SIDEBAR_MODULES.map((m) => m.id)
+  );
   const [isCreatingUser, setIsCreatingUser] = useState(false);
+
+  // Edit Permissions Modal state
+  const [editingUser, setEditingUser] = useState<any | null>(null);
+  const [editUserPermissions, setEditUserPermissions] = useState<string[]>([]);
+  const [isSavingPermissions, setIsSavingPermissions] = useState(false);
 
   useEffect(() => {
     const user = getAdminUser();
@@ -70,7 +93,7 @@ export default function AdminSecurityPage() {
       setName(user.name);
       setEmail(user.email);
     }
-    if (user?.role === "Admin") {
+    if (user?.role === "SuperAdmin" || user?.role === "Admin") {
       fetchTeamUsers();
     }
   }, []);
@@ -199,6 +222,30 @@ export default function AdminSecurityPage() {
     }
   };
 
+  // Auto-apply preset when role is selected
+  const applyRolePreset = (role: RoleType) => {
+    setNewUserRole(role);
+    if (role === "Admin" || role === "SuperAdmin") {
+      setNewUserPermissions(SIDEBAR_MODULES.map((m) => m.id));
+    } else if (role === "Sales") {
+      setNewUserPermissions(["dashboard", "inquiries", "testimonials", "case-studies", "careers", "website"]);
+    } else if (role === "Blog") {
+      setNewUserPermissions(["blogs", "careers", "website"]);
+    }
+  };
+
+  const handleToggleNewUserPermission = (modId: string) => {
+    setNewUserPermissions((prev) =>
+      prev.includes(modId) ? prev.filter((id) => id !== modId) : [...prev, modId]
+    );
+  };
+
+  const handleToggleEditUserPermission = (modId: string) => {
+    setEditUserPermissions((prev) =>
+      prev.includes(modId) ? prev.filter((id) => id !== modId) : [...prev, modId]
+    );
+  };
+
   // Handle Create User
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -209,6 +256,7 @@ export default function AdminSecurityPage() {
         email: newUserEmail,
         password: newUserPassword,
         role: newUserRole,
+        permissions: newUserPermissions,
       });
 
       if (res.success) {
@@ -216,11 +264,12 @@ export default function AdminSecurityPage() {
         setNewUserName("");
         setNewUserEmail("");
         setNewUserPassword("");
+        setNewUserPermissions(SIDEBAR_MODULES.map((m) => m.id));
         fetchTeamUsers();
         Swal.fire({
           icon: "success",
           title: "Staff Member Created",
-          text: `User ${newUserEmail} provisioned with role '${newUserRole}'.`,
+          text: `User ${newUserEmail} provisioned with role '${newUserRole}' and ${newUserPermissions.length} sidebar module(s).`,
           background: "#0f172a",
           color: "#ffffff",
         });
@@ -243,6 +292,56 @@ export default function AdminSecurityPage() {
       });
     } finally {
       setIsCreatingUser(false);
+    }
+  };
+
+  // Handle Save User Permissions
+  const handleSaveUserPermissions = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingUser) return;
+    setIsSavingPermissions(true);
+
+    try {
+      const res = await updateUserApi(editingUser._id, {
+        permissions: editUserPermissions,
+      });
+
+      if (res.success) {
+        // If current logged in user was modified, sync local session
+        if (editingUser._id === currentUser?.id || editingUser.email === currentUser?.email) {
+          const updated = { ...currentUser, permissions: editUserPermissions };
+          localStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify(updated));
+          setCurrentUser(updated);
+        }
+
+        setEditingUser(null);
+        fetchTeamUsers();
+        Swal.fire({
+          icon: "success",
+          title: "Permissions Updated",
+          text: `Sidebar access permissions updated for ${editingUser.email}.`,
+          background: "#0f172a",
+          color: "#ffffff",
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Update Failed",
+          text: res.message || "Failed to update permissions.",
+          background: "#0f172a",
+          color: "#ffffff",
+        });
+      }
+    } catch (err: any) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: err?.message || "Something went wrong.",
+        background: "#0f172a",
+        color: "#ffffff",
+      });
+    } finally {
+      setIsSavingPermissions(false);
     }
   };
 
@@ -305,10 +404,11 @@ export default function AdminSecurityPage() {
     }
   };
 
-  const isAdmin = currentUser?.role === "Admin";
+  const isSuperAdmin = currentUser?.role === "SuperAdmin";
+  const isAdmin = currentUser?.role === "SuperAdmin" || currentUser?.role === "Admin";
 
   return (
-    <AdminGuard allowedRoles={["Admin", "Sales", "Blog"]}>
+    <AdminGuard allowedRoles={["SuperAdmin", "Admin", "Sales", "Blog"]} permission="security">
       <div className="min-h-screen bg-slate-950 text-slate-100 flex font-['Roboto',sans-serif]">
         <AdminSidebar
           isOpen={isMobileSidebarOpen}
@@ -571,6 +671,8 @@ export default function AdminSecurityPage() {
                         <th className="p-3.5 pl-4 rounded-l-xl">User Name</th>
                         <th className="p-3.5">Email / Login ID</th>
                         <th className="p-3.5">Assigned Role</th>
+                        <th className="p-3.5">Sidebar Permissions</th>
+                        <th className="p-3.5">Security Auth Mode</th>
                         <th className="p-3.5">Status</th>
                         <th className="p-3.5">Last Login</th>
                         <th className="p-3.5 pr-4 rounded-r-xl text-right">Actions</th>
@@ -579,18 +681,34 @@ export default function AdminSecurityPage() {
                     <tbody className="divide-y divide-slate-800/60">
                       {teamUsers.map((u) => {
                         const isSelf = u._id === currentUser?.id || u.email === currentUser?.email;
+                        const isUserSuperAdmin = u.role === "SuperAdmin" || u.email === "hiverift@gmail.com";
                         const roleColor =
-                          u.role === "Admin"
+                          isUserSuperAdmin
+                            ? "bg-amber-950/80 border-amber-800 text-amber-400"
+                            : u.role === "Admin"
                             ? "bg-emerald-950/80 border-emerald-800 text-emerald-400"
                             : u.role === "Sales"
                             ? "bg-blue-950/80 border-blue-800 text-blue-400"
                             : "bg-purple-950/80 border-purple-800 text-purple-400";
 
+                        const userPerms = Array.isArray(u.permissions) && u.permissions.length > 0
+                          ? u.permissions
+                          : u.role === "Admin"
+                          ? SIDEBAR_MODULES.map((m) => m.id)
+                          : u.role === "Sales"
+                          ? ["dashboard", "inquiries", "testimonials", "case-studies", "careers", "website"]
+                          : ["blogs", "careers", "website"];
+
                         return (
                           <tr key={u._id} className="hover:bg-slate-800/30 transition-colors">
                             <td className="p-3.5 pl-4 font-bold text-white flex items-center gap-2">
                               <span>{u.name}</span>
-                              {isSelf && (
+                              {isUserSuperAdmin && (
+                                <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-[9px] text-amber-300 font-mono border border-amber-500/40 font-bold">
+                                  SuperAdmin
+                                </span>
+                              )}
+                              {isSelf && !isUserSuperAdmin && (
                                 <span className="px-1.5 py-0.2 rounded bg-slate-800 text-[9px] text-slate-400 font-mono">
                                   You
                                 </span>
@@ -600,14 +718,55 @@ export default function AdminSecurityPage() {
                             <td className="p-3.5">
                               <select
                                 value={u.role}
-                                disabled={isSelf}
+                                disabled={isSelf || isUserSuperAdmin}
                                 onChange={(e) => handleRoleChange(u._id, e.target.value as RoleType)}
                                 className={`px-2.5 py-1 rounded-lg text-xs font-bold border outline-none bg-slate-950 cursor-pointer ${roleColor}`}
                               >
+                                {isUserSuperAdmin && <option value="SuperAdmin">SuperAdmin</option>}
                                 <option value="Admin">Admin</option>
                                 <option value="Sales">Sales Team</option>
                                 <option value="Blog">Blog Team</option>
                               </select>
+                            </td>
+                            <td className="p-3.5">
+                              {isUserSuperAdmin ? (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-950/40 text-amber-300 border border-amber-700/50">
+                                  <span>👑 All Modules (Master)</span>
+                                </span>
+                              ) : (
+                                <div className="flex flex-wrap items-center gap-1 max-w-[210px]">
+                                  {userPerms.slice(0, 3).map((permId: string) => {
+                                    const mod = SIDEBAR_MODULES.find((m) => m.id === permId);
+                                    return (
+                                      <span
+                                        key={permId}
+                                        className="px-1.5 py-0.5 rounded bg-slate-800 text-[10px] text-slate-300 font-medium"
+                                      >
+                                        {mod?.icon} {mod?.name || permId}
+                                      </span>
+                                    );
+                                  })}
+                                  {userPerms.length > 3 && (
+                                    <span className="px-1.5 py-0.5 rounded bg-emerald-950 text-[10px] text-emerald-400 font-bold border border-emerald-800/60">
+                                      +{userPerms.length - 3} more
+                                    </span>
+                                  )}
+                                  {userPerms.length === 0 && (
+                                    <span className="text-[10px] text-rose-400 italic">No access</span>
+                                  )}
+                                </div>
+                              )}
+                            </td>
+                            <td className="p-3.5">
+                              {isUserSuperAdmin ? (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-950/70 text-amber-300 border border-amber-700/70">
+                                  <span>🔐 2-Step OTP</span>
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-950/70 text-emerald-300 border border-emerald-700/70">
+                                  <span>🔑 Email + Password</span>
+                                </span>
+                              )}
                             </td>
                             <td className="p-3.5">
                               <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-950/60 text-emerald-400 border border-emerald-800/60">
@@ -619,15 +778,29 @@ export default function AdminSecurityPage() {
                               {u.lastLogin ? new Date(u.lastLogin).toLocaleString() : "Never logged in"}
                             </td>
                             <td className="p-3.5 pr-4 text-right">
-                              {!isSelf && (
-                                <button
-                                  onClick={() => handleDeleteUser(u._id, u.email)}
-                                  className="p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white transition-colors cursor-pointer"
-                                  title="Revoke Access"
-                                >
-                                  <Trash2 size={14} />
-                                </button>
-                              )}
+                              <div className="flex items-center justify-end gap-1.5">
+                                {!isUserSuperAdmin && (
+                                  <button
+                                    onClick={() => {
+                                      setEditingUser(u);
+                                      setEditUserPermissions(userPerms);
+                                    }}
+                                    className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white transition-colors cursor-pointer"
+                                    title="Edit Sidebar Permissions"
+                                  >
+                                    <Sliders size={14} />
+                                  </button>
+                                )}
+                                {!isSelf && !isUserSuperAdmin && (
+                                  <button
+                                    onClick={() => handleDeleteUser(u._id, u.email)}
+                                    className="p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white transition-colors cursor-pointer"
+                                    title="Revoke Access"
+                                  >
+                                    <Trash2 size={14} />
+                                  </button>
+                                )}
+                              </div>
                             </td>
                           </tr>
                         );
@@ -646,36 +819,35 @@ export default function AdminSecurityPage() {
                     <ShieldCheck size={28} />
                   </div>
                   <div>
-                    <h2 className="text-xl font-black text-white">Two-Factor OTP Security Enforced</h2>
+                    <h2 className="text-xl font-black text-white">Role-Based Multi-Factor Security</h2>
                     <p className="text-xs text-slate-400 mt-1">
-                      Mandatory multi-factor verification active on all CMS access points.
+                      Two-Step Verification (OTP) is strictly enforced for SuperAdmin, while Admin accounts log in directly with Email & Password.
                     </p>
                   </div>
                 </div>
 
                 <div className="grid sm:grid-cols-2 gap-4 pt-4 border-t border-slate-800">
-                  <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
-                    <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
-                      Registered 2FA Mailbox
+                  <div className="p-4 rounded-2xl bg-slate-950 border border-amber-900/50 space-y-1">
+                    <span className="text-[10px] uppercase font-bold text-amber-400 tracking-wider flex items-center gap-1.5">
+                      <span>👑 SuperAdmin Two-Step OTP</span>
                     </span>
-                    <div className="text-sm font-bold text-emerald-400 font-mono">
+                    <div className="text-sm font-bold text-amber-300 font-mono">
                       hiverift@gmail.com
                     </div>
                     <p className="text-[11px] text-slate-400">
-                      Every sign-in request dispatches a single-use 6-digit OTP code to this address.
+                      Dispatches a single-use 6-digit OTP code to this verified mailbox. Required for SuperAdmin logins.
                     </p>
                   </div>
 
-                  <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
-                    <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
-                      OTP Validity Window
+                  <div className="p-4 rounded-2xl bg-slate-950 border border-emerald-900/50 space-y-1">
+                    <span className="text-[10px] uppercase font-bold text-emerald-400 tracking-wider flex items-center gap-1.5">
+                      <span>🛡️ Admin Direct Authentication</span>
                     </span>
-                    <div className="text-sm font-bold text-white font-mono flex items-center gap-1.5">
-                      <Clock size={14} className="text-emerald-400" />
-                      <span>10 Minutes (600 seconds)</span>
+                    <div className="text-sm font-bold text-emerald-300 font-mono">
+                      Email + Password Login
                     </div>
                     <p className="text-[11px] text-slate-400">
-                      Protected against brute-force attacks with a 5-attempt threshold and 60-second resend cooldown.
+                      Standard Admin and staff accounts created by SuperAdmin authenticate seamlessly with verified bcrypt credentials without 2FA delays.
                     </p>
                   </div>
                 </div>
@@ -683,10 +855,10 @@ export default function AdminSecurityPage() {
                 <div className="p-4 rounded-2xl bg-emerald-950/40 border border-emerald-800/80 text-xs text-slate-300 space-y-2">
                   <div className="font-bold text-emerald-300 flex items-center gap-2">
                     <CheckCircle2 size={16} />
-                    <span>Compliance & Security Covenant</span>
+                    <span>Security Model Summary</span>
                   </div>
                   <p className="leading-relaxed">
-                    OTP authentication remains mandatory whether accessing the CMS via local development servers (`http://localhost:3000`) or from live production cloud domains. Credentials and JWT session keys are stored in encrypted form.
+                    SuperAdmin maintains top-level control and can provision new Admins, Sales, and Blog staff from this dashboard. Passwords are encrypted using salted bcrypt hashing and JWT tokens are securely verified per request.
                   </p>
                 </div>
               </div>
@@ -755,18 +927,82 @@ export default function AdminSecurityPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                    Access Role & Permissions
-                  </label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                      Access Role Preset
+                    </label>
+                    <span className="text-[10px] text-slate-500 font-mono">Auto-configures modules</span>
+                  </div>
                   <select
                     value={newUserRole}
-                    onChange={(e) => setNewUserRole(e.target.value as RoleType)}
+                    onChange={(e) => applyRolePreset(e.target.value as RoleType)}
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 px-4 text-xs font-bold text-white outline-none focus:border-emerald-500 transition-all cursor-pointer"
                   >
+                    <option value="Admin">Admin (Full Administrative Access - Email & Password Login)</option>
                     <option value="Sales">Sales Team (Manage & Follow-up Client Queries)</option>
                     <option value="Blog">Blog Team (Manage & Publish Articles Only)</option>
-                    <option value="Admin">Admin (Full Administrative Access to All)</option>
+                    {isSuperAdmin && (
+                      <option value="SuperAdmin">SuperAdmin (Master Access + Mandatory 2FA OTP)</option>
+                    )}
                   </select>
+                </div>
+
+                {/* Granular Sidebar Permissions with Checkboxes */}
+                <div className="space-y-2 pt-2 border-t border-slate-800">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-emerald-400">
+                      Sidebar Access ({newUserPermissions.length}/{SIDEBAR_MODULES.length})
+                    </label>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => setNewUserPermissions(SIDEBAR_MODULES.map((m) => m.id))}
+                        className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
+                      >
+                        All
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setNewUserPermissions([])}
+                        className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-rose-400 transition-colors"
+                      >
+                        Clear
+                      </button>
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-slate-400">
+                    Check the sidebar items this staff member is allowed to see and access:
+                  </p>
+
+                  <div className="grid grid-cols-2 gap-2 max-h-52 overflow-y-auto pr-1">
+                    {SIDEBAR_MODULES.map((mod) => {
+                      const isChecked = newUserPermissions.includes(mod.id);
+                      return (
+                        <label
+                          key={mod.id}
+                          className={`flex items-start gap-2.5 p-2 rounded-xl border text-xs cursor-pointer transition-all ${
+                            isChecked
+                              ? "bg-emerald-950/40 border-emerald-700/80 text-white shadow-sm"
+                              : "bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700"
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            onChange={() => handleToggleNewUserPermission(mod.id)}
+                            className="mt-0.5 rounded accent-emerald-500 cursor-pointer"
+                          />
+                          <div className="min-w-0">
+                            <div className="font-bold text-xs flex items-center gap-1">
+                              <span>{mod.icon}</span>
+                              <span className="truncate">{mod.name}</span>
+                            </div>
+                            <div className="text-[10px] text-slate-400 line-clamp-1">{mod.description}</div>
+                          </div>
+                        </label>
+                      );
+                    })}
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-3 pt-4 border-t border-slate-800">
@@ -789,6 +1025,109 @@ export default function AdminSecurityPage() {
                       </>
                     ) : (
                       <span>Create Account</span>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Permissions Modal */}
+        {editingUser && (
+          <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl space-y-6">
+              <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+                <div>
+                  <h3 className="text-lg font-black text-white flex items-center gap-2">
+                    <Sliders size={18} className="text-emerald-400" />
+                    <span>Edit Sidebar Permissions</span>
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-1">
+                    Manage visible sidebar modules for <strong className="text-white">{editingUser.name}</strong> ({editingUser.email})
+                  </p>
+                </div>
+                <button
+                  onClick={() => setEditingUser(null)}
+                  className="text-slate-400 hover:text-white"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <form onSubmit={handleSaveUserPermissions} className="space-y-4">
+                <div className="flex items-center justify-between pb-1">
+                  <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider">
+                    Assigned Modules ({editUserPermissions.length}/{SIDEBAR_MODULES.length})
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setEditUserPermissions(SIDEBAR_MODULES.map((m) => m.id))}
+                      className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
+                    >
+                      Select All
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEditUserPermissions([])}
+                      className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-rose-400 transition-colors"
+                    >
+                      Clear All
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid sm:grid-cols-2 gap-2.5 max-h-64 overflow-y-auto pr-1">
+                  {SIDEBAR_MODULES.map((mod) => {
+                    const isChecked = editUserPermissions.includes(mod.id);
+                    return (
+                      <label
+                        key={mod.id}
+                        className={`flex items-start gap-3 p-3 rounded-2xl border text-xs cursor-pointer transition-all ${
+                          isChecked
+                            ? "bg-emerald-950/40 border-emerald-700/80 text-white shadow-sm"
+                            : "bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700"
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={() => handleToggleEditUserPermission(mod.id)}
+                          className="mt-0.5 rounded accent-emerald-500 cursor-pointer"
+                        />
+                        <div className="min-w-0">
+                          <div className="font-bold text-xs flex items-center gap-1.5">
+                            <span>{mod.icon}</span>
+                            <span className="truncate">{mod.name}</span>
+                          </div>
+                          <div className="text-[10px] text-slate-400 mt-0.5 line-clamp-1">{mod.description}</div>
+                        </div>
+                      </label>
+                    );
+                  })}
+                </div>
+
+                <div className="flex items-center gap-3 pt-4 border-t border-slate-800">
+                  <button
+                    type="button"
+                    onClick={() => setEditingUser(null)}
+                    className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSavingPermissions}
+                    className="flex-1 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-lg shadow-emerald-900/40 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  >
+                    {isSavingPermissions ? (
+                      <>
+                        <RefreshCw size={14} className="animate-spin" />
+                        <span>Saving...</span>
+                      </>
+                    ) : (
+                      <span>Save Permissions</span>
                     )}
                   </button>
                 </div>

@@ -69,7 +69,7 @@ export default function AdminDashboardPage() {
   const totalBlogs = blogs.length;
 
   return (
-    <AdminGuard allowedRoles={["Admin", "Sales", "Blog"]}>
+    <AdminGuard allowedRoles={["SuperAdmin", "Admin", "Sales", "Blog"]} permission="dashboard">
       <div className="min-h-screen bg-slate-950 text-slate-100 flex font-['Roboto',sans-serif]">
         {/* Sidebar */}
         <AdminSidebar

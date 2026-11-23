@@ -27,6 +27,7 @@ export function AdminHeader({
   const handleToggle = onOpenSidebar || onMenuClick;
 
   const roleBadgeStyles: Record<string, string> = {
+    SuperAdmin: "bg-amber-950/80 border-amber-800 text-amber-400",
     Admin: "bg-emerald-950/80 border-emerald-800 text-emerald-400",
     Sales: "bg-blue-950/80 border-blue-800 text-blue-400",
     Blog: "bg-purple-950/80 border-purple-800 text-purple-400",

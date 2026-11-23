@@ -40,71 +40,97 @@ export function AdminSidebar({ isOpen = false, onClose }: AdminSidebarProps) {
 
   const userRole: RoleType = normalizeRole(currentUser?.role);
 
-  // Build navigation items filtered by RBAC
+  // Build navigation items filtered by RBAC & granular permissions
   const allNavItems = [
     {
+      id: "dashboard",
       name: "Dashboard",
       href: "/admin",
       icon: LayoutDashboard,
-      roles: ["Admin", "Sales", "Blog"] as RoleType[],
+      roles: ["SuperAdmin", "Admin", "Sales", "Blog"] as RoleType[],
     },
     {
+      id: "inquiries",
       name: "Form Inquiries",
       href: "/admin/inquiries",
       icon: Inbox,
-      roles: ["Admin", "Sales"] as RoleType[],
+      roles: ["SuperAdmin", "Admin", "Sales"] as RoleType[],
       badge: "Leads",
     },
     {
+      id: "blogs",
       name: "Blog Posts",
       href: "/admin/blogs",
       icon: FileText,
-      roles: ["Admin", "Blog"] as RoleType[],
+      roles: ["SuperAdmin", "Admin", "Blog"] as RoleType[],
       badge: "CMS",
     },
     {
+      id: "testimonials",
       name: "Google Reviews",
       href: "/admin/testimonials",
       icon: Star,
-      roles: ["Admin", "Sales"] as RoleType[],
+      roles: ["SuperAdmin", "Admin", "Sales"] as RoleType[],
       badge: "4.9 ★",
     },
     {
+      id: "case-studies",
       name: "Case Studies",
       href: "/admin/case-studies",
       icon: Layers,
-      roles: ["Admin", "Sales"] as RoleType[],
+      roles: ["SuperAdmin", "Admin", "Sales"] as RoleType[],
       badge: "Portfolio",
     },
     {
-      name: userRole === "Admin" ? "Users & Security" : "Account Security",
+      id: "security",
+      name:
+        userRole === "SuperAdmin" || userRole === "Admin"
+          ? "Users & Security"
+          : "Account Security",
       href: "/admin/security",
       icon: Shield,
-      roles: ["Admin", "Sales", "Blog"] as RoleType[],
+      roles: ["SuperAdmin", "Admin", "Sales", "Blog"] as RoleType[],
     },
     {
+      id: "careers",
       name: "Careers Page",
       href: "/careers",
       icon: Briefcase,
       external: true,
-      roles: ["Admin", "Sales", "Blog"] as RoleType[],
+      roles: ["SuperAdmin", "Admin", "Sales", "Blog"] as RoleType[],
     },
     {
+      id: "website",
       name: "Live Website",
       href: "/",
       icon: ExternalLink,
       external: true,
-      roles: ["Admin", "Sales", "Blog"] as RoleType[],
+      roles: ["SuperAdmin", "Admin", "Sales", "Blog"] as RoleType[],
     },
   ];
 
-  const visibleNavItems = allNavItems.filter((item) =>
-    item.roles.includes(userRole)
-  );
+  const isSuperAdmin = userRole === "SuperAdmin";
+  const userPermissions = Array.isArray(currentUser?.permissions)
+    ? currentUser.permissions
+    : [];
+
+  // Filter visible items: SuperAdmin sees everything, other users see only their permitted modules
+  const visibleNavItems = allNavItems.filter((item) => {
+    if (isSuperAdmin) return true;
+    if (userPermissions.length > 0) {
+      return userPermissions.includes(item.id);
+    }
+    return item.roles.includes(userRole);
+  });
 
   const roleStyles = {
-    Admin: {
+    SuperAdmin: {
       label: "Super Admin",
+      badgeClass: "bg-amber-950/80 border-amber-800 text-amber-400",
+      avatarClass: "bg-amber-500 text-slate-950",
+    },
+    Admin: {
+      label: "Administrator",
       badgeClass: "bg-emerald-950/80 border-emerald-800 text-emerald-400",
       avatarClass: "bg-emerald-500 text-slate-950",
     },
