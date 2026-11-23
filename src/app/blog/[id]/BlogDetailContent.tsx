@@ -142,6 +142,13 @@ export default function BlogDetailContent({ post }: BlogDetailContentProps) {
   const [copied, setCopied] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [readingProgress, setReadingProgress] = useState(0);
+  const [shareUrl, setShareUrl] = useState<string>("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setShareUrl(window.location.href);
+    }
+  }, []);
 
   // Sync post with API data if dynamic ObjectId
   useEffect(() => {
@@ -173,8 +180,9 @@ export default function BlogDetailContent({ post }: BlogDetailContentProps) {
   }, []);
 
   const handleCopyLink = () => {
-    if (typeof window !== "undefined") {
-      navigator.clipboard.writeText(window.location.href);
+    const textToCopy = shareUrl || (typeof window !== "undefined" ? window.location.href : `https://hiverift.com/blog/${currentPost.id}`);
+    if (navigator?.clipboard) {
+      navigator.clipboard.writeText(textToCopy);
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
     }
@@ -188,6 +196,7 @@ export default function BlogDetailContent({ post }: BlogDetailContentProps) {
 
   const sections = currentPost.content?.sections || [];
   const keyTakeaways = currentPost.content?.keyTakeaways || [];
+  const shareTargetUrl = shareUrl || `https://hiverift.com/blog/${currentPost.id}`;
 
   return (
     <div className="min-h-screen bg-[#fafbfc]">
@@ -423,38 +432,42 @@ export default function BlogDetailContent({ post }: BlogDetailContentProps) {
                   </span>
                   <div className="flex items-center gap-2">
                     <a
-                      href={`https://api.whatsapp.com/send?text=${encodeURIComponent(currentPost.title + " " + (typeof window !== "undefined" ? window.location.href : ""))}`}
+                      href={`https://api.whatsapp.com/send?text=${encodeURIComponent(currentPost.title + " " + shareTargetUrl)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-9 h-9 rounded-full bg-[#25D366] text-white flex items-center justify-center hover:scale-110 transition-transform shadow-sm"
                       title="Share on WhatsApp"
+                      suppressHydrationWarning
                     >
                       <MessageCircle size={16} />
                     </a>
                     <a
-                      href={`https://www.linkedin.com/shareArticle?mini=true&title=${encodeURIComponent(currentPost.title)}`}
+                      href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(shareTargetUrl)}&title=${encodeURIComponent(currentPost.title)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-9 h-9 rounded-full bg-[#0A66C2] text-white flex items-center justify-center hover:scale-110 transition-transform shadow-sm"
                       title="Share on LinkedIn"
+                      suppressHydrationWarning
                     >
                       <Linkedin size={16} />
                     </a>
                     <a
-                      href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(currentPost.title)}`}
+                      href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(currentPost.title)}&url=${encodeURIComponent(shareTargetUrl)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-9 h-9 rounded-full bg-[#1DA1F2] text-white flex items-center justify-center hover:scale-110 transition-transform shadow-sm"
                       title="Share on Twitter / X"
+                      suppressHydrationWarning
                     >
                       <Twitter size={16} />
                     </a>
                     <a
-                      href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(typeof window !== "undefined" ? window.location.href : "")}`}
+                      href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareTargetUrl)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-9 h-9 rounded-full bg-[#1877F2] text-white flex items-center justify-center hover:scale-110 transition-transform shadow-sm"
                       title="Share on Facebook"
+                      suppressHydrationWarning
                     >
                       <Facebook size={16} />
                     </a>
