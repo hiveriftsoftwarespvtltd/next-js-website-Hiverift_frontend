@@ -18,9 +18,6 @@ jobs:
           npm install
           npm run build
 
-          rm -rf /home/hiverift0805/public_html/*
-          cp -r out/* /home/hiverift0805/public_html/
-
-          if [ -f .htaccess ]; then
-            cp .htaccess /home/hiverift0805/public_html/.htaccess
-          fi
+          # Reload or Start Next.js with PM2 on port 3002
+          pm2 reload hiverift || pm2 restart hiverift || pm2 start npm --name "hiverift" -- run start:prod || sudo /bin/pm2 reload hiverift || sudo /bin/pm2 restart hiverift || sudo /bin/pm2 start npm --name "hiverift" -- run start:prod
+          pm2 save || sudo /bin/pm2 save

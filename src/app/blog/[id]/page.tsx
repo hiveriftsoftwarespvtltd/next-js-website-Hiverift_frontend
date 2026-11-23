@@ -2,20 +2,20 @@ import { Metadata } from "next";
 import { blogPosts } from "@/app/data/blogData";
 import BlogDetailContent from "./BlogDetailContent";
 import { createArticleSchema, createBreadcrumbSchema } from "@/app/config/schema";
+import { getBlogByIdFromApi } from "@/app/actions/adminActions";
 
 interface Props {
   params: Promise<{ id: string }>;
 }
 
-export async function generateStaticParams() {
-  return blogPosts.map((post) => ({
-    id: post.id.toString(),
-  }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const post = blogPosts.find((p) => p.id === Number(id) || String(p.id) === String(id));
+  let post = blogPosts.find((p) => p.id === Number(id) || String(p.id) === String(id));
+  if (!post) {
+    post = (await getBlogByIdFromApi(id)) || undefined;
+  }
 
   return {
     title: post ? `${post.title} | HiveRift Blog` : "Article Details | HiveRift Blog",
@@ -25,7 +25,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function BlogDetailPage({ params }: Props) {
   const { id } = await params;
-  const post = blogPosts.find((p) => p.id === Number(id) || String(p.id) === String(id));
+  let post = blogPosts.find((p) => p.id === Number(id) || String(p.id) === String(id));
+  if (!post) {
+    post = (await getBlogByIdFromApi(id)) || undefined;
+  }
 
   const initialPost = post || {
     id: id,
