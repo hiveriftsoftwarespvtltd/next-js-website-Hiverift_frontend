@@ -1,4 +1,6 @@
 import type { MetadataRoute } from "next";
+
+export const dynamic = "force-static";
 import { blogPosts } from "@/app/data/blogData";
 import { FULL_INDUSTRIES_DATA } from "@/app/data/industryDetailsFull";
 import { getAllIndustryKeywordParams } from "@/app/data/industryKeywordsData";
