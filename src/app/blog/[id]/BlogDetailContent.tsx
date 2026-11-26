@@ -17,11 +17,15 @@ import {
   MessageCircle,
   Users,
   ChevronRight,
+  ChevronDown,
   Sparkles,
   BookOpen,
   ListOrdered,
   Lightbulb,
-  Check
+  Check,
+  HelpCircle,
+  Table as TableIcon,
+  List
 } from "lucide-react";
 import { Header } from "@/app/components/Header";
 import { Footer } from "@/app/components/Footer";
@@ -46,6 +50,33 @@ const getBlogFallbackImage = (category?: string) => {
 };
 
 // Formatted Content Parser: Breaks down raw multiline/markdown into clean paragraphs & subheadings
+function FaqItemAccordion({ faq }: { faq: { question: string; answer: string } }) {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <div className="border border-slate-200 rounded-2xl overflow-hidden transition-all bg-slate-50/50">
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full px-6 py-4 flex items-center justify-between text-left font-black text-sm sm:text-base text-slate-900 hover:text-emerald-700 transition-colors"
+      >
+        <span>{faq.question}</span>
+        <span
+          className={`w-7 h-7 rounded-full flex items-center justify-center bg-white border border-slate-200 text-slate-600 shrink-0 ml-4 transition-transform duration-200 ${
+            isOpen ? "rotate-180 bg-emerald-50 text-emerald-700" : ""
+          }`}
+        >
+          <ChevronDown size={14} />
+        </span>
+      </button>
+      {isOpen && (
+        <div className="px-6 pb-5 pt-2 text-slate-600 text-sm leading-relaxed border-t border-slate-100 bg-white font-medium">
+          {renderFormattedContent(faq.answer)}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function parseInlineMarkdown(str: string) {
   if (!str.includes("**")) return str;
   const parts = str.split(/(\*\*[^*]+\*\*)/g);
@@ -180,7 +211,7 @@ export default function BlogDetailContent({ post }: BlogDetailContentProps) {
   }, []);
 
   const handleCopyLink = () => {
-    const textToCopy = shareUrl || (typeof window !== "undefined" ? window.location.href : `https://hiverift.com/blog/${currentPost.id}`);
+    const textToCopy = shareUrl || (typeof window !== "undefined" ? window.location.href : `https://hiverift.com/blog/${currentPost.slug || currentPost.id}`);
     if (navigator?.clipboard) {
       navigator.clipboard.writeText(textToCopy);
       setCopied(true);
@@ -196,7 +227,7 @@ export default function BlogDetailContent({ post }: BlogDetailContentProps) {
 
   const sections = currentPost.content?.sections || [];
   const keyTakeaways = currentPost.content?.keyTakeaways || [];
-  const shareTargetUrl = shareUrl || `https://hiverift.com/blog/${currentPost.id}`;
+  const shareTargetUrl = shareUrl || `https://hiverift.com/blog/${currentPost.slug || currentPost.id}`;
 
   return (
     <div className="min-h-screen bg-[#fafbfc]">
@@ -298,16 +329,24 @@ export default function BlogDetailContent({ post }: BlogDetailContentProps) {
             transition={{ duration: 0.5, delay: 0.15 }}
             className="max-w-5xl mx-auto mb-16 rounded-3xl overflow-hidden shadow-xl border border-slate-200/80 bg-white"
           >
-            <div className="relative aspect-[16/9] w-full bg-slate-100">
-              <img
-                src={currentPost.image}
-                alt={currentPost.title}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = getBlogFallbackImage(currentPost.category);
-                }}
-              />
-            </div>
+            <figure className="m-0">
+              <div className="relative aspect-[16/9] w-full bg-slate-100">
+                <img
+                  src={currentPost.image}
+                  alt={currentPost.imageAlt || currentPost.title}
+                  title={currentPost.imageTitle || currentPost.title}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = getBlogFallbackImage(currentPost.category);
+                  }}
+                />
+              </div>
+              {currentPost.imageCaption && (
+                <figcaption className="px-5 py-3 text-center text-xs text-slate-500 font-medium italic border-t border-slate-100 bg-slate-50/60">
+                  {currentPost.imageCaption}
+                </figcaption>
+              )}
+            </figure>
           </motion.div>
 
           {/* Main Content Grid: Article + Sticky Sidebar */}
@@ -393,6 +432,73 @@ export default function BlogDetailContent({ post }: BlogDetailContentProps) {
                     <div className="article-body">
                       {renderFormattedContent(sec.text)}
                     </div>
+
+                    {/* Semantic Bullet Pointers / List */}
+                    {sec.pointers && sec.pointers.length > 0 && (
+                      <div className="my-6 p-5 sm:p-6 bg-slate-50/80 border border-slate-200/80 rounded-2xl">
+                        <div className="flex items-center gap-2 mb-3 text-xs font-black uppercase tracking-wider text-slate-700">
+                          <List size={14} className="text-emerald-600" />
+                          <span>Key Highlights & Points</span>
+                        </div>
+                        <ul className="space-y-2.5">
+                          {sec.pointers.map((point, pIdx) => (
+                            <li key={pIdx} className="flex items-start gap-3 text-slate-700 font-semibold text-sm leading-relaxed">
+                              <span className="w-4 h-4 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-[10px] shrink-0 mt-0.5">
+                                •
+                              </span>
+                              <span>{parseInlineMarkdown(point)}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Semantic Comparison / Specification Table */}
+                    {sec.table && sec.table.headers && sec.table.headers.length > 0 && (
+                      <div className="my-8 overflow-hidden rounded-2xl border border-slate-200/90 shadow-xs bg-white">
+                        {sec.table.caption && (
+                          <div className="px-5 py-3 bg-slate-50 border-b border-slate-200 text-xs font-black text-slate-700 uppercase tracking-wider flex items-center gap-2">
+                            <TableIcon size={14} className="text-emerald-600" />
+                            <span>{sec.table.caption}</span>
+                          </div>
+                        )}
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left text-sm border-collapse">
+                            <thead>
+                              <tr className="bg-slate-100/80 border-b border-slate-200">
+                                {sec.table.headers.map((hdr, hIdx) => (
+                                  <th
+                                    key={hIdx}
+                                    className="px-4 sm:px-6 py-3.5 text-xs font-black text-slate-900 uppercase tracking-wider whitespace-nowrap"
+                                  >
+                                    {hdr}
+                                  </th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                              {sec.table.rows.map((row, rIdx) => (
+                                <tr
+                                  key={rIdx}
+                                  className="hover:bg-slate-50/60 transition-colors odd:bg-white even:bg-slate-50/30"
+                                >
+                                  {row.map((cell, cIdx) => (
+                                    <td
+                                      key={cIdx}
+                                      className={`px-4 sm:px-6 py-3 text-slate-700 text-xs sm:text-sm font-medium leading-relaxed ${
+                                        cIdx === 0 ? "font-bold text-slate-900" : ""
+                                      }`}
+                                    >
+                                      {cell}
+                                    </td>
+                                  ))}
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
                   </section>
                 ))}
               </div>
@@ -420,6 +526,21 @@ export default function BlogDetailContent({ post }: BlogDetailContentProps) {
                   </div>
                   <div>
                     {renderFormattedContent(currentPost.content.conclusion)}
+                  </div>
+                </div>
+              )}
+
+              {/* FAQ Section */}
+              {((currentPost.faqs && currentPost.faqs.length > 0) || (currentPost.content?.faqs && currentPost.content.faqs.length > 0)) && (
+                <div className="mt-12 pt-8 border-t border-slate-200">
+                  <div className="flex items-center gap-2.5 mb-6 text-slate-900 font-black text-xl">
+                    <HelpCircle size={24} className="text-emerald-600" />
+                    <span>Frequently Asked Questions</span>
+                  </div>
+                  <div className="space-y-3">
+                    {(currentPost.faqs || currentPost.content?.faqs || []).map((faq, fIdx) => (
+                      <FaqItemAccordion key={fIdx} faq={faq} />
+                    ))}
                   </div>
                 </div>
               )}
@@ -487,7 +608,7 @@ export default function BlogDetailContent({ post }: BlogDetailContentProps) {
               <div className="mt-12 grid sm:grid-cols-2 gap-4 pt-8 border-t border-slate-100">
                 {prevPost ? (
                   <Link
-                    href={`/blog/${prevPost.id}`}
+                    href={`/blog/${prevPost.slug || prevPost.id}`}
                     className="p-5 rounded-2xl bg-slate-50/80 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 transition-all group text-left flex flex-col justify-between"
                   >
                     <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
@@ -501,7 +622,7 @@ export default function BlogDetailContent({ post }: BlogDetailContentProps) {
 
                 {nextPost ? (
                   <Link
-                    href={`/blog/${nextPost.id}`}
+                    href={`/blog/${nextPost.slug || nextPost.id}`}
                     className="p-5 rounded-2xl bg-slate-50/80 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 transition-all group text-right flex flex-col justify-between"
                   >
                     <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center justify-end gap-1.5">
@@ -588,7 +709,7 @@ export default function BlogDetailContent({ post }: BlogDetailContentProps) {
                     {recentPosts.slice(0, 3).map((rPost) => (
                       <Link
                         key={String(rPost.id)}
-                        href={`/blog/${rPost.id}`}
+                        href={`/blog/${rPost.slug || rPost.id}`}
                         className="flex items-center gap-3.5 group"
                       >
                         <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-slate-100 border border-slate-100">
@@ -641,7 +762,7 @@ export default function BlogDetailContent({ post }: BlogDetailContentProps) {
                   {recentPosts.slice(0, 3).map((rPost) => (
                     <Link
                       key={String(rPost.id)}
-                      href={`/blog/${rPost.id}`}
+                      href={`/blog/${rPost.slug || rPost.id}`}
                       className="group bg-white rounded-2xl overflow-hidden border border-slate-200/80 shadow-sm hover:shadow-xl hover:border-emerald-300 transition-all duration-300 flex flex-col"
                     >
                       <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">

@@ -305,7 +305,7 @@ export default function AdminBlogsPage() {
                           {/* Actions */}
                           <td className="py-4 px-4 sm:px-6 text-right whitespace-nowrap space-x-1.5 sm:space-x-2">
                             <Link
-                              href={`/blog/${blog.id || (blog as any)._id}`}
+                              href={`/blog/${blog.slug || blog.id || (blog as any)._id}`}
                               target="_blank"
                               className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg inline-flex items-center transition-colors"
                               title="View on site"
@@ -322,7 +322,7 @@ export default function AdminBlogsPage() {
                             </button>
 
                             <button
-                              onClick={() => handleDeleteBlog(String(blog.id || (blog as any)._id), blog.title)}
+                              onClick={() => handleDeleteBlog(String((blog as any)._id || blog.id), blog.title)}
                               className="p-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg inline-flex items-center transition-colors"
                               title="Delete"
                             >

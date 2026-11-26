@@ -1,5 +1,38 @@
+export interface BlogTableData {
+  headers: string[];
+  rows: string[][];
+  caption?: string;
+}
+
+export interface BlogFaqItem {
+  question: string;
+  answer: string;
+}
+
+export interface BlogSeoDetail {
+  metaTitle?: string;
+  metaDescription?: string;
+  focusKeyword?: string;
+  canonicalUrl?: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  ogImage?: string;
+}
+
+export interface BlogSection {
+  heading: string;
+  text: string;
+  pointers?: string[];
+  table?: BlogTableData;
+  imageUrl?: string;
+  imageAlt?: string;
+  imageCaption?: string;
+}
+
 export interface BlogPost {
-  id: number;
+  id: number | string;
+  _id?: string;
+  slug?: string;
   category: string;
   title: string;
   desc: string;
@@ -8,13 +41,17 @@ export interface BlogPost {
   authorRole: string;
   date: string;
   image: string;
+  imageAlt?: string;
+  imageTitle?: string;
+  imageCaption?: string;
+  seo?: BlogSeoDetail;
+  faqs?: BlogFaqItem[];
   content: {
     intro: string;
     keyTakeaways: string[];
-    sections: {
-      heading: string;
-      text: string;
-    }[];
+    sections: BlogSection[];
+    table?: BlogTableData;
+    faqs?: BlogFaqItem[];
     quote?: string;
     conclusion: string;
   };

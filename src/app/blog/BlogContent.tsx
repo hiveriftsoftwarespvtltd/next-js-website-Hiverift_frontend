@@ -181,7 +181,7 @@ export default function BlogContent() {
 
                       <div className="pt-4">
                         <Link
-                          href={`/blog/${post.id}`}
+                          href={`/blog/${post.slug || post.id}`}
                           className="text-xs font-black text-emerald-600 uppercase tracking-widest flex items-center gap-2 hover:gap-3 transition-all"
                         >
                           Read More <ArrowRight size={14} />
@@ -258,7 +258,7 @@ export default function BlogContent() {
                 <h3 className="text-lg font-black text-gray-900 mb-6 tracking-tight">Latest Posts</h3>
                 <div className="space-y-6">
                   {posts.slice(0, 4).map((post, i) => (
-                    <Link key={i} href={`/blog/${post.id}`} className="flex items-center gap-4 group">
+                    <Link key={i} href={`/blog/${post.slug || post.id}`} className="flex items-center gap-4 group">
                       <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
                         <img
                           src={post.image}

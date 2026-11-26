@@ -64,7 +64,9 @@ export async function getBlogsFromApi(category?: string, search?: string): Promi
 
     if (json.success && Array.isArray(json.data) && json.data.length > 0) {
       return json.data.map((item: any) => ({
-        id: item._id || item.id,
+        id: item.slug || item._id || item.id,
+        _id: item._id,
+        slug: item.slug || item._id,
         category: item.category,
         title: item.title,
         desc: item.desc,
@@ -73,6 +75,11 @@ export async function getBlogsFromApi(category?: string, search?: string): Promi
         authorRole: item.authorRole || "Tech & Strategy",
         date: item.createdAt ? new Date(item.createdAt).toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" }) : item.date || "Jan 2026",
         image: getImageUrl(item.image),
+        imageAlt: item.imageAlt || "",
+        imageTitle: item.imageTitle || "",
+        imageCaption: item.imageCaption || "",
+        seo: item.seo || undefined,
+        faqs: item.faqs || item.content?.faqs || [],
         content: item.content || {
           intro: item.desc,
           keyTakeaways: ["High quality content"],
@@ -104,7 +111,9 @@ export async function getBlogByIdFromApi(id: string): Promise<BlogPost | null> {
     if (json.success && json.data) {
       const item = json.data;
       return {
-        id: item._id || item.id,
+        id: item.slug || item._id || item.id,
+        _id: item._id,
+        slug: item.slug || item._id,
         category: item.category,
         title: item.title,
         desc: item.desc,
@@ -113,6 +122,11 @@ export async function getBlogByIdFromApi(id: string): Promise<BlogPost | null> {
         authorRole: item.authorRole || "Tech & Strategy",
         date: item.createdAt ? new Date(item.createdAt).toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" }) : item.date || "Jan 2026",
         image: getImageUrl(item.image),
+        imageAlt: item.imageAlt || "",
+        imageTitle: item.imageTitle || "",
+        imageCaption: item.imageCaption || "",
+        seo: item.seo || undefined,
+        faqs: item.faqs || item.content?.faqs || [],
         content: item.content || {
           intro: item.desc,
           keyTakeaways: ["High quality content"],
