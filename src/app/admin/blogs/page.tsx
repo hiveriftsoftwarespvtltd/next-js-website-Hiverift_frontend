@@ -19,7 +19,7 @@ import { AdminSidebar } from "../components/AdminSidebar";
 import { AdminHeader } from "../components/AdminHeader";
 import { AdminGuard } from "../components/AdminGuard";
 import { BlogFormModal } from "./components/BlogFormModal";
-import { BlogPost } from "@/app/data/blogData";
+import { BlogPost, getBlogFallbackImage } from "@/app/data/blogData";
 import {
   getBlogsFromApi,
   getBlogByIdFromApi,
@@ -265,11 +265,16 @@ export default function AdminBlogsPage() {
                             <div className="flex items-center gap-3">
                               <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 shrink-0 border border-slate-200">
                                 <img
-                                  src={getImageUrl(blog.image)}
+                                  src={getImageUrl(blog.image, blog.category)}
                                   alt={blog.title}
                                   className="w-full h-full object-cover"
                                   onError={(e) => {
-                                    (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800";
+                                    const target = e.target as HTMLImageElement;
+                                    if (target.src.includes("localhost:7001")) {
+                                      target.src = target.src.replace("http://localhost:7001", "https://api.hiverift.com");
+                                      return;
+                                    }
+                                    target.src = getBlogFallbackImage(blog.category);
                                   }}
                                 />
                               </div>

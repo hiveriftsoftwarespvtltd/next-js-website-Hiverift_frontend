@@ -275,3 +275,24 @@ export const blogPosts: BlogPost[] = [
     }
   }
 ];
+
+export const CATEGORY_FALLBACKS: Record<string, string> = {
+  "Web Development": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=800",
+  "Digital Marketing": "https://images.unsplash.com/photo-1533750349088-cd871a92f312?auto=format&fit=crop&q=80&w=800",
+  "SEO": "https://images.unsplash.com/photo-1571721795195-a2ca2d3370a9?auto=format&fit=crop&q=80&w=800",
+  "Tech & AI": "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=800",
+  "Business Growth": "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=800",
+  "Mobile Apps": "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=80&w=800",
+};
+
+export const getBlogFallbackImage = (category?: string): string => {
+  if (category) {
+    const key = Object.keys(CATEGORY_FALLBACKS).find(
+      (k) => k.toLowerCase() === category.trim().toLowerCase()
+    );
+    if (key && CATEGORY_FALLBACKS[key]) {
+      return CATEGORY_FALLBACKS[key];
+    }
+  }
+  return "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=800";
+};

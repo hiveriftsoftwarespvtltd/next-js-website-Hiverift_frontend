@@ -30,24 +30,10 @@ import {
 import { Header } from "@/app/components/Header";
 import { Footer } from "@/app/components/Footer";
 import { EnquiryModal } from "@/app/components/EnquiryModal";
-import { BlogPost, blogPosts } from "@/app/data/blogData";
+import { BlogPost, blogPosts, getBlogFallbackImage } from "@/app/data/blogData";
 import { getBlogByIdFromApi, getBlogsFromApi } from "@/app/actions/adminActions";
 
-const CATEGORY_FALLBACKS: Record<string, string> = {
-  "Web Development": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=800",
-  "Digital Marketing": "https://images.unsplash.com/photo-1533750349088-cd871a92f312?auto=format&fit=crop&q=80&w=800",
-  "SEO": "https://images.unsplash.com/photo-1571721795195-a2ca2d3370a9?auto=format&fit=crop&q=80&w=800",
-  "Tech & AI": "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=800",
-  "Business Growth": "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=800",
-  "Mobile Apps": "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=80&w=800",
-};
 
-const getBlogFallbackImage = (category?: string) => {
-  if (category && CATEGORY_FALLBACKS[category]) {
-    return CATEGORY_FALLBACKS[category];
-  }
-  return "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=800";
-};
 
 // Formatted Content Parser: Breaks down raw multiline/markdown into clean paragraphs & subheadings
 function FaqItemAccordion({ faq }: { faq: { question: string; answer: string } }) {
@@ -337,7 +323,12 @@ export default function BlogDetailContent({ post }: BlogDetailContentProps) {
                   title={currentPost.imageTitle || currentPost.title}
                   className="w-full h-full object-cover"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = getBlogFallbackImage(currentPost.category);
+                    const target = e.target as HTMLImageElement;
+                    if (target.src.includes("localhost:7001")) {
+                      target.src = target.src.replace("http://localhost:7001", "https://api.hiverift.com");
+                      return;
+                    }
+                    target.src = getBlogFallbackImage(currentPost.category);
                   }}
                 />
               </div>
@@ -718,7 +709,12 @@ export default function BlogDetailContent({ post }: BlogDetailContentProps) {
                             alt={rPost.title}
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                             onError={(e) => {
-                              (e.target as HTMLImageElement).src = getBlogFallbackImage(rPost.category);
+                              const target = e.target as HTMLImageElement;
+                              if (target.src.includes("localhost:7001")) {
+                                target.src = target.src.replace("http://localhost:7001", "https://api.hiverift.com");
+                                return;
+                              }
+                              target.src = getBlogFallbackImage(rPost.category);
                             }}
                           />
                         </div>
@@ -771,7 +767,12 @@ export default function BlogDetailContent({ post }: BlogDetailContentProps) {
                           alt={rPost.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           onError={(e) => {
-                            (e.target as HTMLImageElement).src = getBlogFallbackImage(rPost.category);
+                            const target = e.target as HTMLImageElement;
+                            if (target.src.includes("localhost:7001")) {
+                              target.src = target.src.replace("http://localhost:7001", "https://api.hiverift.com");
+                              return;
+                            }
+                            target.src = getBlogFallbackImage(rPost.category);
                           }}
                         />
                         <span className="absolute top-4 left-4 px-3 py-1 bg-white/95 backdrop-blur-md rounded-lg text-[10px] font-black text-emerald-600 uppercase tracking-widest shadow-sm">

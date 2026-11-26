@@ -1,9 +1,9 @@
 import { apiClient, ENDPOINTS, API_BASE_URL } from "@/app/config/api.config";
-import { blogPosts, BlogPost } from "@/app/data/blogData";
+import { blogPosts, BlogPost, getBlogFallbackImage } from "@/app/data/blogData";
 
-export function getImageUrl(image?: string): string {
+export function getImageUrl(image?: string, category?: string): string {
   if (!image) {
-    return "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800";
+    return getBlogFallbackImage(category);
   }
 
   // Blob previews or base64 data URLs
@@ -32,7 +32,7 @@ export function getImageUrl(image?: string): string {
   const filename = image.replace(/^.*\/uploads\//, "").replace(/^.*[\\\/]/, "").trim();
 
   if (!filename) {
-    return "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800";
+    return getBlogFallbackImage(category);
   }
 
   if (process.env.NEXT_PUBLIC_UPLOADS_URL) {
@@ -74,7 +74,7 @@ export async function getBlogsFromApi(category?: string, search?: string): Promi
         author: item.author || "HiveRift Team",
         authorRole: item.authorRole || "Tech & Strategy",
         date: item.createdAt ? new Date(item.createdAt).toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" }) : item.date || "Jan 2026",
-        image: getImageUrl(item.image),
+        image: getImageUrl(item.image, item.category),
         imageAlt: item.imageAlt || "",
         imageTitle: item.imageTitle || "",
         imageCaption: item.imageCaption || "",
@@ -121,7 +121,7 @@ export async function getBlogByIdFromApi(id: string): Promise<BlogPost | null> {
         author: item.author || "HiveRift Team",
         authorRole: item.authorRole || "Tech & Strategy",
         date: item.createdAt ? new Date(item.createdAt).toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" }) : item.date || "Jan 2026",
-        image: getImageUrl(item.image),
+        image: getImageUrl(item.image, item.category),
         imageAlt: item.imageAlt || "",
         imageTitle: item.imageTitle || "",
         imageCaption: item.imageCaption || "",
