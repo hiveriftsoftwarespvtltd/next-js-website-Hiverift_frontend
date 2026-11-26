@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
   X,
@@ -50,6 +50,21 @@ export function BlogFormModal({
   initialData
 }: BlogFormModalProps) {
   const [activeTab, setActiveTab] = useState<"general" | "content" | "faqs" | "seo">("general");
+  const formRef = useRef<HTMLFormElement | null>(null);
+  const [submitReady, setSubmitReady] = useState(false);
+
+  useEffect(() => {
+    formRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+    if (activeTab === "seo") {
+      setSubmitReady(false);
+      const timer = setTimeout(() => {
+        setSubmitReady(true);
+      }, 350);
+      return () => clearTimeout(timer);
+    } else {
+      setSubmitReady(false);
+    }
+  }, [activeTab]);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -389,9 +404,45 @@ export function BlogFormModal({
     });
   };
 
-  // Form Submit
+  // Multi-Step Next Handler
+  const handleNextStep = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (activeTab === "general") {
+      if (!formData.title.trim()) {
+        Swal.fire({
+          icon: "warning",
+          title: "Article Title Required",
+          text: "Please enter an Article Title before moving to Content & Tables."
+        });
+        return;
+      }
+      if (!formData.desc.trim()) {
+        Swal.fire({
+          icon: "warning",
+          title: "Article Summary Required",
+          text: "Please enter a Short Summary before moving to Content & Tables."
+        });
+        return;
+      }
+      setActiveTab("content");
+    } else if (activeTab === "content") {
+      setActiveTab("faqs");
+    } else if (activeTab === "faqs") {
+      setActiveTab("seo");
+    }
+  };
+
+  // Form Submit (Allowed only on final step 'seo' when ready)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (activeTab !== "seo" || !submitReady) {
+      console.warn("Blocked premature form submission on step:", activeTab);
+      return;
+    }
+
     if (!formData.title.trim() || !formData.desc.trim()) {
       Swal.fire({
         icon: "error",
@@ -593,6 +644,7 @@ export function BlogFormModal({
 
             {/* Modal Body / Scrollable Form */}
             <form
+              ref={formRef}
               onSubmit={handleSubmit}
               onKeyDown={(e) => {
                 // Prevent Enter key in single-line text inputs from prematurely submitting the multi-step form
@@ -1366,31 +1418,8 @@ export function BlogFormModal({
                   {activeTab !== "seo" ? (
                     <button
                       type="button"
-                      onClick={() => {
-                        if (activeTab === "general") {
-                          if (!formData.title.trim()) {
-                            Swal.fire({
-                              icon: "warning",
-                              title: "Article Title Required",
-                              text: "Please enter an Article Title before moving to Content & Tables."
-                            });
-                            return;
-                          }
-                          if (!formData.desc.trim()) {
-                            Swal.fire({
-                              icon: "warning",
-                              title: "Article Summary Required",
-                              text: "Please enter a Short Summary before moving to Content & Tables."
-                            });
-                            return;
-                          }
-                          setActiveTab("content");
-                        } else if (activeTab === "content") {
-                          setActiveTab("faqs");
-                        } else if (activeTab === "faqs") {
-                          setActiveTab("seo");
-                        }
-                      }}
+                      key="next-btn"
+                      onClick={handleNextStep}
                       className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-emerald-600/20 transition-all"
                     >
                       <span>
@@ -1403,7 +1432,8 @@ export function BlogFormModal({
                   ) : (
                     <button
                       type="submit"
-                      disabled={isSubmitting}
+                      key="submit-btn"
+                      disabled={isSubmitting || !submitReady}
                       className="px-7 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-emerald-600/25 transition-all disabled:opacity-50"
                     >
                       {isSubmitting ? (
