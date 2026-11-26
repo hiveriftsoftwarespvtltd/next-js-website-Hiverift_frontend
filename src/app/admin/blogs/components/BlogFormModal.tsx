@@ -19,10 +19,12 @@ import {
   Table as TableIcon,
   List,
   Sparkles,
-  Link as LinkIcon
+  Link as LinkIcon,
+  ArrowLeft,
+  ArrowRight
 } from "lucide-react";
 import Swal from "sweetalert2";
-import { BlogPost, BlogTableData, BlogFaqItem, BlogSeoDetail, BlogSection } from "@/app/data/blogData";
+import { BlogPost, BlogTableData, BlogFaqItem, BlogSeoDetail, BlogSection, getBlogFallbackImage } from "@/app/data/blogData";
 import { getImageUrl } from "@/app/actions/adminActions";
 
 interface BlogFormModalProps {
@@ -590,7 +592,16 @@ export function BlogFormModal({
             </div>
 
             {/* Modal Body / Scrollable Form */}
-            <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-8">
+            <form
+              onSubmit={handleSubmit}
+              onKeyDown={(e) => {
+                // Prevent Enter key in single-line text inputs from prematurely submitting the multi-step form
+                if (e.key === "Enter" && (e.target as HTMLElement).tagName === "INPUT") {
+                  e.preventDefault();
+                }
+              }}
+              className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-8"
+            >
               
               {/* TAB 1: GENERAL & COVER IMAGE */}
               {activeTab === "general" && (
@@ -725,7 +736,10 @@ export function BlogFormModal({
                             className="hidden"
                             onChange={(e) => {
                               if (e.target.files && e.target.files[0]) {
-                                setImageFile(e.target.files[0]);
+                                const file = e.target.files[0];
+                                setImageFile(file);
+                                setImageUrlInput("");
+                                setPreviewUrl(URL.createObjectURL(file));
                               }
                             }}
                           />
@@ -782,7 +796,23 @@ export function BlogFormModal({
                     {/* Live Image Preview */}
                     {previewUrl && (
                       <div className="relative aspect-[16/8] max-w-md mx-auto rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shadow-sm">
-                        <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                        <img
+                          src={previewUrl}
+                          alt="Preview"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            if (target.src.includes("localhost:7001")) {
+                              target.src = target.src.replace("http://localhost:7001", "https://api.hiverift.com");
+                              return;
+                            }
+                            if (target.src.includes("api.hiverift.com")) {
+                              target.src = target.src.replace("https://api.hiverift.com", "http://localhost:7001");
+                              return;
+                            }
+                            target.src = getBlogFallbackImage(formData.category);
+                          }}
+                        />
                         <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/70 text-white text-[10px] font-bold">
                           Cover Preview
                         </span>
@@ -1301,45 +1331,91 @@ export function BlogFormModal({
                 </div>
               )}
 
-              {/* Modal Footer / Save Bar */}
+              {/* Modal Footer / Multi-Step Navigation Bar */}
               <div className="pt-6 border-t border-slate-200 flex items-center justify-between">
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 font-bold text-xs transition-colors"
-                >
-                  Cancel
-                </button>
+                <div>
+                  {activeTab === "general" ? (
+                    <button
+                      type="button"
+                      onClick={onClose}
+                      className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 font-bold text-xs transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (activeTab === "content") setActiveTab("general");
+                        else if (activeTab === "faqs") setActiveTab("content");
+                        else if (activeTab === "seo") setActiveTab("faqs");
+                      }}
+                      className="px-5 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs transition-colors flex items-center gap-1.5"
+                    >
+                      <ArrowLeft size={14} />
+                      <span>
+                        {activeTab === "content" && "Back: General & Cover"}
+                        {activeTab === "faqs" && "Back: Content & Tables"}
+                        {activeTab === "seo" && "Back: FAQs"}
+                      </span>
+                    </button>
+                  )}
+                </div>
 
                 <div className="flex items-center gap-3">
                   {activeTab !== "seo" ? (
                     <button
                       type="button"
                       onClick={() => {
-                        if (activeTab === "general") setActiveTab("content");
-                        else if (activeTab === "content") setActiveTab("faqs");
-                        else if (activeTab === "faqs") setActiveTab("seo");
+                        if (activeTab === "general") {
+                          if (!formData.title.trim()) {
+                            Swal.fire({
+                              icon: "warning",
+                              title: "Article Title Required",
+                              text: "Please enter an Article Title before moving to Content & Tables."
+                            });
+                            return;
+                          }
+                          if (!formData.desc.trim()) {
+                            Swal.fire({
+                              icon: "warning",
+                              title: "Article Summary Required",
+                              text: "Please enter a Short Summary before moving to Content & Tables."
+                            });
+                            return;
+                          }
+                          setActiveTab("content");
+                        } else if (activeTab === "content") {
+                          setActiveTab("faqs");
+                        } else if (activeTab === "faqs") {
+                          setActiveTab("seo");
+                        }
                       }}
-                      className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition-colors"
+                      className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-emerald-600/20 transition-all"
                     >
-                      Next Step →
+                      <span>
+                        {activeTab === "general" && "Next: Content & Tables"}
+                        {activeTab === "content" && "Next: FAQs"}
+                        {activeTab === "faqs" && "Next: SEO & Social Meta"}
+                      </span>
+                      <ArrowRight size={14} />
                     </button>
-                  ) : null}
-
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-emerald-600/20 transition-all disabled:opacity-50"
-                  >
-                    {isSubmitting ? (
-                      <span>Saving Article...</span>
-                    ) : (
-                      <>
-                        <Save size={15} />
-                        <span>{initialData ? "Save & Update Article" : "Publish Article"}</span>
-                      </>
-                    )}
-                  </button>
+                  ) : (
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="px-7 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-emerald-600/25 transition-all disabled:opacity-50"
+                    >
+                      {isSubmitting ? (
+                        <span>Saving Article...</span>
+                      ) : (
+                        <>
+                          <Save size={16} />
+                          <span>{initialData ? "Save & Update Article" : "Publish Article"}</span>
+                        </>
+                      )}
+                    </button>
+                  )}
                 </div>
               </div>
 

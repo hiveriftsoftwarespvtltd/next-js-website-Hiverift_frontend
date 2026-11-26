@@ -35,17 +35,18 @@ export function getImageUrl(image?: string, category?: string): string {
     return getBlogFallbackImage(category);
   }
 
-  if (process.env.NEXT_PUBLIC_UPLOADS_URL) {
-    const base = process.env.NEXT_PUBLIC_UPLOADS_URL.replace(/\/$/, "");
-    return `${base}/uploads/${filename}`;
-  }
-
   const isLocalApi =
-    API_BASE_URL.includes("localhost") ||
-    API_BASE_URL.includes("127.0.0.1");
+    typeof window !== "undefined"
+      ? window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+      : API_BASE_URL.includes("localhost") || API_BASE_URL.includes("127.0.0.1");
 
   if (isLocalApi) {
     return `http://localhost:7001/uploads/${filename}`;
+  }
+
+  if (process.env.NEXT_PUBLIC_UPLOADS_URL) {
+    const base = process.env.NEXT_PUBLIC_UPLOADS_URL.replace(/\/$/, "");
+    return `${base}/uploads/${filename}`;
   }
 
   return `https://api.hiverift.com/uploads/${filename}`;

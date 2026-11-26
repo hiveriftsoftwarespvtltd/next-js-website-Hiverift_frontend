@@ -328,6 +328,10 @@ export default function BlogDetailContent({ post }: BlogDetailContentProps) {
                       target.src = target.src.replace("http://localhost:7001", "https://api.hiverift.com");
                       return;
                     }
+                    if (target.src.includes("api.hiverift.com")) {
+                      target.src = target.src.replace("https://api.hiverift.com", "http://localhost:7001");
+                      return;
+                    }
                     target.src = getBlogFallbackImage(currentPost.category);
                   }}
                 />
@@ -714,6 +718,10 @@ export default function BlogDetailContent({ post }: BlogDetailContentProps) {
                                 target.src = target.src.replace("http://localhost:7001", "https://api.hiverift.com");
                                 return;
                               }
+                              if (target.src.includes("api.hiverift.com")) {
+                                target.src = target.src.replace("https://api.hiverift.com", "http://localhost:7001");
+                                return;
+                              }
                               target.src = getBlogFallbackImage(rPost.category);
                             }}
                           />
@@ -770,6 +778,10 @@ export default function BlogDetailContent({ post }: BlogDetailContentProps) {
                             const target = e.target as HTMLImageElement;
                             if (target.src.includes("localhost:7001")) {
                               target.src = target.src.replace("http://localhost:7001", "https://api.hiverift.com");
+                              return;
+                            }
+                            if (target.src.includes("api.hiverift.com")) {
+                              target.src = target.src.replace("https://api.hiverift.com", "http://localhost:7001");
                               return;
                             }
                             target.src = getBlogFallbackImage(rPost.category);

@@ -145,6 +145,10 @@ export default function BlogContent() {
                           target.src = target.src.replace("http://localhost:7001", "https://api.hiverift.com");
                           return;
                         }
+                        if (target.src.includes("api.hiverift.com")) {
+                          target.src = target.src.replace("https://api.hiverift.com", "http://localhost:7001");
+                          return;
+                        }
                         target.src = getBlogFallbackImage(post.category);
                       }}
                     />
@@ -259,6 +263,10 @@ export default function BlogContent() {
                             const target = e.target as HTMLImageElement;
                             if (target.src.includes("localhost:7001")) {
                               target.src = target.src.replace("http://localhost:7001", "https://api.hiverift.com");
+                              return;
+                            }
+                            if (target.src.includes("api.hiverift.com")) {
+                              target.src = target.src.replace("https://api.hiverift.com", "http://localhost:7001");
                               return;
                             }
                             target.src = getBlogFallbackImage(post.category);
